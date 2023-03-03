@@ -73,4 +73,8 @@ def main(n, min_depth=4):
 
 
 if __name__ == '__main__':
+    import time
+    import sys
+    t1 = time.time()
     main(int(sys.argv[1]))
+    print(time.time() - t1, file=sys.stderr)
