@@ -4,7 +4,7 @@
    contributed by Leonhard Holz
    thanks to Anthony Donnefort for the basic mapping idea
    Modified by Hyuk-Je Kwon to run 100 times
-   TODO: Issue with ExecutorService
+   TODO: Fix concurrency issues
 */
 
 import java.io.IOException;
@@ -19,8 +19,7 @@ public class revcomp
 {
    private static final byte[] map = new byte[256];      
    private static final int CHUNK_SIZE = 1024 * 1024 * 16;
-   private static final int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
-   private static final ExecutorService service = Executors.newFixedThreadPool(NUMBER_OF_CORES);
+   // private static final int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
    private static final List<byte[]> list = Collections.synchronizedList(new ArrayList<byte[]>());
 
    static {
@@ -46,6 +45,7 @@ public class revcomp
    {
       // java-100 loop inserted here:
       for (int java100Iterations = 0; java100Iterations < 100; java100Iterations++) {
+         final ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
          System.err.println("Iteration: " + java100Iterations);
 
          int read;
@@ -57,7 +57,7 @@ public class revcomp
             read = System.in.read(buffer);
             list.add(buffer);
 
-            Finder finder = new Finder(buffer, read, lastFinder);
+            Finder finder = new Finder(buffer, read, lastFinder, service);
             service.execute(finder);
             lastFinder = finder;
 
@@ -85,12 +85,16 @@ public class revcomp
       private Status status;
       private Finder previous;
       private boolean done = false;
+
+      // added for Java-100
+      private ExecutorService service;
       
-      public Finder(byte[] a, int size, Finder previous)
+      public Finder(byte[] a, int size, Finder previous, ExecutorService service)
       {
          this.a = a;
          this.size = size;
          this.previous = previous;
+         this.service = service;
       }
       
       public Status finish()

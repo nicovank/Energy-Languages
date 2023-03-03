@@ -6,7 +6,6 @@
  * contributed by Tristan Dupont
  * *reset*
  * Modified by Hyuk-Je Kwon to run 100 times
- * TODO: Deal with ExecutorService
  */
 
 import java.util.concurrent.ExecutorService;
@@ -16,12 +15,12 @@ import java.util.concurrent.TimeUnit;
 public class binarytrees {
 
     private static final int MIN_DEPTH = 4;
-    private static final ExecutorService EXECUTOR_SERVICE = 
-        Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());  // set number of threads
-
+    
     public static void main(final String[] args) throws Exception {
         // java-100 loop inserted here:
         for (int java100Iterations = 0; java100Iterations < 100; java100Iterations++) {
+            final ExecutorService EXECUTOR_SERVICE = 
+                Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());  // set number of threads
             System.err.println("Iteration: " + java100Iterations);
 
             int n = 0;
