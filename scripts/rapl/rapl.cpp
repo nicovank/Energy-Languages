@@ -1,3 +1,5 @@
+// MODIFIED BY Hyuk-Je Kwon, 11/2022 to observe RAPL differences between before and after a given system call.
+
 /* -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 /* vim: set ts=8 sts=2 et sw=2 tw=80: */
 /* This Source Code Form is subject to the terms of the Mozilla Public
@@ -210,6 +212,9 @@ typedef struct {
   uint32_t ncpus;
   core_energy_stat_t cest[];
 } pkg_energy_statistics_t;
+
+// command to test
+char* cmd;
 
 static int diagCall64(uint64_t aMode, void* aBuf) {
   // We cannot use syscall() here because it doesn't work with diagnostic
@@ -667,6 +672,54 @@ static void SigAlrmHandler(int aSigNum, siginfo_t* aInfo, void* aContext) {
   // redirected through |tee| or anything like that.
   PrintAndFlush("#%02d %s W = %s (%s + %s + %s) + %s W\n", sampleNumber++,
                 totalStr, pkgStr, coresStr, gpuStr, otherStr, ramStr);
+  // system(cmd); // call the command passed in as an argument
+}
+
+static void printResults() {
+  static int sampleNumber = 1;
+
+  double pkg_J, cores_J, gpu_J, ram_J;
+  gRapl->EnergyEstimates(pkg_J, cores_J, gpu_J, ram_J);
+
+  // We should have pkg and cores estimates, but might not have gpu and ram
+  // estimates.
+  assert(pkg_J != kUnsupported_j);
+  assert(cores_J != kUnsupported_j);
+
+  // This needs to be big enough to print watt values to two decimal places. 16
+  // should be plenty.
+  static const size_t kNumStrLen = 16;
+
+  static char pkgStr[kNumStrLen], coresStr[kNumStrLen], gpuStr[kNumStrLen],
+      ramStr[kNumStrLen];
+  NormalizeAndPrintAsWatts(pkgStr, pkg_J);
+  NormalizeAndPrintAsWatts(coresStr, cores_J);
+  NormalizeAndPrintAsWatts(gpuStr, gpu_J);
+  NormalizeAndPrintAsWatts(ramStr, ram_J);
+
+  // Core and GPU power are a subset of the package power.
+  assert(pkg_J >= cores_J + gpu_J);
+
+  // Compute "other" (i.e. rest of the package) and "total" only after the
+  // other values have been normalized.
+
+  char otherStr[kNumStrLen];
+  double other_J = pkg_J - cores_J - gpu_J;
+  NormalizeAndPrintAsWatts(otherStr, other_J);
+
+  char totalStr[kNumStrLen];
+  double total_J = pkg_J + ram_J;
+  NormalizeAndPrintAsWatts(totalStr, total_J);
+
+  gTotals_W.push_back(JoulesToWatts(total_J));
+
+  // Print and flush so that the output appears immediately even if being
+  // redirected through |tee| or anything like that.
+
+  /** NOTE: i (hyukje) changed the units from W to J, because if we only take one
+   * sample over the cmd execution, there will be no diff between W and J **/
+  PrintAndFlush("%s J total = %s pkg (%s cores + %s gpu + %s other) + %s RAM \n",
+                totalStr, pkgStr, coresStr, gpuStr, otherStr, ramStr);
 }
 
 static void Finish() {
@@ -756,7 +809,10 @@ int main(int argc, char** argv) {
   // Process command line options.
 
   gArgv0 = argv[0];
-
+  cmd = argv[1];  // get command argument
+  if (argc != 2) {
+    Abort("Should only have 1 argument (the command in quotations).");
+  }
   // Default values.
   int sampleInterval_msec = 1000;
   int sampleCount = 0;
@@ -828,47 +884,48 @@ int main(int argc, char** argv) {
 
   // Install the signal handlers.
 
-  struct sigaction sa;
-  memset(&sa, 0, sizeof(sa));
-  sa.sa_flags = SA_RESTART | SA_SIGINFO;
-  // The extra parens around (0) suppress a -Wunreachable-code warning on OS X
-  // where sigemptyset() is a macro that can never fail and always returns 0.
-  if (sigemptyset(&sa.sa_mask) < (0)) {
-    Abort("sigemptyset() failed");
-  }
-  sa.sa_sigaction = SigAlrmHandler;
-  if (sigaction(SIGALRM, &sa, NULL) < 0) {
-    Abort("sigaction(SIGALRM) failed");
-  }
-  sa.sa_sigaction = SigIntHandler;
-  if (sigaction(SIGINT, &sa, NULL) < 0) {
-    Abort("sigaction(SIGINT) failed");
-  }
+  // struct sigaction sa;
+  // memset(&sa, 0, sizeof(sa));
+  // sa.sa_flags = SA_RESTART | SA_SIGINFO;
+  // // The extra parens around (0) suppress a -Wunreachable-code warning on OS X
+  // // where sigemptyset() is a macro that can never fail and always returns 0.
+  // if (sigemptyset(&sa.sa_mask) < (0)) {
+  //   Abort("sigemptyset() failed");
+  // }
+  // sa.sa_sigaction = SigAlrmHandler;
+  // if (sigaction(SIGALRM, &sa, NULL) < 0) {
+  //   Abort("sigaction(SIGALRM) failed");
+  // }
+  // // sa.sa_sigaction = SigIntHandler;
+  // if (sigaction(SIGINT, &sa, NULL) < 0) {
+  //   Abort("sigaction(SIGINT) failed");
+  // }
 
   // Set up the timer.
-  struct itimerval timer;
-  timer.it_interval.tv_sec = sampleInterval_msec / 1000;
-  timer.it_interval.tv_usec = (sampleInterval_msec % 1000) * 1000;
-  timer.it_value = timer.it_interval;
-  if (setitimer(ITIMER_REAL, &timer, NULL) < 0) {
-    Abort("setitimer() failed");
-  }
+  // struct itimerval timer;
+  // timer.it_interval.tv_sec = sampleInterval_msec / 1000;
+  // timer.it_interval.tv_usec = (sampleInterval_msec % 1000) * 1000;
+  // timer.it_value = timer.it_interval;
+  // if (setitimer(ITIMER_REAL, &timer, NULL) < 0) {
+  //   Abort("setitimer() failed");
+  // }
 
   // Print header.
-  PrintAndFlush("    total W = _pkg_ (cores + _gpu_ + other) + _ram_ W\n");
-
+  // PrintAndFlush("    total W = _pkg_ (cores + _gpu_ + other) + _ram_ W\n");
   // Take samples.
   if (sampleCount == 0) {
-    while (true) {
-      pause();
-    }
+    // while (true) {
+      // pause();
+    // }
+    system(cmd);
+    printResults();
   } else {
     for (int i = 0; i < sampleCount; i++) {
       pause();
     }
   }
 
-  Finish();
+  // Finish();
 
   return 0;
 }
