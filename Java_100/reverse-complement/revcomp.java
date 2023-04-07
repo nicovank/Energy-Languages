@@ -4,7 +4,6 @@
    contributed by Leonhard Holz
    thanks to Anthony Donnefort for the basic mapping idea
    Modified by Hyuk-Je Kwon to run 100 times
-   TODO: Fix concurrency issues
 */
 
 import java.io.IOException;
@@ -14,6 +13,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import java.io.FileInputStream;
 
 public class revcomp
 {
@@ -45,8 +46,10 @@ public class revcomp
    {
       // java-100 loop inserted here:
       for (int java100Iterations = 0; java100Iterations < 100; java100Iterations++) {
+         list.clear();
          final ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
          System.err.println("Iteration: " + java100Iterations);
+         FileInputStream reader = new FileInputStream(args[0]);
 
          int read;
          byte[] buffer;
@@ -54,7 +57,7 @@ public class revcomp
          
          do {
             buffer = new byte[CHUNK_SIZE];
-            read = System.in.read(buffer);
+            read = reader.read(buffer);
             list.add(buffer);
 
             Finder finder = new Finder(buffer, read, lastFinder, service);
@@ -62,6 +65,8 @@ public class revcomp
             lastFinder = finder;
 
          } while (read == CHUNK_SIZE);
+         System.err.println(list.toString());
+         reader.close();
 
          Status status = lastFinder.finish();
          Mapper mapper = new Mapper(status.lastFinding, status.count - 1, status.lastMapper);

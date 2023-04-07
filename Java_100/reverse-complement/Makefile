@@ -14,7 +14,7 @@ measure:
 	sudo ../../RAPL/main "$(JAVA) revcomp 0 < ../../revcomp-input25000000.txt" Java reverse-complement
 
 run:
-	$(JAVA) revcomp 0 < ../../revcomp-input25000000.txt
+	$(JAVA) revcomp ../../revcomp-input25000000.txt 0
 
 mem:
 	/usr/bin/time -v $(JAVA) revcomp 0 < ../../revcomp-input25000000.txt

@@ -16,6 +16,8 @@ import java.util.regex.*;
 
 import static java.util.stream.Collectors.*;
 
+import java.io.FileInputStream;
+
 public class regexredux {
 
   public static void main(String[] args) throws IOException {
@@ -23,14 +25,16 @@ public class regexredux {
     for (int java100Iterations = 0; java100Iterations < 100; java100Iterations++) {
       System.err.println("Iteration: " + java100Iterations);
 
+      FileInputStream reader = new FileInputStream(args[0]);
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       {
           byte[] buf = new byte[65536];
           int count;
-          while ((count = System.in.read(buf)) > 0) {
+          while ((count = reader.read(buf)) > 0) {
               baos.write(buf, 0, count);
           }
       }
+      reader.close();
       final String input = baos.toString("US-ASCII");
 
       final int initialLength = input.length();
