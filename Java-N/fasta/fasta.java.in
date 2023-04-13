@@ -31,8 +31,8 @@ public class fasta {
     static int last = 42;
 
     public static void main(String[] args) {
-        // java-100 loop inserted here:
-        for (int java_N_Iterations = 0; java_N_Iterations < 10; java_N_Iterations++) {
+        // Number of iterations: NNNNN (will be replaced when running make)
+        for (int java_N_Iterations = 0; java_N_Iterations < NNNNN; java_N_Iterations++) {
             System.err.println("Iteration: " + java_N_Iterations);
             
             int n = 1000;

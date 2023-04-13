@@ -3,7 +3,6 @@
    http://benchmarksgame.alioth.debian.org/
 
    contributed by Francois Green
-   Modified by Hyuk-Je Kwon to run 100 times
 */
 
 import java.io.*;
@@ -21,8 +20,8 @@ import java.io.FileInputStream;
 public class regexredux {
 
   public static void main(String[] args) throws IOException {
-    // Number of iterations: 10 (will be replaced when running make)
-    for (int java_N_Iterations = 0; java_N_Iterations < 10; java_N_Iterations++) {
+    // Number of iterations: NNNNN (will be replaced when running make)
+    for (int java_N_Iterations = 0; java_N_Iterations < NNNNN; java_N_Iterations++) {
       System.err.println("Iteration: " + java_N_Iterations);
 
       FileInputStream reader = new FileInputStream(args[0]);

@@ -18,7 +18,7 @@ public class spectralnorm
     public static void main (String[] args)
     {
         // Number of iterations: 10 (will be replaced when running make)
-        for (int java_N_Iterations = 0; java_N_Iterations < 10; java_N_Iterations++) {
+        for (int java_N_Iterations = 0; java_N_Iterations < NNNNN; java_N_Iterations++) {
             System.err.println("Iteration: " + java_N_Iterations);
             int n = 1000;
             if (args.length > 0) n = Integer.parseInt (args[0]);

@@ -43,8 +43,8 @@ public class revcomp
 
    public static void main(String[] args) throws IOException
    {
-      // Number of iterations: 2 (will be replaced when running make)
-      for (int java_N_Iterations = 0; java_N_Iterations < 2; java_N_Iterations++) {
+      // Number of iterations: NNNNN (will be replaced when running make)
+      for (int java_N_Iterations = 0; java_N_Iterations < NNNNN; java_N_Iterations++) {
          // list.clear();
          final ExecutorService service = Executors.newFixedThreadPool(NUMBER_OF_CORES);
          System.err.println("Iteration: " + java_N_Iterations);

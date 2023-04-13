@@ -3,7 +3,6 @@
  * http://benchmarksgame.alioth.debian.org/
  *
  * Contributed by Oleg Mazurov, June 2010
- * Modified by Hyuk-Je Kwon to run 100 times
  * TODO: Make sure not creating zombie threads
  */
 
@@ -134,8 +133,8 @@ public final class fannkuchredux implements Runnable
 
     public static void main( String[] args )
     {
-        // Number of iterations: 10 (will be replaced when running make)
-        for (int java_N_Iterations = 0; java_N_Iterations < 10; java_N_Iterations++) {
+        // Number of iterations: NNNNN (will be replaced when running make)
+        for (int java_N_Iterations = 0; java_N_Iterations < NNNNN; java_N_Iterations++) {
             System.err.println("Iteration: " + java_N_Iterations);
 
             n = args.length > 0 ? Integer.parseInt( args[0] ) : 12;

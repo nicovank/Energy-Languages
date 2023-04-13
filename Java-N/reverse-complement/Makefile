@@ -7,6 +7,10 @@ JAVA := java
 endif
 
 compile:
+ifndef NNNNN
+	$(error NNNNN is not defined)
+endif
+	sed s/NNNNN/$(NNNNN)/ revcomp.java.in > revcomp.java
 	$(JAVAC) -d . revcomp.java
 
 measure:
