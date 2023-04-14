@@ -144,9 +144,15 @@ int main(int argc, char* argv[]) {
         previous.emplace_back(msr::sample(package));
     }
 
+    std::string args(argv[2]);
+    for (int i = 3; i < argc; ++i) {
+        args += " ";
+        args += argv[i];
+    }
+
     ioctl(fd, PERF_EVENT_IOC_ENABLE, 0);
     const auto start = Clock::now();
-    const auto status = system(argv[2]);
+    const auto status = system(args.c_str());
     const auto end = Clock::now();
     ioctl(fd, PERF_EVENT_IOC_DISABLE, 0);
 
