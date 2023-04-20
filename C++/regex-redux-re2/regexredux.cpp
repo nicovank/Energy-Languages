@@ -53,7 +53,7 @@ int main(void)
 
     len1 = str.length();
     RE2 re1(">[^\\n]+\\n|[\\n]");
-    RE2::Replace(&str, re1, "");
+    RE2::GlobalReplace(&str, re1, "");
     len2 = str.length();
 
     out = str;
@@ -75,7 +75,7 @@ int main(void)
         for (int i = 0; i < (int)(sizeof(pattern2) / sizeof(string)); i += 2)
         {
             RE2 re(pattern2[i]);
-            RE2::Replace(&out, re, pattern2[i + 1]);
+            RE2::GlobalReplace(&out, re, pattern2[i + 1]);
         }
     }
 
