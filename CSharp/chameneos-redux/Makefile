@@ -4,11 +4,11 @@ compile:
 	$(DOTNET) build build/ -c Release --no-incremental
 
 run:
-	sudo ../../RAPL/main "$(DOTNET) run -c Release --project build/ --no-build -- 6000000"
+	$(DOTNET) run -c Release --project build/ --no-build -- 6000000
 
 measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
 	sudo modprobe msr
-	sudo ../../RAPL/main "$(DOTNET) run -c Release --project build/ --no-build -- 6000000"
+	sudo ../../RAPL/main $(JSON) $(DOTNET) run -c Release --project build/ --no-build -- 6000000
