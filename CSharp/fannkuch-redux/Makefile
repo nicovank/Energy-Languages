@@ -4,8 +4,11 @@ compile:
 	$(DOTNET) build build/ -c Release --no-incremental
 
 measure:
+ifndef JSON
+	$(error JSON is not defined)
+endif
 	sudo modprobe msr
-	sudo ../../RAPL/main "$(DOTNET) run -c Release --project build/ --no-build -- 12" CSharp fannkuch-redux
+	sudo ../../scripts/RAPL/build/rapl $(JSON) $(DOTNET) run -c Release --project build/ --no-build -- 12
 
 run:
 	$(DOTNET) run -c Release --project build/ --no-build -- 12

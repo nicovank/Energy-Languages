@@ -4,8 +4,11 @@ compile:
 	$(DOTNET) build build/ -c Release --no-incremental
 
 measure:
+ifndef JSON
+	$(error JSON is not defined)
+endif
 	sudo modprobe msr
-	sudo ../../RAPL/main "$(DOTNET) run -c Release --project build/ --no-build -- 0 < ../../knucleotide-input25000000.txt" CSharp k-nucleotide
+	sudo ../../scripts/RAPL/build/rapl $(JSON) $(DOTNET) run -c Release --project build/ --no-build -- 0 < ../../knucleotide-input25000000.txt
 
 run:
 	$(DOTNET) run -c Release --project build/ --no-build -- 0 < ../../knucleotide-input25000000.txt
