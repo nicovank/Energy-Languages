@@ -3,18 +3,12 @@ compile:
 	cp regexredux.csharpcore-4.csharpcore build/Program.cs
 	$(DOTNET) build build/ -c Release --no-incremental
 
+run:
+	sudo ../../scripts/RAPL/build/rapl $(JSON) $(DOTNET) run -c Release --project build/ --no-build -- 0 < ../../regexredux-input5000000.txt
+
 measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
 	sudo modprobe msr
 	sudo ../../scripts/RAPL/build/rapl $(JSON) $(DOTNET) run -c Release --project build/ --no-build -- 0 < ../../regexredux-input5000000.txt
-
-run:
-	$(DOTNET) run -c Release --project build/ --no-build -- 0 < ../../regexredux-input5000000.txt
-
-mem:
-	/usr/bin/time -v $(DOTNET) run -c Release --project build/ --no-build -- 0 < ../../regexredux-input5000000.txt
-
-valgrind:
-	valgrind --tool=massif --stacks=yes $(DOTNET) run -c Release --project build/ --no-build -- 0 < ../../regexredux-input5000000.txt
