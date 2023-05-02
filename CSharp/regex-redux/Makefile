@@ -4,7 +4,7 @@ compile:
 	$(DOTNET) build build/ -c Release --no-incremental
 
 run:
-	sudo ../../scripts/RAPL/build/rapl $(JSON) $(DOTNET) run -c Release --project build/ --no-build -- 0 < ../../regexredux-input5000000.txt
+	$(DOTNET) run -c Release --project build/ --no-build -- 0 < ../../regexredux-input5000000.txt
 
 measure:
 ifndef JSON

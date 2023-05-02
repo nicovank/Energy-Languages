@@ -4,7 +4,7 @@ compile:
 	$(DOTNET) build build/ -c Release --no-incremental
 
 run:
-	sudo ../../scripts/RAPL/build/rapl $(JSON) $(DOTNET) run -c Release --project build/ --no-build -- 25000000
+	$(DOTNET) run -c Release --project build/ --no-build -- 25000000
 
 measure:
 ifndef JSON
