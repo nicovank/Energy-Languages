@@ -1,16 +1,17 @@
 compile:
-	cp binarytrees.csharpcore-4.csharpcore Program.cs
-	$(DOTNET) build -c Release
+	$(DOTNET) new console -o build -n build --force
+	cp binarytrees.csharpcore-4.csharpcore build/Program.cs
+	$(DOTNET) build build/ -c Release --no-incremental
 
 measure:
 	sudo modprobe msr
-	sudo ../../RAPL/main "$(DOTNET) ./bin/Release/netcoreapp1.1/tmp.dll 21" CSharp binary-trees
+	sudo ../../RAPL/main "$(DOTNET) run -c Release --project build/ --no-build -- 21" CSharp binary-trees
 
 run:
-	$(DOTNET) ./bin/Release/netcoreapp1.1/tmp.dll 21
+	$(DOTNET) run -c Release --project build/ --no-build -- 21
 
 mem:
-	/usr/bin/time -v  $(DOTNET) ./bin/Release/netcoreapp1.1/tmp.dll 21
+	/usr/bin/time -v $(DOTNET) run -c Release --project build/ --no-build -- 21
 
 valgrind:
-	valgrind --tool=massif --stacks=yes  $(DOTNET) ./bin/Release/netcoreapp1.1/tmp.dll 21
+	valgrind --tool=massif --stacks=yes $(DOTNET) run -c Release --project build/ --no-build -- 21

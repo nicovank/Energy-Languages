@@ -1,16 +1,17 @@
 compile:
-	cp mandelbrot.csharpcore-5.csharpcore Program.cs
-	$(DOTNET) build -c Release
+	$(DOTNET) new console -o build -n build --force
+	cp mandelbrot.csharpcore-5.csharpcore build/Program.cs
+	$(DOTNET) build build/ -c Release --no-incremental
 
 measure:
 	sudo modprobe msr
-	sudo ../../RAPL/main "$(DOTNET) ./bin/Release/netcoreapp1.1/tmp.dll 16000" CSharp mandelbrot
+	sudo ../../RAPL/main "$(DOTNET) run -c Release --project build/ --no-build -- 16000" CSharp mandelbrot
 
 run:
-	$(DOTNET) ./bin/Release/netcoreapp1.1/tmp.dll 16000
+	$(DOTNET) run -c Release --project build/ --no-build -- 16000
 
 mem:
-	/usr/bin/time -v $(DOTNET) ./bin/Release/netcoreapp1.1/tmp.dll 16000
+	/usr/bin/time -v $(DOTNET) run -c Release --project build/ --no-build -- 16000
 
 valgrind:
-	valgrind --tool=massif --stacks=yes $(DOTNET) ./bin/Release/netcoreapp1.1/tmp.dll 16000
+	valgrind --tool=massif --stacks=yes $(DOTNET) run -c Release --project build/ --no-build -- 16000
