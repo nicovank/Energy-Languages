@@ -49,7 +49,9 @@ if __name__ == "__main__":
     elif view == 'logscale':
         plt.xscale('log')
         plt.yscale('log')
-    plt.title('Time v. Energy per Language / Benchmark Pair')
+    plt.title(f'Time v. Energy: {view} view')
+    plt.xlabel('Time (ms)')
+    plt.ylabel('Energy (J)')
     for language in data:
         times, energies = [], []
         for benchmark in data[language]:
@@ -58,4 +60,5 @@ if __name__ == "__main__":
             energies.append(energy)
         plt.scatter(times, energies, color=STYLES[language], label=language)
     plt.legend(loc='upper left')
+    plt.savefig(f'time_v_energy_{view}.jpg')
     plt.show()
