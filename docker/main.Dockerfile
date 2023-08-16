@@ -1,35 +1,54 @@
-FROM ubuntu:22.04
+FROM ubuntu:latest
 
-VOLUME [ "/lib/modules", "/root/data" ]
+VOLUME [ "/root/data" ]
 
-WORKDIR /root
-RUN apt update
+RUN mkdir /root/Energy-Languages
+COPY . /root/Energy-Languages
 
 # General.
-RUN apt install -y git cmake ninja-build build-essential python3 python3-pip sudo curl wget pkg-config
-# C/C++ libraries. (GCC 11)
+RUN apt update
+RUN apt install -y git cmake ninja-build build-essential sudo curl wget pkg-config gpg
+RUN gpg --import /root/Energy-Languages/docker/keys/*
+
+# C/C++ libraries.
 RUN apt install -y libapr1-dev libgmp-dev libpcre3-dev libboost-regex-dev libhts-dev
-# Rust. (1.71.1)
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-RUN . "$HOME/.cargo/env"
-# Java. (OpenJDK 11)
+
+# Rust.
+# https://forge.rust-lang.org/infra/other-installation-methods.html#standalone-installers
+ARG RUST_VERSION=1.71.1
+RUN wget https://static.rust-lang.org/dist/rust-${RUST_VERSION}-x86_64-unknown-linux-gnu.tar.gz
+RUN wget https://static.rust-lang.org/dist/rust-${RUST_VERSION}-x86_64-unknown-linux-gnu.tar.gz.asc
+RUN gpg --verify rust-${RUST_VERSION}-x86_64-unknown-linux-gnu.tar.gz.asc rust-${RUST_VERSION}-x86_64-unknown-linux-gnu.tar.gz
+RUN tar -xzf rust-${RUST_VERSION}-x86_64-unknown-linux-gnu.tar.gz
+RUN ./rust-${RUST_VERSION}-x86_64-unknown-linux-gnu/install.sh
+RUN rm -rf rust-${RUST_VERSION}-x86_64-unknown-linux-gnu.tar.gz rust-${RUST_VERSION}-x86_64-unknown-linux-gnu.tar.gz.asc
+
+# Java.
 RUN apt install -y openjdk-11-jdk libfastutil-java
-# Go. (1.20.7)
-RUN wget https://go.dev/dl/go1.20.7.linux-amd64.tar.gz
-RUN rm -rf /usr/local/go && tar -C /usr/local -xzf go1.20.7.linux-amd64.tar.gz && rm go1.20.7.linux-amd64.tar.gz
+
+# Go. On version update, the checksum should also be updated.
+# https://go.dev/dl/
+ARG GO_VERSION=1.21.0
+RUN wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz
+RUN echo "d0398903a16ba2232b389fb31032ddf57cac34efda306a0eebac34f0965a0742 go${GO_VERSION}.linux-amd64.tar.gz" | sha256sum --check --status
+RUN rm -rf /usr/local/go && tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz && rm go${GO_VERSION}.linux-amd64.tar.gz
 ENV PATH=$PATH:/usr/local/go/bin
+RUN echo 'export PATH=$PATH:/usr/local/go/bin' >> /etc/profile
 
-# Energy-Languages repo
-# RUN git clone https://github.com/nicovank/Energy-Languages.git
-RUN mkdir /Energy-Languages
-WORKDIR /Energy-Languages
-COPY . .
+# Python.
+ARG PYTHON_VERSION=3.11.4
+# https://devguide.python.org/getting-started/setup-building/index.html#build-dependencies
+RUN DEBIAN_FRONTEND=noninteractive apt install -y gdb lcov libbz2-dev libffi-dev libgdbm-dev libgdbm-compat-dev liblzma-dev libncurses5-dev libreadline6-dev libsqlite3-dev libssl-dev lzma lzma-dev tk-dev uuid-dev zlib1g-dev
+RUN wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz
+RUN wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz.asc
+RUN gpg --verify Python-${PYTHON_VERSION}.tar.xz.asc Python-${PYTHON_VERSION}.tar.xz
+RUN tar -xJf Python-${PYTHON_VERSION}.tar.xz
+RUN cd Python-${PYTHON_VERSION} && ./configure --enable-optimizations --with-lto && make -j && make install
+RUN rm -rf Python-${PYTHON_VERSION}.tar.xz Python-${PYTHON_VERSION}.tar.xz.asc
 
-# Python scripts dependencies
-WORKDIR /Energy-Languages/scripts
-RUN pip install -r requirements.txt
-# Generate input
-WORKDIR /Energy-Languages
-RUN bash ./gen-input.sh
+# Python scripts dependencies.
+RUN python3 -m pip install -r /root/Energy-Languages/scripts/requirements.txt
 
-ENTRYPOINT [ "./bench.sh" ]
+WORKDIR /root/Energy-Languages
+RUN ./gen-input.sh
+ENTRYPOINT [ "./docker/bench.sh" ]
