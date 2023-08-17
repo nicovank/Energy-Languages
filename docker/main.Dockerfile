@@ -21,7 +21,7 @@ RUN wget https://static.rust-lang.org/dist/rust-${RUST_VERSION}-x86_64-unknown-l
 RUN gpg --verify rust-${RUST_VERSION}-x86_64-unknown-linux-gnu.tar.gz.asc rust-${RUST_VERSION}-x86_64-unknown-linux-gnu.tar.gz
 RUN tar -xzf rust-${RUST_VERSION}-x86_64-unknown-linux-gnu.tar.gz
 RUN ./rust-${RUST_VERSION}-x86_64-unknown-linux-gnu/install.sh
-RUN rm -rf rust-${RUST_VERSION}-x86_64-unknown-linux-gnu.tar.gz rust-${RUST_VERSION}-x86_64-unknown-linux-gnu.tar.gz.asc
+RUN rm rust-${RUST_VERSION}-x86_64-unknown-linux-gnu.tar.gz rust-${RUST_VERSION}-x86_64-unknown-linux-gnu.tar.gz.asc
 
 # Java.
 RUN apt install -y openjdk-11-jdk libfastutil-java
@@ -52,24 +52,35 @@ ARG NODE_CHECKSUM=07e76408ddb0300a6f46fcc9abc61f841acde49b45020ec4e86bb9b25df4dc
 RUN wget https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz
 RUN echo "${NODE_CHECKSUM} node-v${NODE_VERSION}-linux-x64.tar.xz" | sha256sum --check --status
 RUN tar -C /usr/local --strip-components=1 -xJf node-v${NODE_VERSION}-linux-x64.tar.xz
-RUN rm -rf node-v${NODE_VERSION}-linux-x64.tar.xz
+RUN rm node-v${NODE_VERSION}-linux-x64.tar.xz
 
 # TypeScript.
+# https://www.npmjs.com/package/typescript
 RUN TYPESCRIPT_VERSION=5.1.6
 RUN npm install -g typescript@${TYPESCRIPT_VERSION}
 
 # PHP.
+# https://www.php.net/downloads.php
+ARG PHP_VERSION=8.2.9
+ARG PHP_CHECKSUM=5fac52041335cacfb5845aeff2303f92403925338a0285f2e160feebcb840f04
+# https://github.com/php/php-src#building-php-source-code
+RUN apt install -y pkg-config build-essential autoconf bison re2c libxml2-dev libsqlite3-dev
+RUN wget https://www.php.net/distributions/php-${PHP_VERSION}.tar.gz
+RUN echo "${NODE_CHECKSUM} php-${PHP_VERSION}.tar.gz" | sha256sum --check --status
+RUN tar -xzf php-${PHP_VERSION}.tar.gz
+RUN cd php-${PHP_VERSION} && ./buildconf && ./configure && make -j && make install
+RUN rm -rf php-${PHP_VERSION}.tar.gz php-${PHP_VERSION}
 
 # Python.
 ARG PYTHON_VERSION=3.11.4
 # https://devguide.python.org/getting-started/setup-building/index.html#build-dependencies
-RUN DEBIAN_FRONTEND=noninteractive apt install -y gdb lcov libbz2-dev libffi-dev libgdbm-dev libgdbm-compat-dev liblzma-dev libncurses5-dev libreadline6-dev libsqlite3-dev libssl-dev lzma lzma-dev tk-dev uuid-dev zlib1g-dev
+RUN DEBIAN_FRONTEND=noninteractive apt install -y build-essential gdb lcov pkg-config libbz2-dev libffi-dev libgdbm-dev libgdbm-compat-dev liblzma-dev libncurses5-dev libreadline6-dev libsqlite3-dev libssl-dev lzma lzma-dev tk-dev uuid-dev zlib1g-dev
 RUN wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz
 RUN wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz.asc
 RUN gpg --verify Python-${PYTHON_VERSION}.tar.xz.asc Python-${PYTHON_VERSION}.tar.xz
 RUN tar -xJf Python-${PYTHON_VERSION}.tar.xz
 RUN cd Python-${PYTHON_VERSION} && ./configure --enable-optimizations --with-lto && make -j && make install
-RUN rm -rf Python-${PYTHON_VERSION}.tar.xz Python-${PYTHON_VERSION}.tar.xz.asc
+RUN rm -rf Python-${PYTHON_VERSION}.tar.xz Python-${PYTHON_VERSION}.tar.xz.asc Python-${PYTHON_VERSION}
 
 # Python scripts dependencies.
 RUN python3 -m pip install -r /root/Energy-Languages/scripts/requirements.txt
