@@ -26,14 +26,27 @@ RUN rm -rf rust-${RUST_VERSION}-x86_64-unknown-linux-gnu.tar.gz rust-${RUST_VERS
 # Java.
 RUN apt install -y openjdk-11-jdk libfastutil-java
 
-# Go. On version update, the checksum should also be updated.
+# Go.
 # https://go.dev/dl/
 ARG GO_VERSION=1.21.0
+ARG GO_CHECKSUM=d0398903a16ba2232b389fb31032ddf57cac34efda306a0eebac34f0965a0742
 RUN wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz
-RUN echo "d0398903a16ba2232b389fb31032ddf57cac34efda306a0eebac34f0965a0742 go${GO_VERSION}.linux-amd64.tar.gz" | sha256sum --check --status
-RUN rm -rf /usr/local/go && tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz && rm go${GO_VERSION}.linux-amd64.tar.gz
-ENV PATH=$PATH:/usr/local/go/bin
-RUN echo 'export PATH=$PATH:/usr/local/go/bin' >> /etc/profile
+RUN echo "${GO_CHECKSUM} go${GO_VERSION}.linux-amd64.tar.gz" | sha256sum --check --status
+RUN tar -C /usr/local --strip-components=1 -xzf go${GO_VERSION}.linux-amd64.tar.gz
+RUN rm go${GO_VERSION}.linux-amd64.tar.gz
+
+# C#.
+
+# Node.js.
+# https://nodejs.org/en/download
+ARG NODE_VERSION=18.17.1
+ARG NODE_CHECKSUM=07e76408ddb0300a6f46fcc9abc61f841acde49b45020ec4e86bb9b25df4dced
+RUN wget https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz
+RUN echo "${NODE_CHECKSUM} node-v${NODE_VERSION}-linux-x64.tar.xz" | sha256sum --check --status
+RUN tar -C /usr/local --strip-components=1 -xJf node-v${NODE_VERSION}-linux-x64.tar.xz
+RUN rm -rf node-v${NODE_VERSION}-linux-x64.tar.xz
+
+# PHP.
 
 # Python.
 ARG PYTHON_VERSION=3.11.4
