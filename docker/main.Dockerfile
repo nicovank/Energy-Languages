@@ -46,6 +46,10 @@ RUN echo "${NODE_CHECKSUM} node-v${NODE_VERSION}-linux-x64.tar.xz" | sha256sum -
 RUN tar -C /usr/local --strip-components=1 -xJf node-v${NODE_VERSION}-linux-x64.tar.xz
 RUN rm -rf node-v${NODE_VERSION}-linux-x64.tar.xz
 
+# TypeScript.
+RUN TYPESCRIPT_VERSION=5.1.6
+RUN npm install -g typescript@${TYPESCRIPT_VERSION}
+
 # PHP.
 
 # Python.
