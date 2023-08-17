@@ -41,6 +41,7 @@ ARG DOTNET_VERSION=7.0.400
 ARG DOTNET_URL=https://download.visualstudio.microsoft.com/download/pr/dbfe6cc7-dd82-4cec-b267-31ed988b1652/c60ab4793c3714be878abcb9aa834b63/dotnet-sdk-${DOTNET_VERSION}-linux-x64.tar.gz
 ARG DOTNET_CHECKSUM=4cfeedb8e99ffd423da7a99159ee3f31535fd142711941b8206542acb6be26638fbd9a184a5d904084ffdbd8362c83b6b2acf9d193b2cd38bf7f061443439e3c
 RUN wget ${DOTNET_URL}
+RUN echo "${DOTNET_CHECKSUM} dotnet-sdk-${DOTNET_VERSION}-linux-x64.tar.gz" | sha512sum --check --status
 RUN tar -C /usr/local/bin -xzf dotnet-sdk-${DOTNET_VERSION}-linux-x64.tar.gz
 RUN rm dotnet-sdk-${DOTNET_VERSION}-linux-x64.tar.gz
 
