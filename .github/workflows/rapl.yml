@@ -16,23 +16,16 @@ env:
   LLVM_VERSION: 16
 
 jobs:
-  rapl:
+  check-rapl:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install LLVM/Clang $LLVM_VERSION
+      - name: Install LLVM/Clang
         run: |
           sudo apt install lsb-release wget software-properties-common gnupg
           curl -sSf https://apt.llvm.org/llvm.sh | sudo bash -s -- $LLVM_VERSION all
-      
-      - name: Install IWYU
-        run: |
-          git clone https://github.com/include-what-you-use/include-what-you-use.git --branch=clang_$LLVM_VERSION --depth=1
-          cmake include-what-you-use -B include-what-you-use/build -DCMAKE_PREFIX_PATH=/usr/lib/llvm-$LLVM_VERSION
-          cmake --build include-what-you-use/build
-          sudo cmake --install include-what-you-use/build
 
       - name: g++
         run: |
@@ -40,11 +33,9 @@ jobs:
           sudo cmake $GITHUB_WORKSPACE/scripts/RAPL -B $GITHUB_WORKSPACE/scripts/RAPL/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc
           sudo cmake --build $GITHUB_WORKSPACE/scripts/RAPL/build
 
-      - name: clang++, iwyu
+      - name: clang++, clang-tidy
         run: |
           sudo rm -rf $GITHUB_WORKSPACE/scripts/RAPL/build
-          sudo cmake $GITHUB_WORKSPACE/scripts/RAPL -B $GITHUB_WORKSPACE/scripts/RAPL/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++-$LLVM_VERSION -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE=include-what-you-use
+          sudo cmake $GITHUB_WORKSPACE/scripts/RAPL -B $GITHUB_WORKSPACE/scripts/RAPL/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++-$LLVM_VERSION -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
           sudo cmake --build $GITHUB_WORKSPACE/scripts/RAPL/build
-
-      - name: clang-format
-        run: clang-format-$LLVM_VERSION $GITHUB_WORKSPACE/scripts/RAPL/src/*.cpp $GITHUB_WORKSPACE/scripts/RAPL/include/*.hpp --dry-run --Werror
+          clang-tidy-$LLVM_VERSION --quiet --warnings-as-errors="*" -p $GITHUB_WORKSPACE/scripts/RAPL/build $GITHUB_WORKSPACE/scripts/RAPL/src/*.cpp
