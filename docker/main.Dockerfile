@@ -57,7 +57,7 @@ RUN rm node-v${NODE_VERSION}-linux-x64.tar.xz
 
 # TypeScript.
 # https://www.npmjs.com/package/typescript
-RUN TYPESCRIPT_VERSION=5.1.6
+ARG TYPESCRIPT_VERSION=5.1.6
 RUN npm install -g typescript@${TYPESCRIPT_VERSION}
 
 # PHP.
