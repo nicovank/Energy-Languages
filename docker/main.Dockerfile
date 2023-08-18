@@ -3,7 +3,7 @@ FROM ubuntu:latest
 VOLUME [ "/root/data" ]
 
 RUN mkdir /root/Energy-Languages
-COPY . /root/Energy-Languages
+COPY ./docker/keys /root/Energy-Languages/docker/keys
 
 # General.
 RUN apt update
@@ -69,7 +69,7 @@ RUN apt install -y pkg-config build-essential autoconf bison re2c libxml2-dev li
 RUN wget https://www.php.net/distributions/php-${PHP_VERSION}.tar.gz
 RUN echo "${PHP_CHECKSUM} php-${PHP_VERSION}.tar.gz" | sha256sum --check
 RUN tar -xzf php-${PHP_VERSION}.tar.gz
-RUN cd php-${PHP_VERSION} && ./configure --enable-pcntl --enable-shmop --enable-sysvmsg --with-gmp && make -j && make install
+RUN cd php-${PHP_VERSION} && ./configure --enable-pcntl --enable-shmop --enable-sysvmsg --with-gmp && make && make install
 RUN rm -rf php-${PHP_VERSION}.tar.gz php-${PHP_VERSION}
 
 # Python.
@@ -84,9 +84,11 @@ RUN cd Python-${PYTHON_VERSION} && ./configure --enable-optimizations --with-lto
 RUN rm -rf Python-${PYTHON_VERSION}.tar.xz Python-${PYTHON_VERSION}.tar.xz.asc Python-${PYTHON_VERSION}
 
 # Python scripts dependencies.
+COPY ./requirements.txt /root/Energy-Languages/
 RUN python3 -m pip install -r /root/Energy-Languages/requirements.txt
 
 WORKDIR /root/Energy-Languages
+COPY . .
 RUN ./gen-input.sh
 # TODO Restore.
 # ENTRYPOINT [ "./docker/bench.sh" ]
