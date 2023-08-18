@@ -24,6 +24,7 @@ jobs:
 
       - name: g++
         run: |
+          cmake --version
           cmake --clean-first ${{github.workspace}}/scripts/RAPL -B ${{github.workspace}}/scripts/RAPL/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc
           cmake --build ${{github.workspace}}/scripts/RAPL/build
 
