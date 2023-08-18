@@ -3,10 +3,10 @@ name: RAPL
 on:
   push:
     branches: ["ci"]
-    paths: ["scripts/RAPL"]
+    paths: ["scripts/RAPL/**"]
   pull_request:
     branches: ["ci"]
-    paths: ["scripts/RAPL"]
+    paths: ["scripts/RAPL/**"]
 
 jobs:
   rapl:
