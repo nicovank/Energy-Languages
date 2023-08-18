@@ -84,7 +84,7 @@ RUN cd Python-${PYTHON_VERSION} && ./configure --enable-optimizations --with-lto
 RUN rm -rf Python-${PYTHON_VERSION}.tar.xz Python-${PYTHON_VERSION}.tar.xz.asc Python-${PYTHON_VERSION}
 
 # Python scripts dependencies.
-RUN python3 -m pip install -r /root/Energy-Languages/scripts/requirements.txt
+RUN python3 -m pip install -r /root/Energy-Languages/requirements.txt
 
 WORKDIR /root/Energy-Languages
 RUN ./gen-input.sh
