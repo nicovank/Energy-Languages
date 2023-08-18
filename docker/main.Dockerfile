@@ -2,13 +2,12 @@ FROM ubuntu:latest
 
 VOLUME [ "/root/data" ]
 
-RUN mkdir /root/Energy-Languages
-COPY ./docker/keys /root/Energy-Languages/docker/keys
-
 # General.
 RUN apt update
 RUN DEBIAN_FRONTEND=noninteractive apt install -y tzdata
 RUN apt install -y git cmake ninja-build build-essential sudo curl wget pkg-config gpg
+
+COPY docker/keys /root/Energy-Languages/docker/keys
 RUN gpg --import /root/Energy-Languages/docker/keys/*
 
 # C/C++ libraries.
@@ -84,7 +83,7 @@ RUN cd Python-${PYTHON_VERSION} && ./configure --enable-optimizations --with-lto
 RUN rm -rf Python-${PYTHON_VERSION}.tar.xz Python-${PYTHON_VERSION}.tar.xz.asc Python-${PYTHON_VERSION}
 
 # Python scripts dependencies.
-COPY ./requirements.txt /root/Energy-Languages/
+COPY requirements.txt /root/Energy-Languages/
 RUN python3 -m pip install -r /root/Energy-Languages/requirements.txt
 
 WORKDIR /root/Energy-Languages
