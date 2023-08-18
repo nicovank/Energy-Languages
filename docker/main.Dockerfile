@@ -7,6 +7,7 @@ COPY . /root/Energy-Languages
 
 # General.
 RUN apt update
+RUN DEBIAN_FRONTEND=noninteractive apt install -y tzdata
 RUN apt install -y git cmake ninja-build build-essential sudo curl wget pkg-config gpg
 RUN gpg --import /root/Energy-Languages/docker/keys/*
 
@@ -74,7 +75,7 @@ RUN rm -rf php-${PHP_VERSION}.tar.gz php-${PHP_VERSION}
 # Python.
 ARG PYTHON_VERSION=3.11.4
 # https://devguide.python.org/getting-started/setup-building/index.html#build-dependencies
-RUN DEBIAN_FRONTEND=noninteractive apt install -y build-essential gdb lcov pkg-config libbz2-dev libffi-dev libgdbm-dev libgdbm-compat-dev liblzma-dev libncurses5-dev libreadline6-dev libsqlite3-dev libssl-dev lzma lzma-dev tk-dev uuid-dev zlib1g-dev
+RUN apt install -y build-essential gdb lcov pkg-config libbz2-dev libffi-dev libgdbm-dev libgdbm-compat-dev liblzma-dev libncurses5-dev libreadline6-dev libsqlite3-dev libssl-dev lzma lzma-dev tk-dev uuid-dev zlib1g-dev
 RUN wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz
 RUN wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz.asc
 RUN gpg --verify Python-${PYTHON_VERSION}.tar.xz.asc Python-${PYTHON_VERSION}.tar.xz
