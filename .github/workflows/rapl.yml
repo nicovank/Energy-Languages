@@ -12,6 +12,9 @@ on:
      - "scripts/RAPL/**"
      - ".github/workflows/rapl.yml"
 
+env:
+  LLVM_VERSION: 16
+
 jobs:
   rapl:
     runs-on: ubuntu-latest
@@ -19,20 +22,29 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install dependencies
-        run: sudo apt install -y clang-format cmake iwyu
+      - name: Install LLVM/Clang $LLVM_VERSION
+        run: |
+          apt install lsb-release wget software-properties-common gnupg
+          curl -sSf https://apt.llvm.org/llvm.sh | bash -s -- $LLVM_VERSION all
+      
+      - name: Install IWYU
+        run: |
+          git clone https://github.com/include-what-you-use/include-what-you-use.git --branch=clang_$LLVM_VERSION --depth=1
+          cmake include-what-you-use -B include-what-you-use/build -DCMAKE_PREFIX_PATH=/usr/lib/llvm-$LLVM_VERSION
+          cmake --build include-what-you-use/build
+          cmake --install include-what-you-use/build
 
       - name: g++
         run: |
-          rm -rf ${{github.workspace}}/scripts/RAPL/build
-          cmake ${{github.workspace}}/scripts/RAPL -B ${{github.workspace}}/scripts/RAPL/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc
-          cmake --build ${{github.workspace}}/scripts/RAPL/build
+          rm -rf $GITHUB_WORKSPACE/scripts/RAPL/build
+          cmake $GITHUB_WORKSPACE/scripts/RAPL -B $GITHUB_WORKSPACE/scripts/RAPL/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc
+          cmake --build $GITHUB_WORKSPACE/scripts/RAPL/build
 
       - name: clang++, iwyu
         run: |
-          rm -rf ${{github.workspace}}/scripts/RAPL/build
-          cmake ${{github.workspace}}/scripts/RAPL -B ${{github.workspace}}/scripts/RAPL/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE=include-what-you-use
-          cmake --build ${{github.workspace}}/scripts/RAPL/build
+          rm -rf $GITHUB_WORKSPACE/scripts/RAPL/build
+          cmake $GITHUB_WORKSPACE/scripts/RAPL -B $GITHUB_WORKSPACE/scripts/RAPL/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++-$LLVM_VERSION -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE=include-what-you-use
+          cmake --build $GITHUB_WORKSPACE/scripts/RAPL/build
 
       - name: clang-format
-        run: clang-format ${{github.workspace}}/scripts/RAPL/src/*.cpp ${{github.workspace}}/scripts/RAPL/include/*.hpp --dry-run --Werror
+        run: clang-format-$LLVM_VERSION $GITHUB_WORKSPACE/scripts/RAPL/src/*.cpp $GITHUB_WORKSPACE/scripts/RAPL/include/*.hpp --dry-run --Werror
