@@ -2,12 +2,12 @@ name: RAPL
 
 on:
   push:
-    branches: ["ci"]
+    branches: ["master"]
     paths:
      - "scripts/RAPL/**"
      - ".github/workflows/rapl.yml"
   pull_request:
-    branches: ["ci"]
+    branches: ["master"]
     paths:
      - "scripts/RAPL/**"
      - ".github/workflows/rapl.yml"
