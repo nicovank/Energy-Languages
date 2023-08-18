@@ -11,7 +11,7 @@ RUN apt install -y git cmake ninja-build build-essential sudo curl wget pkg-conf
 RUN gpg --import /root/Energy-Languages/docker/keys/*
 
 # C/C++ libraries.
-RUN apt install -y libapr1-dev libgmp-dev libpcre3-dev libboost-regex-dev libhts-dev
+RUN apt install -y libapr1-dev libgmp-dev libpcre3-dev libboost-regex-dev
 
 # Rust.
 # https://forge.rust-lang.org/infra/other-installation-methods.html#standalone-installers
@@ -68,7 +68,7 @@ RUN apt install -y pkg-config build-essential autoconf bison re2c libxml2-dev li
 RUN wget https://www.php.net/distributions/php-${PHP_VERSION}.tar.gz
 RUN echo "${PHP_CHECKSUM} php-${PHP_VERSION}.tar.gz" | sha256sum --check
 RUN tar -xzf php-${PHP_VERSION}.tar.gz
-RUN cd php-${PHP_VERSION} && ./buildconf && ./configure && make -j && make install
+RUN cd php-${PHP_VERSION} && ./configure --enable-pcntl --enable-shmop --enable-sysvmsg --with-gmp && make -j && make install
 RUN rm -rf php-${PHP_VERSION}.tar.gz php-${PHP_VERSION}
 
 # Python.
