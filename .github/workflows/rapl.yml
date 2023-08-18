@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Install dependencies
-        run: sudo apt install -y clang-format cmake
+        run: sudo apt install -y clang-format cmake iwyu
 
       - name: g++
         run: |
@@ -28,10 +28,10 @@ jobs:
           cmake ${{github.workspace}}/scripts/RAPL -B ${{github.workspace}}/scripts/RAPL/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc
           cmake --build ${{github.workspace}}/scripts/RAPL/build
 
-      - name: clang++
+      - name: clang++, iwyu
         run: |
           rm -rf ${{github.workspace}}/scripts/RAPL/build
-          cmake ${{github.workspace}}/scripts/RAPL -B ${{github.workspace}}/scripts/RAPL/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang
+          cmake ${{github.workspace}}/scripts/RAPL -B ${{github.workspace}}/scripts/RAPL/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE=include-what-you-use
           cmake --build ${{github.workspace}}/scripts/RAPL/build
 
       - name: clang-format
