@@ -1,0 +1,32 @@
+name: RAPL
+
+on:
+  push:
+    branches: ["ci"]
+    paths: ["scripts/RAPL"]
+  pull_request:
+    branches: ["ci"]
+    paths: ["scripts/RAPL"]
+
+jobs:
+  rapl:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: sudo apt install -y clang-format
+
+      - name: g++
+        run: |
+          cmake --clean-first ${{github.workspace}}/scripts/RAPL -B ${{github.workspace}}/scripts/RAPL/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc
+          cmake --build ${{github.workspace}}/scripts/RAPL/build
+
+      - name: clang++
+        run: |
+          cmake --clean-first ${{github.workspace}}/scripts/RAPL -B ${{github.workspace}}/scripts/RAPL/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang
+          cmake --build ${{github.workspace}}/scripts/RAPL/build
+
+      - name: clang-format
+        run: clang-format ${{github.workspace}}/scripts/RAPL/src/*.cpp ${{github.workspace}}/scripts/RAPL/include/*.hpp --dry-run --Werror
