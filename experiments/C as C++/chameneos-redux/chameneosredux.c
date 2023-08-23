@@ -90,9 +90,7 @@ enum color_t color_complement(enum color_t c1, enum color_t c2)
 
 void print_colors()
 {
-    int color_t                c1;
-    int color_t                c2;
-    int color_t                c3;
+    int c1, c2, c3;
 
     for (c1 = color_blue; c1 <= color_yellow; c1 += 1)
     {
