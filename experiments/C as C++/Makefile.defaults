@@ -1,2 +1,2 @@
 CC := $(CXX)
-CFLAGS := -O3 -DNDEBUG -flto -march=native -mtune=native -fpermissive
+CFLAGS := -O3 -DNDEBUG -flto -march=native -mtune=native -x c++ -fpermissive
