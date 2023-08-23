@@ -67,7 +67,7 @@ if (cluster.isMaster) {
           yd
         );
 
-        byte_acc |= (sum <= limit);
+        byte_acc |= (sum <= limit ? 1 : 0);
         bit_num++;
 
         if (bit_num === 8) {
