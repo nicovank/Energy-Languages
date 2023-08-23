@@ -8,6 +8,8 @@
 
 class RandomGenerator
 {
+    last;
+
     constructor()
     {
         this.last = 42;
@@ -22,6 +24,10 @@ class RandomGenerator
 
 class StringRepeater
 {
+    remainingLength;
+    buffers;
+    bufferIndex;
+
     constructor(string, resultLength, lineLength)
     {
         this.remainingLength = (resultLength + Math.floor(resultLength / lineLength)) | 0;
@@ -85,6 +91,12 @@ class StringRepeater
 
 class DNAGenerator
 {
+    cumulativeProbs;
+    randomGenerator;
+    lineLength;
+    remainingLength;
+    buffer;
+
     constructor(probs, randomGenerator, resultLength, lineLength)
     {
         this.cumulativeProbs = DNAGenerator._makeCumulative(probs);
@@ -160,6 +172,9 @@ class DNAGenerator
 
 class Fasta
 {
+    lineLength;
+    outputStream;
+
     constructor(outputStream)
     {
         this.lineLength = 60;
@@ -178,7 +193,7 @@ class Fasta
                     if (needEol) {
                         this.outputStream.write('\n', resolve);
                     } else {
-                        resolve();
+                        resolve(undefined);
                     }
                     return;
                 }
