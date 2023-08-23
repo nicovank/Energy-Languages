@@ -4,7 +4,7 @@
    *reset* 
 */
 
-function TreeNode(left,right,item){
+function TreeNode(left,right) {
    this.left = left;
    this.right = right;
 }
