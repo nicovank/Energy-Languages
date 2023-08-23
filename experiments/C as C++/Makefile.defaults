@@ -1,1 +1,2 @@
-CFLAGS := -O3 -DNDEBUG -flto -march=native -mtune=native
+CC := $(CXX)
+CFLAGS := -O3 -DNDEBUG -flto -march=native -mtune=native -fpermissive
