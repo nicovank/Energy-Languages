@@ -1,75 +1,92 @@
-﻿/* The Computer Language Benchmarks Game
+/* The Computer Language Benchmarks Game
    http://benchmarksgame.alioth.debian.org/
 
-   contributed by Josh Goldfoot
+   Contributed by Jesse Millikan
+   Modified by Matt Baker
+   Ported, modified, and parallelized by Roman Pletnev
 */
 
-import { createInterface } from "readline";
+'use strict';
 
-class RefNum {
-    num: number;
-    constructor(n: number) {
-        this.num = n;
-    }
-}
+var rd = require('readline'), cp = require('child_process');
 
-function frequency(sequence: string, length: number): Map<string, RefNum> {
-    var freq = new Map<string, RefNum>();
-    var n = sequence.length - length + 1;
-    var sub = "";
-    var m: RefNum;
-    for (var i = 0; i < n; i++) {
-        sub = sequence.substr(i, length);
-        m = freq.get(sub);
-        if (m === undefined) {
-            freq.set(sub, new RefNum(1));
-        } else {
-            m.num += 1;
-        }
+function RefNum(num){ this.num = num; }
+RefNum.prototype.toString = function() { return this.num.toString(); }
+
+function frequency(seq, length){
+    var freq = new Map(), n = seq.length-length+1, key, cur, i = 0;
+    for(; i<n; ++i){
+        key = seq.substr(i, length);
+        cur = freq.get(key);
+        cur === undefined ? freq.set(key, new RefNum(1)) : ++cur.num;
     }
     return freq;
 }
 
-function sort(sequence: string, length: number): void {
-    var freq = frequency(sequence, length);
-    var keys = new Array<string>();
-    for (let k of freq.keys())
-        keys.push(k);
-    keys.sort((a, b) => (freq.get(b).num - freq.get(a).num));
-    var n = sequence.length - length + 1;
-    keys.forEach(key => {
-        var count = (freq.get(key).num * 100 / n).toFixed(3);
-        console.log(key + " " + count);
-    });
-    console.log("");
+function sort(seq, length){
+    var f = frequency(seq, length), keys = Array.from(f.keys()),
+        n = seq.length-length+1, res = '';
+    keys.sort((a, b)=>f.get(b)-f.get(a));
+    for (var key of keys) res +=
+        key.toUpperCase()+' '+(f.get(key)*100/n).toFixed(3)+'\n';
+    res += '\n';
+    return res;
 }
 
-function find(haystack: string, needle: string): void {
-    var freq = frequency(haystack, needle.length);
-    var m = freq.get(needle);
-    var num = m ? m.num : 0;
-    console.log(num + "\t" + needle);
+function find(seq, s){
+    var f = frequency(seq, s.length);
+    return (f.get(s) || 0)+"\t"+s.toUpperCase()+'\n';
 }
 
-function main() {
-    var sequence = "";
-    var reading = false;
-    createInterface({ input: process.stdin, output: process.stdout })
-        .on('line', line => {
-            if (reading) {
-                if (line[0] !== '>')
-                    sequence += line.toUpperCase();
-            } else
-                reading = line.substr(0, 6) === '>THREE';
-        }).on('close', () => {
-            sort(sequence, 1);
-            sort(sequence, 2);
-            find(sequence, 'GGT');
-            find(sequence, 'GGTA');
-            find(sequence, 'GGTATT');
-            find(sequence, 'GGTATTTTAATT');
-            find(sequence, 'GGTATTTTAATTTATAGT');
+function master() {
+    var workers = [];
+    for (var i=1; i<5;++i) workers.push(
+        cp.fork(__filename, [], {silent: true, env: {workerId: i}}));
+    for (var w of workers) process.stdin.pipe(w.stdin);
+    var jobs = workers.length, results = [];
+    var messageHandler = function(i){
+        return function(message){
+            results[i] = message;
+            if (!(--jobs)) {
+                process.stdout.write(results.join(''));
+                process.exit(0);
+            }
+        };
+    };
+    for (var i=0; i<workers.length; ++i)
+        workers[i].on('message', messageHandler(i));
+}
+
+function worker(){
+    var seq = '', reading = false;
+    var lineHandler = function(line){
+        if (reading) {
+            if (line[0]!=='>') seq += line;
+        } else reading = line.substr(0, 6)==='>THREE';
+    };
+    rd.createInterface(process.stdin, process.stdout)
+        .on('line', lineHandler).on('close', function() {
+            var res = '';
+            switch (process.env.workerId) {
+                case '1':
+                    res += sort(seq, 1);
+                    res += sort(seq, 2);
+                    res += find(seq, "ggt");
+                    break;
+                case '2':
+                    res += find(seq, "ggta");
+                    res += find(seq, "ggtatt");
+                    break;
+                case '3':
+                    res += find(seq, "ggtattttaatt");
+                    break;
+                case '4':
+                    res += find(seq, "ggtattttaatttatagt");
+                    break;
+            }
+            process.send(res);
+            process.exit();
         });
 }
 
-main();
+process.env.workerId ? worker() : master();

@@ -1,61 +1,52 @@
 /* The Computer Language Benchmarks Game
    http://benchmarksgame.alioth.debian.org/
-   contributed by Isaac Gouy 
+
+   contributed by Isaac Gouy, transliterated from Mike Pall's Lua program 
+   modified by Roman Pletnev
 */
 
-function fannkuch(n: number): number {
-   const perm = new Array(n), count = new Array(n)
-
-   const perm1 = new Array(n)
-   for (let i=0; i<n; i++) { perm1[i] = i }
-
-   let f = 0, i = 0, k = 0, r = 0, flips = 0, nperm = 0, checksum = 0
-
-   r = n
-   while (r > 0) {
-      i = 0
-      while (r != 1) { count[r-1] = r; r -= 1 }
-      while (i < n) { perm[i] = perm1[i]; i += 1 }
-
-      // Count flips and update max  and checksum
-      f = 0
-      k = perm[0]
-      while (k != 0) {
-         i = 0
-         while (2*i < k) {
-            const t = perm[i]; perm[i] = perm[k-i]; perm[k-i] = t
-            i += 1
-         }
-         k = perm[0]
-         f += 1
+function fannkuch(n) {
+   var p = [], q = [], s = [];
+   var sign = 1, maxflips = 0, sum = 0, m = n-1;
+   for(var i=0; i<n; i++){ p.push(i); q.push(i); s.push(i); }
+   do {
+      // Copy and flip.
+      var q0 = p[0];                                     // Cache 0th element.
+      if (q0 != 0){
+         for(var i=1; i<n; i++) q[i] = p[i];             // Work on a copy.
+         var flips = 1;
+         do { 
+            var qq = q[q0]; 
+            if (qq === 0){                               // ... until 0th element is 0.
+               sum += sign*flips;
+	       if (flips > maxflips) maxflips = flips;   // New maximum?
+               break; 
+            } 
+ 	    q[q0] = q0; 
+	    if (q0 >= 3){
+	       var i = 1, j = q0 - 1, t;
+               do { t = q[i]; q[i] = q[j]; q[j] = t; i++; j--; } while (i < j); 
+            }
+	    q0 = qq; flips++;
+         } while (true); 
       }
-      if (f > flips) { flips = f }
-      if ((nperm & 0x1) == 0) { checksum += f } else { checksum -= f }
-
-      // Use incremental change to generate another permutation
-      let go = true
-      while (go) {
-         if (r == n) {
-            console.log(checksum)
-            return flips
+      // Permute.
+      if (sign === 1){
+         var t = p[1]; p[1] = p[0]; p[0] = t; sign = -1; // Rotate 0<-1.
+      } else { 
+         var t = p[1]; p[1] = p[2]; p[2] = t; sign = 1;  // Rotate 0<-1 and 0<-1<-2.
+         for(var i=2; i<n; i++){ 
+	    var sx = s[i];
+	    if (sx != 0){ s[i] = sx-1; break; }
+	    if (i === m) return [sum,maxflips];      // Out of permutations.
+	    s[i] = i;
+	    // Rotate 0<-...<-i+1.
+	    t = p[0]; for(var j=0; j<=i; j++){ p[j] = p[j+1]; } p[i+1] = t;
          }
-         let p0 = perm1[0]
-         i = 0
-         while (i < r) {
-            const j = i+1
-            perm1[i] = perm1[j]
-            i = j
-         }
-         perm1[r] = p0
-
-         count[r] -= 1
-         if (count[r] > 0) { go = false } else { r += 1 }
       }
-      nperm += 1
-   }
-   return flips
+   } while (true);
 }
 
-
-const n = +process.argv[2]
-console.log( "Pfannkuchen(" + n + ") = " + fannkuch(n) )
+var n = +process.argv[2];
+var pf = fannkuch(n);
+console.log(pf[0] + "\n" + "Pfannkuchen(" + n + ") = " + pf[1]);

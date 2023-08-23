@@ -1,52 +1,50 @@
-/* The Computer Language Benchmarks Game
-   http://benchmarksgame.alioth.debian.org/
-   contributed by Isaac Gouy 
-*/
+// The Computer Language Benchmarks Game
+// http://benchmarksgame.alioth.debian.org/
+//
+// contributed by Ian Osgood
+// modified for Node.js by Isaac Gouy 
 
-function approximate(n: number): number {
-   let u = Array(n), v = Array(n)
-   for (let i=0; i<n; ++i) {
-      u[i] = 1.0     
-   }
-   for (let i=0; i<10; ++i) {
-      multiplyAtAv(n,u,v)
-      multiplyAtAv(n,v,u)
-   }
-   let vBv = 0.0, vv = 0.0
-   for (let i=0; i<10; ++i) {
-      vBv += u[i]*v[i]
-      vv  += v[i]*v[i]
-   }
-   return Math.sqrt(vBv/vv)
+function A(i,j) {
+  return 1/((i+j)*(i+j+1)/2+i+1);
 }
 
-function a(i,j: number): number {
-   return 1.0 / ( (i+j) * ((i+j) +1)/2 + i+1 ) 
+function Au(u,v) {
+  for (var i=0; i<u.length; ++i) {
+    var t = 0;
+    for (var j=0; j<u.length; ++j)
+      t += A(i,j) * u[j];
+    v[i] = t;
+  }
 }
 
-function multiplyAv(n: number, v: number[], av: number[]) {
-   for (let i=0; i<n-1; ++i) {
-      av[i] = 0.0
-      for (let j=0; j<n-1; ++j) {
-         av[i] += a(i,j) * v[j] 
-      }
-   }
+function Atu(u,v) {
+  for (var i=0; i<u.length; ++i) {
+    var t = 0;
+    for (var j=0; j<u.length; ++j)
+      t += A(j,i) * u[j];
+    v[i] = t;
+  }
 }
 
-function multiplyAtv(n: number, v: number[], atv: number[]) {
-   for (let i=0; i<n-1; ++i) {
-      atv[i] = 0.0
-      for (let j=0; j<n-1; ++j) {
-         atv[i] += a(j,i) * v[j] 
-      }
-   }
+function AtAu(u,v,w) {
+  Au(u,w);
+  Atu(w,v);
 }
 
-function multiplyAtAv(n: number, v: number[], atAv: number[]) {
-   let u = new Array(n) 
-   multiplyAv(n,v,u)
-   multiplyAtv(n,u,atAv)
+function spectralnorm(n) {
+  var i, u=new Float64Array(n), v=new Float64Array(n), w=new Float64Array(n), vv=0, vBv=0;
+  for (i=0; i<n; ++i) {
+    u[i] = 1; v[i] = w[i] = 0; 
+  }
+  for (i=0; i<10; ++i) {
+    AtAu(u,v,w);
+    AtAu(v,u,w);
+  }
+  for (i=0; i<n; ++i) {
+    vBv += u[i]*v[i];
+    vv  += v[i]*v[i];
+  }
+  return Math.sqrt(vBv/vv);
 }
 
-
-console.log( approximate(+process.argv[2]).toFixed(9) )
+console.log(spectralnorm(+process.argv[2]).toFixed(9));
