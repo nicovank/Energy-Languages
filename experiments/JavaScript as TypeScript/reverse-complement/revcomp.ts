@@ -99,7 +99,7 @@ function reverse(la_) {
 
 
 const LA_LEN = 30;
-const headLA = new LinkedArray();
+const headLA = new LinkedArray(undefined);
 let la = headLA;
 let lnIdx = 0;
 let lines = la.data;
@@ -128,7 +128,7 @@ function read() {
             // if have read a partial header line, read the rest of it
             if (needHeader) {
                 const headerEnds = chunk.indexOf('\n');
-                console.log(headerPartial.toString('ascii') + chunk.slice(0, headerEnds).toString('ascii'));
+                console.log(headerPartial.toString() + chunk.slice(0, headerEnds).toString('ascii'));
                 headerPartial = '';
                 chunk = chunk.slice(headerEnds);
                 needHeader = false;
