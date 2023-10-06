@@ -10,9 +10,6 @@ RUN apt install -y git cmake ninja-build build-essential sudo curl wget pkg-conf
 COPY docker/keys /root/LangeBench/docker/keys
 RUN gpg --import /root/LangeBench/docker/keys/*
 
-# C/C++ libraries.
-# RUN apt install -y 
-
 # Java.
 ARG JAVA_VERSION=11.0.20+8
 ARG JAVA_CHECKSUM=7a99258af2e3ee9047e90f1c0c1775fd6285085759501295358d934d662e01f9
