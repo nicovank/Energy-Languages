@@ -33,7 +33,7 @@ def main(args):
             ),
         )
         fig, ax = plt.subplots()
-        fig.set_size_inches(7, 5)
+        fig.set_size_inches(5, 4)
 
         for n in sorted(data.keys()):
             x = np.sort(np.array(list(data.keys())))
@@ -56,7 +56,7 @@ def main(args):
 
         if not args.no_title:
             ax.set_title(f"Runtime per iteration for {args.benchmark} (Java)")
-        ax.set_ylabel("Time [ms]")
+        ax.set_ylabel("Time per iteration [ms]")
         ax.set_xlabel("Number of iterations")
         ax.set_axisbelow(True)
         ax.set_ylim(0, ax.get_ylim()[1])
