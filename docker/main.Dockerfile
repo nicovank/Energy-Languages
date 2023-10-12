@@ -16,6 +16,8 @@ RUN apt install -y lsb-release wget software-properties-common gnupg
 RUN curl -sSf https://apt.llvm.org/llvm.sh | bash -s -- ${CLANG_VERSION} all
 ENV CC=clang-${CLANG_VERSION}
 ENV CXX=clang++-${CLANG_VERSION}
+RUN ln -s /usr/bin/llvm-ar-17 /usr/bin/llvm-ar
+RUN ln -s /usr/bin/llvm-profdata-17 /usr/bin/llvm-profdata
 
 # C/C++ libraries.
 RUN apt install -y libapr1-dev libgmp-dev libpcre3-dev libboost-regex-dev
