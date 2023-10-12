@@ -3,6 +3,8 @@ import collections
 import json
 import os
 
+from cycler import cycler
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -24,6 +26,12 @@ def main(args):
 
     plt.rcParams.update({"text.usetex": True, "font.family": "serif"})
     with plt.style.context("bmh"):
+        plt.rc(
+            "axes",
+            prop_cycle=cycler(
+                color=[plt.rcParams["axes.prop_cycle"].by_key()["color"][0]]
+            ),
+        )
         fig, ax = plt.subplots()
         fig.set_size_inches(7, 5)
 
@@ -35,8 +43,16 @@ def main(args):
             y = np.median(runtime, axis=1) / x
             sigma = np.std(runtime, axis=1) / x
 
-            ax.scatter(x, y, marker=".")
-            ax.errorbar(x, y, sigma, linestyle="", elinewidth=1, capsize=2, alpha=0.5)
+            ax.errorbar(
+                x,
+                y,
+                sigma,
+                linestyle="",
+                elinewidth=0.5,
+                capsize=2,
+                capthick=0.5,
+            )
+            ax.scatter(x, y, s=20)
 
         if not args.no_title:
             ax.set_title(f"Runtime per iteration for {args.benchmark} (Java)")
