@@ -1,14 +1,21 @@
-FROM ubuntu:latest
+FROM --platform=linux/amd64 ubuntu:latest
 
 VOLUME [ "/root/data" ]
 
 # General.
 RUN apt update
 RUN DEBIAN_FRONTEND=noninteractive apt install -y tzdata
-RUN apt install -y git cmake ninja-build build-essential sudo curl wget pkg-config gnupg
+RUN apt install -y git cmake ninja-build sudo curl wget pkg-config gnupg
 
 COPY docker/keys /root/Energy-Languages/docker/keys
 RUN gpg --import /root/Energy-Languages/docker/keys/*
+
+# C++.
+ARG CLANG_VERSION=17
+RUN apt install -y lsb-release wget software-properties-common gnupg
+RUN curl -sSf https://apt.llvm.org/llvm.sh | bash -s -- ${CLANG_VERSION} all
+ENV CC=clang-${CLANG_VERSION}
+ENV CXX=clang++-${CLANG_VERSION}
 
 # C/C++ libraries.
 RUN apt install -y libapr1-dev libgmp-dev libpcre3-dev libboost-regex-dev
