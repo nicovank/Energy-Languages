@@ -3,6 +3,8 @@ import collections
 import json
 import os
 
+from cycler import cycler
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -22,28 +24,45 @@ def main(args):
             for line in f:
                 data[n].append(json.loads(line))
 
-        x = np.sort(np.array(list(data.keys())))
-        runtime = [[r["runtime"] for r in data[n]] for n in x]
-        energy = [[r["energy"]["pkg"] for r in data[n]] for n in x]
+    plt.rcParams.update({"text.usetex": True, "font.family": "serif"})
+    with plt.style.context("bmh"):
+        plt.rc(
+            "axes",
+            prop_cycle=cycler(
+                color=[plt.rcParams["axes.prop_cycle"].by_key()["color"][0]]
+            ),
+        )
+        fig, ax = plt.subplots()
+        fig.set_size_inches(5, 4)
 
-        y = np.median(runtime, axis=1) / x
-        sigma = np.std(runtime, axis=1) / x
+        for n in sorted(data.keys()):
+            x = np.sort(np.array(list(data.keys())))
+            runtime = [[r["runtime"] for r in data[n]] for n in x]
+            energy = [[r["energy"]["pkg"] for r in data[n]] for n in x]
 
-        plt.rcParams.update({"text.usetex": True, "font.family": "serif"})
-        with plt.style.context("bmh"):
-            fig, ax = plt.subplots()
-            fig.set_size_inches(10, 7)
-            if not args.no_title:
-                ax.set_title(f"Runtime per iteration for {args.benchmark} (Java)")
+            y = np.median(runtime, axis=1) / x
+            sigma = np.std(runtime, axis=1) / x
 
-            ax.scatter(x, y, marker=".")
-            ax.errorbar(x, y, sigma, linestyle="", elinewidth=1, capsize=2, alpha=0.5)
-            ax.set_axisbelow(True)
-            ax.set_ylim(0, ax.get_ylim()[1])
-            ax.set_ylabel("Time [ms]")
-            ax.set_xlabel("Number of iterations")
+            ax.errorbar(
+                x,
+                y,
+                sigma,
+                linestyle="",
+                elinewidth=0.5,
+                capsize=2,
+                capthick=0.5,
+            )
+            ax.scatter(x, y, s=20)
 
-            plt.savefig(f"java-n.{args.benchmark}.{args.format}", format=args.format)
+        if not args.no_title:
+            ax.set_title(f"Runtime per iteration for {args.benchmark} (Java)")
+        ax.set_ylabel("Time per iteration [ms]")
+        ax.set_xlabel("Number of iterations")
+        ax.set_axisbelow(True)
+        ax.set_ylim(0, ax.get_ylim()[1])
+
+        fig.tight_layout()
+        plt.savefig(f"java-n.{args.benchmark}.{args.format}", format=args.format)
 
 
 if __name__ == "__main__":

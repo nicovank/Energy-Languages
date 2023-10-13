@@ -27,44 +27,42 @@ def main(args):
                     data[language][benchmark].append(line)
 
     benchmarks = sorted(list({b for l in data.values() for b in l.keys()}))
+    runtimes = {
+        language: {
+            benchmark: 0.001
+            * statistics.geometric_mean(
+                [r["runtime"] for r in data[language][benchmark]]
+            )
+            for benchmark in benchmarks
+            if benchmark in data[language]
+        }
+        for language in args.languages
+    }
+
+    energies = {
+        language: {
+            benchmark: statistics.geometric_mean(
+                [r["energy"]["pkg"] for r in data[language][benchmark]]
+            )
+            for benchmark in benchmarks
+            if benchmark in data[language]
+        }
+        for language in args.languages
+    }
 
     plt.rcParams.update({"text.usetex": True, "font.family": "serif"})
     with plt.style.context("bmh"):
         markers = [".", "v", "^", "<", ">", "s", "*", "x", "D", "2", "+"]
         colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 
-        runtimes = {
-            language: {
-                benchmark: 0.001
-                * statistics.geometric_mean(
-                    [r["runtime"] for r in data[language][benchmark]]
-                )
-                for benchmark in benchmarks
-                if benchmark in data[language]
-            }
-            for language in args.languages
-        }
-
-        energies = {
-            language: {
-                benchmark: 0.001
-                * statistics.geometric_mean(
-                    [r["energy"]["pkg"] for r in data[language][benchmark]]
-                )
-                for benchmark in benchmarks
-                if benchmark in data[language]
-            }
-            for language in args.languages
-        }
-
         fig, ax = plt.subplots()
-        fig.set_size_inches(10, 7)
+        fig.set_size_inches(7, 5)
         if not args.no_title:
             ax.set_title(
                 f"Energy consumed as a function of runtime for all (language, benchmark) pairs"
             )
         ax.set_xlabel("Time [s]")
-        ax.set_ylabel("Energy [kJ]")
+        ax.set_ylabel("Energy [J]")
         if args.axin_xmax:
             axins = ax.inset_axes([0.02, 0.48, 0.5, 0.5])
 
@@ -129,7 +127,7 @@ def main(args):
             handles=languages_legend_handles
             + [whitespace_handle]
             + benchmark_legend_handles,
-            prop={"size": 9},
+            prop={"size": 6},
         )
 
         fig.tight_layout()
