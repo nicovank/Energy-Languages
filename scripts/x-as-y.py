@@ -11,7 +11,7 @@ from rich.table import Table
 
 def main(args):
     data = collections.defaultdict(lambda: collections.defaultdict(list))
-    LANGUAGES = (args.x, args.experiment)
+    LANGUAGES = [args.x, args.y, args.experiment]
     for language in LANGUAGES:
         LANGUAGES_ROOT = os.path.join(args.data_root, language)
         assert os.path.isdir(LANGUAGES_ROOT), LANGUAGES_ROOT
@@ -34,6 +34,8 @@ def main(args):
     table.add_column(f"{args.x} runtime [ms]")
     table.add_column(f"{args.y} runtime [ms]")
     table.add_column("Ratio [%]")
+    table.add_column(f"Original {args.y} runtime [ms]")
+    table.add_column("Ratio [%]")
 
     runtimes = [
         [
@@ -47,6 +49,8 @@ def main(args):
         table.add_row(
             benchmark,
             f"{runtimes[0][i]:.0f}",
+            f"{runtimes[2][i]:.0f}",
+            f"{100 * runtimes[2][i] / runtimes[0][i]:.1f}",
             f"{runtimes[1][i]:.0f}",
             f"{100 * runtimes[1][i] / runtimes[0][i]:.1f}",
         )
