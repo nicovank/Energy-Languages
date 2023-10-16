@@ -42,10 +42,6 @@ def table(title, args, data, means):
         text.stylize("strike")
         table.add_row(text)
 
-    per_language_baseline = statistics.geometric_mean(
-        [m for m in means[args.baseline].values()]
-    )
-
     per_language_normalized_means = {
         language: statistics.geometric_mean(
             [
