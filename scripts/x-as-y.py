@@ -1,3 +1,4 @@
+import argparse
 import collections
 import json
 import os
@@ -7,18 +8,13 @@ import numpy as np
 from rich.console import Console
 from rich.table import Table
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA_ROOT = os.path.join(ROOT, "data", "obelix96", "default")
-X = "C"
-Y = "C++"
-LANGUAGES = [X, f"{X} as {Y}"]
 
-
-if __name__ == "__main__":
+def main(args):
     data = collections.defaultdict(lambda: collections.defaultdict(list))
+    LANGUAGES = (args.x, args.experiment)
     for language in LANGUAGES:
-        LANGUAGES_ROOT = os.path.join(DATA_ROOT, language)
-        assert os.path.isdir(LANGUAGES_ROOT)
+        LANGUAGES_ROOT = os.path.join(args.data_root, language)
+        assert os.path.isdir(LANGUAGES_ROOT), LANGUAGES_ROOT
         for benchmark in os.listdir(LANGUAGES_ROOT):
             path = os.path.join(LANGUAGES_ROOT, benchmark)
             assert os.path.isfile(path) and path.endswith(".json")
@@ -32,11 +28,11 @@ if __name__ == "__main__":
     benchmarks = [b for b in benchmarks if np.all([b in data[l] for l in LANGUAGES])]
 
     table = Table(
-        title=f"Runtime geometric mean of {X} source benchmarks compiled in {X} and {Y} modes"
+        title=f"Runtime geometric mean of {args.x} source benchmarks compiled in {args.x} and {args.y} modes"
     )
     table.add_column("Benchmark")
-    table.add_column(f"{X} runtime [ms]")
-    table.add_column(f"{Y} runtime [ms]")
+    table.add_column(f"{args.x} runtime [ms]")
+    table.add_column(f"{args.y} runtime [ms]")
     table.add_column("Ratio [%]")
 
     runtimes = [
@@ -57,3 +53,12 @@ if __name__ == "__main__":
 
     console = Console()
     console.print(table)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--data-root", type=str, required=True)
+    parser.add_argument("-x", type=str, required=True)
+    parser.add_argument("-y", type=str, required=True)
+    parser.add_argument("--experiment", type=str, required=True)
+    main(parser.parse_args())
