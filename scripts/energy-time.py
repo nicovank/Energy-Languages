@@ -56,7 +56,6 @@ def main(args):
         colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 
         fig, ax = plt.subplots()
-        fig.set_size_inches(7, 5)
         if not args.no_title:
             ax.set_title(
                 f"Energy consumed as a function of runtime for all (language, benchmark) pairs"

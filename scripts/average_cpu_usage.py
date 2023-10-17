@@ -84,7 +84,6 @@ def main(args):
         }
 
         fig, ax = plt.subplots()
-        fig.set_size_inches(10, 7)
         if not args.no_title:
             ax.set_title(
                 f"Power consumption as a function of CPU usage for all (language, benchmark) pairs"
@@ -103,20 +102,26 @@ def main(args):
                     y.append(energy_over_time_ratio[language][benchmark])
             all_xs.extend(x)
             all_ys.extend(y)
-            ax.scatter(
-                x,
-                y,
-                marker=".",
-                s=50,
-                label=language.replace("#", "\\#"),
-            )
+            # ax.scatter(
+            #     x,
+            #     y,
+            #     marker=".",
+            #     s=50,
+            #     label=language.replace("#", "\\#"),
+            # )
+        ax.scatter(
+            all_xs,
+            all_ys,
+            marker=".",
+            s=50
+        )
 
         regression = scipy.stats.linregress(all_xs, all_ys)
         print("Regression slope :", regression.slope)
         print("Regression ravlue:", regression.rvalue)
         print("Regression stderr:", regression.stderr)
 
-        ax.legend()
+        # ax.legend()
         fig.tight_layout()
         plt.savefig(f"cpu_usage.{args.format}", format=args.format)
 
