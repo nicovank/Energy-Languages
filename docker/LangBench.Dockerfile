@@ -21,12 +21,13 @@ RUN ln -s /usr/bin/llvm-ar-${CLANG_VERSION} /usr/bin/llvm-ar
 RUN ln -s /usr/bin/llvm-profdata-${CLANG_VERSION} /usr/bin/llvm-profdata
 
 # Java.
-ARG JAVA_VERSION=11.0.20+8
-ARG JAVA_CHECKSUM=7a99258af2e3ee9047e90f1c0c1775fd6285085759501295358d934d662e01f9
-RUN wget --quiet https://github.com/adoptium/temurin11-binaries/releases/download/jdk-${JAVA_VERSION}/OpenJDK11U-jdk_x64_linux_hotspot_$(echo $JAVA_VERSION | sed s/+/_/).tar.gz
-RUN echo "${JAVA_CHECKSUM} OpenJDK11U-jdk_x64_linux_hotspot_$(echo $JAVA_VERSION | sed s/+/_/).tar.gz" | sha256sum --check
-RUN tar -C /usr/local --strip-components=1 -xzf OpenJDK11U-jdk_x64_linux_hotspot_$(echo $JAVA_VERSION | sed s/+/_/).tar.gz
-RUN rm OpenJDK11U-jdk_x64_linux_hotspot_$(echo $JAVA_VERSION | sed s/+/_/).tar.gz
+ARG JAVA_VERSION=21+35
+ARG JAVA_CHECKSUM=82f64c53acaa045370d6762ebd7441b74e6fda14b464d54d1ff8ca941ec069e6
+RUN apt install -y libfastutil-java
+RUN wget --quiet https://github.com/adoptium/temurin21-binaries/releases/download/jdk-${JAVA_VERSION}/OpenJDK21U-jdk_x64_linux_hotspot_$(echo $JAVA_VERSION | sed s/+/_/).tar.gz
+RUN echo "${JAVA_CHECKSUM} OpenJDK21U-jdk_x64_linux_hotspot_$(echo $JAVA_VERSION | sed s/+/_/).tar.gz" | sha256sum --check
+RUN tar -C /usr/local --strip-components=1 -xzf OpenJDK21U-jdk_x64_linux_hotspot_$(echo $JAVA_VERSION | sed s/+/_/).tar.gz
+RUN rm OpenJDK21U-jdk_x64_linux_hotspot_$(echo $JAVA_VERSION | sed s/+/_/).tar.gz
 
 # Go.
 # https://go.dev/dl/
