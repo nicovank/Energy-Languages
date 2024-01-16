@@ -112,6 +112,14 @@ RUN tar -C /usr/local -xjf pypy${PYPY_PYTHON_VERSION}-v${PYPY_VERSION}-linux64.t
 RUN ln -s /usr/local/pypy${PYPY_PYTHON_VERSION}-v${PYPY_VERSION}-linux64/bin/pypy3 /usr/local/bin/pypy3
 RUN rm pypy${PYPY_PYTHON_VERSION}-v${PYPY_VERSION}-linux64.tar.bz2
 
+# Lua
+ARG LUA_VERSION=5.4.6
+ARG LUA_CHECKSUM=7d5ea1b9cb6aa0b59ca3dde1c6adcb57ef83a1ba8e5432c0ecd06bf439b3ad88
+RUN wget --quiet https://www.lua.org/ftp/lua-${LUA_VERSION}.tar.gz
+RUN echo "${LUA_CHECKSUM} https://www.lua.org/ftp/lua-${LUA_VERSION}.tar.gz" | sha256sum --check
+RUN cd lua-${LUA_VERSION} && make && make install
+RUN rm https://www.lua.org/ftp/lua-${LUA_VERSION}.tar.gz
+
 WORKDIR /root/Energy-Languages
 COPY . .
 RUN ./gen-input.sh
