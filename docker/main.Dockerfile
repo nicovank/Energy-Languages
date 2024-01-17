@@ -102,7 +102,7 @@ COPY requirements.txt /root/Energy-Languages/
 RUN python3 -m pip install --upgrade pip
 RUN python3 -m pip install -r /root/Energy-Languages/requirements.txt
 
-# PyPy
+# PyPy.
 ARG PYPY_VERSION=7.3.12
 ARG PYPY_PYTHON_VERSION=3.10
 ARG PYPY_CHECKSUM=6c577993160b6f5ee8cab73cd1a807affcefafe2f7441c87bd926c10505e8731
@@ -112,7 +112,7 @@ RUN tar -C /usr/local -xjf pypy${PYPY_PYTHON_VERSION}-v${PYPY_VERSION}-linux64.t
 RUN ln -s /usr/local/pypy${PYPY_PYTHON_VERSION}-v${PYPY_VERSION}-linux64/bin/pypy3 /usr/local/bin/pypy3
 RUN rm pypy${PYPY_PYTHON_VERSION}-v${PYPY_VERSION}-linux64.tar.bz2
 
-# Lua
+# Lua.
 ARG LUA_VERSION=5.4.6
 ARG LUA_CHECKSUM=7d5ea1b9cb6aa0b59ca3dde1c6adcb57ef83a1ba8e5432c0ecd06bf439b3ad88
 RUN wget --no-verbose https://www.lua.org/ftp/lua-${LUA_VERSION}.tar.gz
