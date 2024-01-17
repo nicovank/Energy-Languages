@@ -121,6 +121,12 @@ RUN tar -xzf lua-${LUA_VERSION}.tar.gz
 RUN cd lua-${LUA_VERSION} && make && make install
 RUN rm lua-${LUA_VERSION}.tar.gz
 
+# LuaJIT.
+ARG LUAJIT_BRANCH=v2.1
+RUN git clone --branch ${LUAJIT_BRANCH} --depth 1 https://luajit.org/git/luajit.git
+RUN cd luajit && make && make install
+RUN rm -rf luajit
+
 WORKDIR /root/Energy-Languages
 COPY . .
 RUN ./gen-input.sh
