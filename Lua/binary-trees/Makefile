@@ -1,14 +1,19 @@
+ifndef LUAC
+LUAC := luac
+endif
+
 ifndef LUA
 LUA := lua
 endif
 
 compile:
+	$(LUAC) -o binarytrees.luac binarytrees.lua
 
 run:
-	$(LUA) binarytrees.lua 21
+	$(LUA) binarytrees.luac 21
 
 measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../scripts/RAPL/build/rapl "$(JSON)" $(LUA) binarytrees.lua 21
+	sudo ../../scripts/RAPL/build/rapl "$(JSON)" $(LUA) binarytrees.luac 21
