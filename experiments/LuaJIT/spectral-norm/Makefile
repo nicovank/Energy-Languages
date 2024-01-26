@@ -3,12 +3,13 @@ LUAJIT := luajit
 endif
 
 compile:
+	$(LUAJIT) -b spectralnorm.lua spectralnorm.out
 
 run:
-	$(LUAJIT) spectralnorm.lua 5500
+	$(LUAJIT) spectralnorm.out 5500
 
 measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../scripts/RAPL/build/rapl "$(JSON)" $(LUAJIT) spectralnorm.lua 5500
+	sudo ../../../scripts/RAPL/build/rapl "$(JSON)" $(LUAJIT) spectralnorm.out 5500

@@ -3,12 +3,13 @@ LUAJIT := luajit
 endif
 
 compile:
+	$(LUAJIT) -b binarytrees.lua binarytrees.out
 
 run:
-	$(LUAJIT) binarytrees.lua 21
+	$(LUAJIT) binarytrees.out 21
 
 measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../scripts/RAPL/build/rapl "$(JSON)" $(LUAJIT) binarytrees.lua 21
+	sudo ../../../scripts/RAPL/build/rapl "$(JSON)" $(LUAJIT) binarytrees.out 21

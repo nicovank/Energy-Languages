@@ -3,12 +3,13 @@ LUAJIT := luajit
 endif
 
 compile:
+	$(LUAJIT) -b mandelbrot.lua mandelbrot.out
 
 run:
-	$(LUAJIT) mandelbrot.lua 16000
+	$(LUAJIT) mandelbrot.out 16000
 
 measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../scripts/RAPL/build/rapl "$(JSON)" $(LUAJIT) mandelbrot.lua 16000
+	sudo ../../../scripts/RAPL/build/rapl "$(JSON)" $(LUAJIT) mandelbrot.out 16000
