@@ -1,14 +1,19 @@
+ifndef LUAC
+LUAC := luac
+endif
+
 ifndef LUA
 LUA := lua
 endif
 
 compile:
+	$(LUAC) -o fasta.luac fasta.lua
 
 run:
-	$(LUA) fasta.lua 25000000
+	$(LUA) fasta.luac 25000000
 
 measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../scripts/RAPL/build/rapl "$(JSON)" $(LUA) fasta.lua 25000000
+	sudo ../../scripts/RAPL/build/rapl "$(JSON)" $(LUA) fasta.luac 25000000
