@@ -2,6 +2,17 @@
 
 TODO.
 
+## License
+
+The original benchmark suite, the
+[Computer Language Benchmark Game](https://benchmarksgame-team.pages.debian.net/benchmarksgame/), is under
+[BSD-3-Clause](https://salsa.debian.org/benchmarksgame-team/benchmarksgame/-/blob/master/LICENSE.md).
+
+Code from [the repository this one originally forked from](https://github.com/greensoftwarelab/Energy-Languages) is
+under [MIT](https://github.com/greensoftwarelab/Energy-Languages/blob/master/LICENSE).
+
+Any other code in this repository is under [Apache-2.0](LICENSE).
+
 ## Documentation
 
 ### Requirements
