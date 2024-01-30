@@ -1,6 +1,9 @@
 # Energy Efficiency in Programming Languages
 
-TODO.
+[Nicolas van Kempen](https://nvankempen.com), [Emery Berger](https://emeryberger.com),
+Hyuk-Je Kwon, and Dung Tuan Nguyen.
+
+This repository contains our code and experiments reproducing and investigating _[Energy efficiency across programming languages: how do energy, time, and memory relate?](https://dl.acm.org/doi/10.1145/3136014.3136031)_.
 
 ## License
 
