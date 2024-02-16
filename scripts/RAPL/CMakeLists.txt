@@ -16,6 +16,12 @@ FetchContent_Declare(
 )
 
 FetchContent_Declare(
+  benchmark
+  GIT_REPOSITORY https://github.com/google/benchmark.git
+  GIT_TAG 344117638c8ff7e239044fd0fa7085839fc03021 # v1.8.3
+)
+
+FetchContent_Declare(
     glaze
     GIT_REPOSITORY https://github.com/stephenberry/glaze.git
     GIT_TAG b99111789445dc3693c7542dabe1ee1538a39611 # v1.3.5
@@ -23,6 +29,10 @@ FetchContent_Declare(
 
 message(STATUS "Downloading and configuring argparse")
 FetchContent_MakeAvailable(argparse)
+
+message(STATUS "Downloading and configuring Benchmark")
+set(BENCHMARK_ENABLE_TESTING OFF)
+FetchContent_MakeAvailable(benchmark)
 
 message(STATUS "Downloading and configuring Glaze")
 FetchContent_MakeAvailable(glaze)
@@ -57,11 +67,12 @@ target_compile_options(idle PRIVATE -Wall -Wextra -Wpedantic -Werror)
 target_link_libraries(idle PRIVATE rapl_lib)
 target_link_libraries(idle PRIVATE Threads::Threads)
 
-add_executable(benchmark src/benchmark.cpp)
-target_compile_options(benchmark PRIVATE -Wall -Wextra -Wpedantic -Werror)
-target_link_libraries(benchmark PRIVATE argparse)
-target_link_libraries(benchmark PRIVATE rapl_lib)
-target_link_libraries(benchmark PRIVATE Threads::Threads)
+add_executable(microbenchmark src/benchmark.cpp)
+target_compile_options(microbenchmark PRIVATE -Wall -Wextra -Wpedantic -Werror)
+target_link_libraries(microbenchmark PRIVATE argparse)
+target_link_libraries(microbenchmark PRIVATE benchmark)
+target_link_libraries(microbenchmark PRIVATE rapl_lib)
+target_link_libraries(microbenchmark PRIVATE Threads::Threads)
 
 check_ipo_supported(RESULT IPO_SUPPORTED)
 if(IPO_SUPPORTED)
@@ -69,7 +80,7 @@ if(IPO_SUPPORTED)
     set_property(TARGET rapl_lib PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
     set_property(TARGET rapl PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
     set_property(TARGET idle PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
-    set_property(TARGET benchmark PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+    set_property(TARGET microbenchmark PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 else()
     message(DEBUG "IPO/LTO is not supported")
 endif()
