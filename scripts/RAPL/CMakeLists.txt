@@ -10,10 +10,19 @@ set(CMAKE_CXX_STANDARD 20)
 find_package(Threads REQUIRED)
 
 FetchContent_Declare(
+  argparse
+  GIT_REPOSITORY https://github.com/p-ranav/argparse.git
+  GIT_TAG af442b4da0cd7a07b56fa709bd16571889dc7fda # v3.0
+)
+
+FetchContent_Declare(
     glaze
     GIT_REPOSITORY https://github.com/stephenberry/glaze.git
     GIT_TAG b99111789445dc3693c7542dabe1ee1538a39611 # v1.3.5
 )
+
+message(STATUS "Downloading and configuring argparse")
+FetchContent_MakeAvailable(argparse)
 
 message(STATUS "Downloading and configuring Glaze")
 FetchContent_MakeAvailable(glaze)
@@ -48,12 +57,19 @@ target_compile_options(idle PRIVATE -Wall -Wextra -Wpedantic -Werror)
 target_link_libraries(idle PRIVATE rapl_lib)
 target_link_libraries(idle PRIVATE Threads::Threads)
 
+add_executable(benchmark src/benchmark.cpp)
+target_compile_options(benchmark PRIVATE -Wall -Wextra -Wpedantic -Werror)
+target_link_libraries(benchmark PRIVATE argparse)
+target_link_libraries(benchmark PRIVATE rapl_lib)
+target_link_libraries(benchmark PRIVATE Threads::Threads)
+
 check_ipo_supported(RESULT IPO_SUPPORTED)
 if(IPO_SUPPORTED)
     message(DEBUG "Enabling IPO/LTO")
     set_property(TARGET rapl_lib PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
     set_property(TARGET rapl PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
     set_property(TARGET idle PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+    set_property(TARGET benchmark PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 else()
     message(DEBUG "IPO/LTO is not supported")
 endif()
