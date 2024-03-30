@@ -38,11 +38,11 @@ int perf_event_open(struct perf_event_attr* attr, pid_t pid, int cpu, int group_
 }
 
 // Cache event only, TODO later.
-struct Event {
-    explicit Event(std::uint64_t config) {
+struct CountingEvent {
+    explicit CountingEvent(std::uint32_t type, std::uint64_t config) {
         struct perf_event_attr attr;
         std::memset(&attr, 0, sizeof(struct perf_event_attr));
-        attr.type = PERF_TYPE_HW_CACHE;
+        attr.type = type;
         attr.size = sizeof(struct perf_event_attr);
         attr.config = config;
         attr.disabled = 1;
@@ -56,14 +56,14 @@ struct Event {
         assert(fd != -1);
     }
 
-    ~Event() {
+    ~CountingEvent() {
         close(fd);
     }
 
-    Event(const Event&) = delete;
-    Event(Event&&) = default;
-    Event& operator=(const Event&) = delete;
-    Event& operator=(Event&&) = default;
+    CountingEvent(const CountingEvent&) = delete;
+    CountingEvent(CountingEvent&&) = default;
+    CountingEvent& operator=(const CountingEvent&) = delete;
+    CountingEvent& operator=(CountingEvent&&) = default;
 
     void reset() {
         const auto status = ioctl(fd, PERF_EVENT_IOC_RESET, 0);
@@ -95,10 +95,10 @@ struct Event {
 struct EventGroup {
     // EventGroup(std::vector<Event> events) : events(std::move(events)) {}
 
-    EventGroup(std::vector<std::uint64_t> configs) {
-        events.reserve(configs.size());
-        for (const auto& config : configs) {
-            events.emplace_back(config);
+    EventGroup(std::vector<std::pair<std::uint32_t, std::uint64_t>> definitions) {
+        events.reserve(definitions.size());
+        for (const auto& [type, config] : definitions) {
+            events.emplace_back(type, config);
         }
     }
 
@@ -130,7 +130,7 @@ struct EventGroup {
     }
 
   private:
-    std::vector<Event> events;
+    std::vector<CountingEvent> events;
 };
 } // namespace perf
 
@@ -177,11 +177,14 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
-    auto group = perf::EventGroup(
-        {PERF_COUNT_HW_CACHE_LL | (PERF_COUNT_HW_CACHE_OP_READ << 8) | (PERF_COUNT_HW_CACHE_RESULT_MISS << 16),
-         PERF_COUNT_HW_CACHE_LL | (PERF_COUNT_HW_CACHE_OP_READ << 8) | (PERF_COUNT_HW_CACHE_RESULT_ACCESS << 16),
-         PERF_COUNT_HW_CACHE_LL | (PERF_COUNT_HW_CACHE_OP_WRITE << 8) | (PERF_COUNT_HW_CACHE_RESULT_MISS << 16),
-         PERF_COUNT_HW_CACHE_LL | (PERF_COUNT_HW_CACHE_OP_WRITE << 8) | (PERF_COUNT_HW_CACHE_RESULT_ACCESS << 16)});
+    auto group = perf::EventGroup({{PERF_TYPE_HW_CACHE, PERF_COUNT_HW_CACHE_LL | (PERF_COUNT_HW_CACHE_OP_READ << 8)
+                                                            | (PERF_COUNT_HW_CACHE_RESULT_MISS << 16)},
+                                   {PERF_TYPE_HW_CACHE, PERF_COUNT_HW_CACHE_LL | (PERF_COUNT_HW_CACHE_OP_READ << 8)
+                                                            | (PERF_COUNT_HW_CACHE_RESULT_ACCESS << 16)},
+                                   {PERF_TYPE_HW_CACHE, PERF_COUNT_HW_CACHE_LL | (PERF_COUNT_HW_CACHE_OP_WRITE << 8)
+                                                            | (PERF_COUNT_HW_CACHE_RESULT_MISS << 16)},
+                                   {PERF_TYPE_HW_CACHE, PERF_COUNT_HW_CACHE_LL | (PERF_COUNT_HW_CACHE_OP_WRITE << 8)
+                                                            | (PERF_COUNT_HW_CACHE_RESULT_ACCESS << 16)}});
 
     // Note: This should be greater than the L3 cache size
     // memory = std::make_unique<std::vector<std::uint8_t>>(1'000'000'000);
