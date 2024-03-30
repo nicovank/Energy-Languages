@@ -12,30 +12,41 @@ on:
      - "scripts/RAPL/**"
      - ".github/workflows/rapl.yml"
 
-env:
-  LLVM_VERSION: 17
-
 jobs:
   check-rapl:
+    strategy:
+      matrix:
+        build-type: [Debug, Release]
+
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install LLVM/Clang
+      - name: Install gcc/g++ 12
+        run: sudo apt install -y gcc-12 g++-12
+
+      - name: Install LLVM/Clang 17
         run: |
           sudo apt install -y lsb-release wget software-properties-common gnupg
-          curl -sSf https://apt.llvm.org/llvm.sh | sudo bash -s -- $LLVM_VERSION all
+          curl -sSf https://apt.llvm.org/llvm.sh | sudo bash -s -- 17 all
 
       - name: g++
         run: |
-          rm -rf $GITHUB_WORKSPACE/scripts/RAPL/build
-          cmake $GITHUB_WORKSPACE/scripts/RAPL -B $GITHUB_WORKSPACE/scripts/RAPL/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc
-          cmake --build $GITHUB_WORKSPACE/scripts/RAPL/build
+          rm -rf scripts/RAPL/build
+          cmake scripts/RAPL -B scripts/RAPL/build -DCMAKE_BUILD_TYPE=${{matrix.build-type}} -DCMAKE_C_COMPILER=gcc-12 -DCMAKE_CXX_COMPILER=g++-12
+          cmake --build scripts/RAPL/build --parallel
 
-      - name: clang++, clang-tidy
+      - name: clang++
         run: |
-          rm -rf $GITHUB_WORKSPACE/scripts/RAPL/build
-          cmake $GITHUB_WORKSPACE/scripts/RAPL -B $GITHUB_WORKSPACE/scripts/RAPL/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++-$LLVM_VERSION -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-          cmake --build $GITHUB_WORKSPACE/scripts/RAPL/build
-          clang-tidy-$LLVM_VERSION --quiet --warnings-as-errors="*" -p $GITHUB_WORKSPACE/scripts/RAPL/build $GITHUB_WORKSPACE/scripts/RAPL/src/*.cpp
+          rm -rf scripts/RAPL/build
+          cmake scripts/RAPL -B scripts/RAPL/build -DCMAKE_BUILD_TYPE=${{matrix.build-type}} -DCMAKE_C_COMPILER=clang-17 -DCMAKE_CXX_COMPILER=clang++-17 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          cmake --build scripts/RAPL/build --parallel
+      
+      - name: clang-format
+        if: ${{ matrix.build-type == 'Debug' }}
+        run: find scripts/RAPL/cmake scripts/RAPL/include scripts/RAPL/src -name '*.cpp' -o -name '*.h' -o -name '*.hpp'  | xargs clang-format-17 --dry-run --Werror
+
+      - name: clang-tidy
+        if: ${{ matrix.build-type == 'Debug' }}
+        run: find scripts/RAPL/src -name '*.cpp' | xargs clang-tidy-17 -p scripts/RAPL/build --warnings-as-errors='*'
