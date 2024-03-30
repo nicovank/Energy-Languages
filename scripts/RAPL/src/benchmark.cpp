@@ -195,16 +195,13 @@ int main(int argc, char** argv) {
     group.reset();
     group.enable();
 
-    if (cores == 1) {
-        work(std::chrono::seconds(duration));
-    } else {
-        std::vector<std::thread> threads;
-        for (std::uint8_t i = 0; i < cores; ++i) {
-            threads.emplace_back(work, std::chrono::seconds(duration));
-        }
-        for (auto& thread : threads) {
-            thread.join();
-        }
+    std::vector<std::thread> threads;
+    for (std::uint8_t i = 0; i < cores - 1; ++i) {
+        threads.emplace_back(work, std::chrono::seconds(duration));
+    }
+    work(std::chrono::seconds(duration));
+    for (auto& thread : threads) {
+        thread.join();
     }
 
     group.disable();
