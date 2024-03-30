@@ -66,23 +66,23 @@ struct CountingEvent {
     CountingEvent& operator=(CountingEvent&&) = default;
 
     void reset() {
-        const auto status = ioctl(fd, PERF_EVENT_IOC_RESET, 0);
+        [[maybe_unused]] const auto status = ioctl(fd, PERF_EVENT_IOC_RESET, 0);
         assert(status == 0);
     }
 
     void enable() {
-        const auto status = ioctl(fd, PERF_EVENT_IOC_ENABLE, 0);
+        [[maybe_unused]] const auto status = ioctl(fd, PERF_EVENT_IOC_ENABLE, 0);
         assert(status == 0);
     }
 
     void disable() {
-        const auto status = ioctl(fd, PERF_EVENT_IOC_DISABLE, 0);
+        [[maybe_unused]] const auto status = ioctl(fd, PERF_EVENT_IOC_DISABLE, 0);
         assert(status == 0);
     }
 
     std::uint64_t read() const {
         std::uint64_t count;
-        const auto status = ::read(fd, &count, sizeof(std::uint64_t));
+        [[maybe_unused]] const auto status = ::read(fd, &count, sizeof(std::uint64_t));
         assert(status == sizeof(std::uint64_t));
         return count;
     }
