@@ -184,7 +184,9 @@ int main(int argc, char** argv) {
                                    {PERF_TYPE_HW_CACHE, PERF_COUNT_HW_CACHE_LL | (PERF_COUNT_HW_CACHE_OP_WRITE << 8)
                                                             | (PERF_COUNT_HW_CACHE_RESULT_MISS << 16)},
                                    {PERF_TYPE_HW_CACHE, PERF_COUNT_HW_CACHE_LL | (PERF_COUNT_HW_CACHE_OP_WRITE << 8)
-                                                            | (PERF_COUNT_HW_CACHE_RESULT_ACCESS << 16)}});
+                                                            | (PERF_COUNT_HW_CACHE_RESULT_ACCESS << 16)},
+                                   {PERF_TYPE_HARDWARE, PERF_COUNT_HW_CPU_CYCLES},
+                                   {PERF_TYPE_HARDWARE, PERF_COUNT_HW_REF_CPU_CYCLES}});
 
     // Note: This should be greater than the L3 cache size
     // memory = std::make_unique<std::vector<std::uint8_t>>(1'000'000'000);
@@ -206,12 +208,11 @@ int main(int argc, char** argv) {
 
     group.disable();
     const auto counts = group.read();
+
     std::cout << "llc-read-misses    : " << counts[0] << std::endl;
     std::cout << "llc-read-accesses  : " << counts[1] << std::endl;
     std::cout << "llc-write-misses   : " << counts[2] << std::endl;
     std::cout << "llc-write-accesses : " << counts[3] << std::endl;
-    std::cout << "llc-read-miss-rate : " << 100 * static_cast<double>(counts[0]) / static_cast<double>(counts[1])
-              << std::endl;
-    std::cout << "llc-write-miss-rate: " << 100 * static_cast<double>(counts[2]) / static_cast<double>(counts[3])
-              << std::endl;
+    std::cout << "cpu-cycles         : " << counts[4] << std::endl;
+    std::cout << "ref-cpu-cycles     : " << counts[5] << std::endl;
 }
