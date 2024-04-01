@@ -209,10 +209,10 @@ int main(int argc, char** argv) {
     group.disable();
     const auto counts = group.read();
 
-    std::cout << "llc-read-misses    : " << counts[0] << std::endl;
-    std::cout << "llc-read-accesses  : " << counts[1] << std::endl;
-    std::cout << "llc-write-misses   : " << counts[2] << std::endl;
-    std::cout << "llc-write-accesses : " << counts[3] << std::endl;
-    std::cout << "cpu-cycles         : " << counts[4] << std::endl;
-    std::cout << "ref-cpu-cycles     : " << counts[5] << std::endl;
+    std::cout << "llc-read-misses    : " << counts.at(0) << std::endl;
+    std::cout << "llc-read-accesses  : " << counts.at(1) << std::endl;
+    std::cout << "llc-write-misses   : " << counts.at(2) << std::endl;
+    std::cout << "llc-write-accesses : " << counts.at(3) << std::endl;
+    std::cout << "cpu-cycles         : " << counts.at(4) << std::endl;
+    std::cout << "ref-cpu-cycles     : " << counts.at(5) << std::endl;
 }
