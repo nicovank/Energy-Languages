@@ -188,7 +188,7 @@ void perf::Group::reset() {
     }
 }
 
-bool perf::Group::isEnabled() {
+bool perf::Group::isEnabled() const {
     return enabled;
 }
 
