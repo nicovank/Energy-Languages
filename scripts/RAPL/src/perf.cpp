@@ -3,6 +3,7 @@
 #include <cassert>
 #include <cstring>
 #include <iostream>
+#include <string>
 
 #include <linux/perf_event.h>
 #include <sys/ioctl.h>
