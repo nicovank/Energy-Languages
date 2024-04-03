@@ -1,8 +1,9 @@
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <iostream>
-#include <memory>
+#include <random>
 #include <thread>
 #include <vector>
 
@@ -21,15 +22,21 @@
 #error "This tool requires MSR PKG domain support"
 #endif
 
-static std::unique_ptr<std::vector<std::uint8_t>> memory;
+#define CACHE_LINE_SIZE sysconf(_SC_LEVEL3_CACHE_LINESIZE)
+#define LL_CACHE_SIZE sysconf(_SC_LEVEL3_CACHE_SIZE)
 
-void work(std::chrono::seconds duration) {
+void work(std::chrono::seconds duration, std::vector<std::uint8_t> memory) {
+    std::uint64_t sum = 0;
+    std::size_t index = 0;
     auto start = std::chrono::high_resolution_clock::now();
     while (std::chrono::high_resolution_clock::now() - start < duration) {
         for (int i = 0; i < 1'000; ++i) {
-            benchmark::DoNotOptimize(i);
+            index += CACHE_LINE_SIZE;
+            sum += memory[index % memory.size()];
+            memory[index % memory.size()] = index;
         }
     }
+    benchmark::DoNotOptimize(sum);
 }
 
 namespace perf {
@@ -163,9 +170,9 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
-    auto cores = program.get<std::uint8_t>("cores");
-    auto duration = program.get<std::uint64_t>("duration");
-    auto misses = program.get<double>("percentage-misses");
+    const auto cores = program.get<std::uint8_t>("cores");
+    const auto duration = program.get<std::uint64_t>("duration");
+    const auto misses = program.get<double>("percentage-misses");
 
     if (cores == 0) {
         std::cerr << "[ERROR] Can't run a benchmark on zero cores." << std::endl;
@@ -175,6 +182,16 @@ int main(int argc, char** argv) {
     if (misses < 0 || misses > 1) {
         std::cerr << "[ERROR] Invalid cache miss percentage." << std::endl;
         return EXIT_FAILURE;
+    }
+
+    auto generator = std::default_random_engine(std::random_device()());
+
+    std::cout << "[INFO] Creating scratch memory..." << std::endl;
+    auto memory = std::vector<std::vector<std::uint8_t>>(cores, std::vector<std::uint8_t>(LL_CACHE_SIZE));
+    for (auto& buffer : memory) {
+        for (auto& byte : buffer) {
+            byte = std::uniform_int_distribution<std::uint8_t>()(generator);
+        }
     }
 
     auto group = perf::EventGroup({{PERF_TYPE_HW_CACHE, PERF_COUNT_HW_CACHE_LL | (PERF_COUNT_HW_CACHE_OP_READ << 8)
@@ -188,20 +205,16 @@ int main(int argc, char** argv) {
                                    {PERF_TYPE_HARDWARE, PERF_COUNT_HW_CPU_CYCLES},
                                    {PERF_TYPE_HARDWARE, PERF_COUNT_HW_REF_CPU_CYCLES}});
 
-    // Note: This should be greater than the L3 cache size
-    // memory = std::make_unique<std::vector<std::uint8_t>>(1'000'000'000);
-    // for (int i = 0; i < 1'000'000'000; ++i) {
-    //     memory->at(i) = i;
-    // }
+    std::cout << "[INFO] Starting benchmark..." << std::endl;
 
     group.reset();
     group.enable();
 
     std::vector<std::thread> threads;
     for (std::uint8_t i = 0; i < cores - 1; ++i) {
-        threads.emplace_back(work, std::chrono::seconds(duration));
+        threads.emplace_back(work, std::chrono::seconds(duration), std::move(memory.at(i)));
     }
-    work(std::chrono::seconds(duration));
+    work(std::chrono::seconds(duration), std::move(memory.back()));
     for (auto& thread : threads) {
         thread.join();
     }
