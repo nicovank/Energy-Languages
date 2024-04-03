@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
     program.add_argument("-p")
         .required()
         .help("the probability of taking the true branch")
-        .metavar("N")
+        .metavar("P")
         .scan<'g', double>();
 
     try {
