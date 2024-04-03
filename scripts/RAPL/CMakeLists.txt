@@ -22,6 +22,12 @@ FetchContent_Declare(
 )
 
 FetchContent_Declare(
+  fmt
+  GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+  GIT_TAG e69e5f977d458f2650bb346dadf2ad30c5320281 # 10.2.1
+)
+
+FetchContent_Declare(
     glaze
     GIT_REPOSITORY https://github.com/stephenberry/glaze.git
     GIT_TAG b99111789445dc3693c7542dabe1ee1538a39611 # v1.3.5
@@ -33,6 +39,9 @@ FetchContent_MakeAvailable(argparse)
 message(STATUS "Downloading and configuring Benchmark")
 set(BENCHMARK_ENABLE_TESTING OFF)
 FetchContent_MakeAvailable(benchmark)
+
+message(STATUS "Downloading and configuring {fmt}")
+FetchContent_MakeAvailable(fmt)
 
 message(STATUS "Downloading and configuring Glaze")
 FetchContent_MakeAvailable(glaze)
@@ -78,8 +87,8 @@ add_executable(benchmark_prediction src/benchmarks/prediction.cpp)
 target_compile_options(benchmark_prediction PRIVATE -Wall -Wextra -Wpedantic -Werror)
 target_link_libraries(benchmark_prediction PRIVATE argparse)
 target_link_libraries(benchmark_prediction PRIVATE benchmark)
+target_link_libraries(benchmark_prediction PRIVATE fmt)
 target_link_libraries(benchmark_prediction PRIVATE rapl_lib)
-target_link_libraries(benchmark_prediction PRIVATE Threads::Threads)
 
 check_ipo_supported(RESULT IPO_SUPPORTED)
 if(IPO_SUPPORTED)

@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <chrono>
 #include <cstdint>
 #include <deque>
 #include <iostream>
@@ -6,6 +8,7 @@
 
 #include <argparse/argparse.hpp>
 #include <benchmark/benchmark.h>
+#include <fmt/core.h>
 
 int main(int argc, char** argv) {
     auto program = argparse::ArgumentParser("benchmark", "", argparse::default_arguments::help);
@@ -53,6 +56,8 @@ int main(int argc, char** argv) {
     std::generate(conditions.begin(), conditions.end(),
                   [p, &generator]() { return std::bernoulli_distribution(p)(generator); });
 
+    const auto start = std::chrono::high_resolution_clock::now();
+
     std::uint64_t sum = 0;
     for (std::uint64_t i = 0; i < iterations; ++i) {
         if (conditions[i]) {
@@ -67,6 +72,9 @@ int main(int argc, char** argv) {
             }
         }
     }
-
     benchmark::DoNotOptimize(sum);
+
+    const auto end = std::chrono::high_resolution_clock::now();
+    const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    fmt::println("Duration: {} ms", duration);
 }
