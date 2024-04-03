@@ -22,7 +22,7 @@ struct Group {
     void disable();
     void reset();
 
-    bool isEnabled();
+    bool isEnabled() const;
 
     std::vector<std::uint64_t> read() const;
 
