@@ -130,10 +130,6 @@ perf::Group::Group(const std::vector<std::pair<int, int>>& events) {
         std::cerr << "perf_event_open failed for event " << perf::toString(pe.type, pe.config) << std::endl;
         exit(EXIT_FAILURE);
     }
-    if (ioctl(leader, PERF_EVENT_IOC_RESET, PERF_IOC_FLAG_GROUP)) {
-        std::cerr << "ioctl(RESET) failed for event " << perf::toString(pe.type, pe.config) << std::endl;
-        exit(EXIT_FAILURE);
-    }
     descriptors.push_back(leader);
 
     for (std::size_t i = 1; i < events.size(); ++i) {
@@ -143,14 +139,11 @@ perf::Group::Group(const std::vector<std::pair<int, int>>& events) {
         pe.type = events[i].first;
         pe.config = events[i].second;
         pe.inherit = 1;
+        pe.disabled = 1;
 
         const auto fd = syscall(SYS_perf_event_open, &pe, 0, -1, leader, 0);
         if (fd == -1) {
             std::cerr << "perf_event_open failed for event " << perf::toString(pe.type, pe.config) << std::endl;
-            exit(EXIT_FAILURE);
-        }
-        if (ioctl(fd, PERF_EVENT_IOC_RESET, PERF_IOC_FLAG_GROUP)) {
-            std::cerr << "ioctl(RESET) failed for event " << perf::toString(pe.type, pe.config) << std::endl;
             exit(EXIT_FAILURE);
         }
         descriptors.push_back(fd);
