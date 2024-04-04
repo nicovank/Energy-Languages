@@ -1,3 +1,5 @@
+#include <linux/perf_event.h>
+
 #include <algorithm>
 #include <chrono>
 #include <cstdint>
@@ -9,6 +11,8 @@
 #include <argparse/argparse.hpp>
 #include <benchmark/benchmark.h>
 #include <fmt/core.h>
+
+#include <perf.hpp>
 
 int main(int argc, char** argv) {
     auto program = argparse::ArgumentParser("benchmark", "", argparse::default_arguments::help);
@@ -56,6 +60,13 @@ int main(int argc, char** argv) {
     std::generate(conditions.begin(), conditions.end(),
                   [p, &generator]() { return std::bernoulli_distribution(p)(generator); });
 
+    const std::vector<std::pair<int, int>> events = {{PERF_TYPE_HARDWARE, PERF_COUNT_HW_CPU_CYCLES},
+                                                     {PERF_TYPE_HARDWARE, PERF_COUNT_HW_BRANCH_INSTRUCTIONS},
+                                                     {PERF_TYPE_HARDWARE, PERF_COUNT_HW_BRANCH_MISSES}};
+    perf::Group group(events);
+    group.reset();
+
+    group.enable();
     const auto start = std::chrono::high_resolution_clock::now();
 
     std::uint64_t sum = 0;
@@ -75,6 +86,12 @@ int main(int argc, char** argv) {
     benchmark::DoNotOptimize(sum);
 
     const auto end = std::chrono::high_resolution_clock::now();
+    group.disable();
+
     const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    fmt::println("Duration: {} ms", duration);
+    const auto counters = group.read();
+    fmt::println("Duration : {} ms", duration);
+    fmt::println("Cycles   : {}", counters[0]);
+    fmt::println("Branches : {}", counters[1]);
+    fmt::println("Miss rate: {:.2f} %", 100 * static_cast<double>(counters[2]) / static_cast<double>(counters[1]));
 }
