@@ -1,12 +1,12 @@
-#include <rapl.hpp>
+#include <rapl/rapl.hpp>
 
 #include <cmath>
 #include <vector>
 
 #include <unistd.h>
 
-#include <cpu.hpp>
-#include <msr.hpp>
+#include <rapl/cpu.hpp>
+#include <rapl/msr.hpp>
 
 namespace {
 double getEnergyUnitForPackage(int package) {

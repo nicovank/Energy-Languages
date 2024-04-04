@@ -4,8 +4,8 @@
 #include <thread>
 #include <vector>
 
-#include <cpu.hpp>
-#include <rapl.hpp>
+#include <rapl/cpu.hpp>
+#include <rapl/rapl.hpp>
 
 using Clock = std::chrono::high_resolution_clock;
 

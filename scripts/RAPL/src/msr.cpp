@@ -1,4 +1,4 @@
-#include <msr.hpp>
+#include <rapl/msr.hpp>
 
 #include <cerrno>
 #include <cstdlib>
