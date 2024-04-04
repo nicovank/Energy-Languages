@@ -114,8 +114,8 @@ int main(int argc, char** argv) {
     }
 
     group.disable();
-    const auto counts = group.read();
+    const auto counters = group.read();
     for (std::size_t i = 0; i < events.size(); ++i) {
-        std::cout << perf::toString(events[i].first, events[i].second) << ": " << counts[i] << std::endl;
+        std::cout << perf::toString(events[i].first, events[i].second) << ": " << counters[i] << std::endl;
     }
 }
