@@ -88,10 +88,10 @@ int main(int argc, char** argv) {
     const auto end = std::chrono::high_resolution_clock::now();
     group.disable();
 
-    const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    const auto runtime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
     const auto counters = group.read();
-    fmt::println("Duration : {} ms", duration);
-    fmt::println("Cycles   : {}", counters[0]);
-    fmt::println("Branches : {}", counters[1]);
-    fmt::println("Miss rate: {:.2f} %", 100 * static_cast<double>(counters[2]) / static_cast<double>(counters[1]));
+    fmt::println("Runtime                        : {} ms", runtime);
+    fmt::println("Cycles                         : {}", counters[0]);
+    fmt::println("Branches (miss / total -> rate): {} / {} -> {:.2f} %", counters[2], counters[1],
+                 100 * static_cast<double>(counters[2]) / static_cast<double>(counters[1]));
 }
