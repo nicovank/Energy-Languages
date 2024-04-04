@@ -16,8 +16,8 @@
 #include <argparse/argparse.hpp>
 #include <benchmark/benchmark.h>
 
-#include <perf.hpp>
-#include <rapl.hpp>
+#include <rapl/perf.hpp>
+#include <rapl/rapl.hpp>
 
 #ifndef RAPL_MSR_PKG_SUPPORTED
 #error "This tool requires MSR PKG domain support"

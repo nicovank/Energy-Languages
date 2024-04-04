@@ -12,7 +12,7 @@
 #include <benchmark/benchmark.h>
 #include <fmt/core.h>
 
-#include <perf.hpp>
+#include <rapl/perf.hpp>
 
 int main(int argc, char** argv) {
     auto program = argparse::ArgumentParser("benchmark", "", argparse::default_arguments::help);
