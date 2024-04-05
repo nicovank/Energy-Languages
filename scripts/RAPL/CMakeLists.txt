@@ -30,7 +30,7 @@ FetchContent_Declare(
 FetchContent_Declare(
     glaze
     GIT_REPOSITORY https://github.com/stephenberry/glaze.git
-    GIT_TAG b99111789445dc3693c7542dabe1ee1538a39611 # v1.3.5
+    GIT_TAG cc58afa1f751513daa482a905e6021f5dcc5fe2c # v2.4.4
 )
 
 message(STATUS "Downloading and configuring argparse")
