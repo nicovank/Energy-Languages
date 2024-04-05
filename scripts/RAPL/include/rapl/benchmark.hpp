@@ -33,6 +33,8 @@ int main(int argc, char **argv) {
 #include <deque>
 #include <vector>
 
+#include <glaze/core/common.hpp>
+
 #include <rapl/perf.hpp>
 
 #ifndef RAPL_BENCHMARK_ENERGY_GRANULARITY_MS
@@ -61,6 +63,26 @@ struct Result {
     static_assert(false);
     std::deque<EnergySample> energy_samples;
 #endif
+};
+
+template <>
+struct glz::meta<Result> {
+    using T = Result;
+    // clang-format off
+    [[maybe_unused]] static constexpr auto value =
+        std::apply([](auto... args) { return glz::object(args...); }, std::tuple{
+#if RAPL_BENCHMARK_RUNTIME
+    "runtime_ms", &T::runtime_ms,
+#endif
+#if RAPL_BENCHMARK_COUNTERS
+    "counters", &T::counters,
+#endif
+#if RAPL_BENCHMARK_ENERGY
+    static_assert(false);
+    "energy_samples", &T::energy_samples,
+#endif
+    });
+    // clang-format on
 };
 
 extern void setup(int argc, char** argv);

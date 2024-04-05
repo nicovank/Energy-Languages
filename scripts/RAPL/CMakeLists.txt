@@ -80,6 +80,7 @@ add_executable(benchmark_iteration src/benchmarks/iteration.cpp)
 target_compile_options(benchmark_iteration PRIVATE -Wall -Wextra -Wpedantic -Werror)
 target_link_libraries(benchmark_iteration PRIVATE argparse)
 target_link_libraries(benchmark_iteration PRIVATE benchmark)
+target_link_libraries(benchmark_iteration PRIVATE glaze::glaze)
 target_link_libraries(benchmark_iteration PRIVATE rapl_lib)
 target_link_libraries(benchmark_iteration PRIVATE Threads::Threads)
 
@@ -88,6 +89,7 @@ target_compile_options(benchmark_prediction PRIVATE -Wall -Wextra -Wpedantic -We
 target_link_libraries(benchmark_prediction PRIVATE argparse)
 target_link_libraries(benchmark_prediction PRIVATE benchmark)
 target_link_libraries(benchmark_prediction PRIVATE fmt)
+target_link_libraries(benchmark_prediction PRIVATE glaze::glaze)
 target_link_libraries(benchmark_prediction PRIVATE rapl_lib)
 
 check_ipo_supported(RESULT IPO_SUPPORTED)

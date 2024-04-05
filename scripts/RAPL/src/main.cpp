@@ -104,7 +104,8 @@ template <>
 struct glz::meta<rapl::DoubleSample> {
     using T = rapl::DoubleSample;
     // clang-format off
-    [[maybe_unused]] static constexpr auto value = std::apply([](auto... args) { return glz::object(args...); }, std::tuple{
+    [[maybe_unused]] static constexpr auto value =
+        std::apply([](auto... args) { return glz::object(args...); }, std::tuple{
 #ifdef RAPL_MSR_PKG_SUPPORTED
         "pkg", &T::pkg,
 #endif
