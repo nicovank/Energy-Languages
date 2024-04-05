@@ -1,5 +1,3 @@
-#include <linux/perf_event.h>
-
 #include <algorithm>
 #include <chrono>
 #include <cstdint>
@@ -8,13 +6,35 @@
 #include <random>
 #include <vector>
 
+#include <cstdlib>
+
 #include <argparse/argparse.hpp>
 #include <benchmark/benchmark.h>
 #include <fmt/core.h>
 
-#include <rapl/perf.hpp>
+#define RAPL_BENCHMARK_RUNTIME 1
 
-int main(int argc, char** argv) {
+#include <linux/perf_event.h>
+#define RAPL_BENCHMARK_COUNTERS 1
+#define RAPL_BENCHMARK_COUNTERS_EVENTS                                                                                 \
+    {                                                                                                                  \
+        {PERF_TYPE_HARDWARE, PERF_COUNT_HW_CPU_CYCLES}, {PERF_TYPE_HARDWARE, PERF_COUNT_HW_BRANCH_INSTRUCTIONS}, {     \
+            PERF_TYPE_HARDWARE, PERF_COUNT_HW_BRANCH_MISSES                                                            \
+        }                                                                                                              \
+    }
+
+#include <rapl/benchmark.hpp>
+
+namespace {
+std::uint64_t n;
+std::uint64_t iterations;
+
+std::vector<std::uint64_t> a;
+std::vector<std::uint64_t> b;
+/* std::vector<bool> */ std::deque<std::uint64_t> c;
+}; // namespace
+
+void setup(int argc, char** argv) {
     auto program = argparse::ArgumentParser("benchmark", "", argparse::default_arguments::help);
 
     program.add_argument("-n")
@@ -40,38 +60,30 @@ int main(int argc, char** argv) {
     } catch (const std::exception& err) {
         std::cerr << err.what() << std::endl;
         std::cerr << program;
-        return EXIT_FAILURE;
+        exit(EXIT_FAILURE);
     }
 
-    const auto n = program.get<std::uint64_t>("n");
-    const auto iterations = program.get<std::uint64_t>("iterations");
+    n = program.get<std::uint64_t>("n");
+    iterations = program.get<std::uint64_t>("iterations");
     const auto p = program.get<double>("p");
 
     auto generator = std::mt19937_64(std::random_device()());
 
-    std::vector<std::uint64_t> a(n);
+    a.resize(n);
     std::generate(a.begin(), a.end(),
                   [&generator]() { return std::uniform_int_distribution<std::uint64_t>()(generator); });
-    std::vector<std::uint64_t> b(n);
+    b.resize(n);
     std::generate(b.begin(), b.end(),
                   [&generator]() { return std::uniform_int_distribution<std::uint64_t>()(generator); });
 
-    /* std::vector<bool> */ std::deque<bool> conditions(iterations);
-    std::generate(conditions.begin(), conditions.end(),
-                  [p, &generator]() { return std::bernoulli_distribution(p)(generator); });
+    c.resize(iterations);
+    std::generate(c.begin(), c.end(), [p, &generator]() { return std::bernoulli_distribution(p)(generator); });
+}
 
-    const std::vector<std::pair<int, int>> events = {{PERF_TYPE_HARDWARE, PERF_COUNT_HW_CPU_CYCLES},
-                                                     {PERF_TYPE_HARDWARE, PERF_COUNT_HW_BRANCH_INSTRUCTIONS},
-                                                     {PERF_TYPE_HARDWARE, PERF_COUNT_HW_BRANCH_MISSES}};
-    perf::Group group(events);
-    group.reset();
-
-    group.enable();
-    const auto start = std::chrono::high_resolution_clock::now();
-
+void run() {
     std::uint64_t sum = 0;
     for (std::uint64_t i = 0; i < iterations; ++i) {
-        if (conditions[i]) {
+        if (c[i]) {
             for (std::uint64_t j = 0; j < n; ++j) {
                 a[j] += (i * 13) ^ (j * 71);
                 sum += a[j] ^ (b[j] << 3);
@@ -84,14 +96,14 @@ int main(int argc, char** argv) {
         }
     }
     benchmark::DoNotOptimize(sum);
+}
 
-    const auto end = std::chrono::high_resolution_clock::now();
-    group.disable();
+void teardown() {}
 
-    const auto runtime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    const auto counters = group.read();
-    fmt::println("Runtime                        : {} ms", runtime);
-    fmt::println("Cycles                         : {}", counters[0]);
-    fmt::println("Branches (miss / total -> rate): {} / {} -> {:.2f} %", counters[2], counters[1],
-                 100 * static_cast<double>(counters[2]) / static_cast<double>(counters[1]));
+int main(int argc, char** argv) {
+    const auto result = RAPL_BENCHMARK_MEASURE(argc, argv);
+    std::cout << "Runtime: " << result.runtime_ms << std::endl;
+    for (std::size_t i = 0; i < result.counters.size(); ++i) {
+        std::cout << "Counter " << i << ": " << result.counters[i] << std::endl;
+    }
 }
