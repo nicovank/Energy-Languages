@@ -114,6 +114,10 @@ std::string perf::toString(int type, int config) {
     return "[unknown]";
 }
 
+std::string perf::toString(std::pair<int, int> event) {
+    return toString(event.first, event.second);
+}
+
 perf::Group::Group(const std::vector<std::pair<int, int>>& events) {
     assert(!events.empty());
 

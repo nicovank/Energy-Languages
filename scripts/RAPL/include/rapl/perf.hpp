@@ -7,6 +7,7 @@
 
 namespace perf {
 std::string toString(int type, int config);
+std::string toString(std::pair<int, int> event);
 
 struct Group {
     Group(const std::vector<std::pair<int, int>>& events);
