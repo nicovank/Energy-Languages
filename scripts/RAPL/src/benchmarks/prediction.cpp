@@ -15,6 +15,8 @@
 
 #define RAPL_BENCHMARK_RUNTIME 1
 
+#define RAPL_BENCHMARK_RUSAGE 1
+
 #define RAPL_BENCHMARK_COUNTERS 1
 
 // clang-format off

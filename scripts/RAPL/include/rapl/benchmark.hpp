@@ -6,6 +6,9 @@ measurements easier. A benchmark file should look like this.
 // To enable runtime measurements.
 #define RAPL_BENCHMARK_RUNTIME 1
 
+// To enable rusage.
+#define RAPL_BENCHMARK_RUSAGE 1
+
 // To enable energy measurements.
 #define RAPL_BENCHMARK_COUNTERS 1
 
@@ -46,6 +49,12 @@ int main(int argc, char **argv) {
 
 #include <rapl/perf.hpp>
 
+#if RAPL_BENCHMARK_RUSAGE
+#include <rapl/rusage.hpp>
+#include <sys/resource.h>
+#include <sys/time.h>
+#endif
+
 #ifndef RAPL_BENCHMARK_ENERGY_GRANULARITY_MS
 #define RAPL_BENCHMARK_ENERGY_GRANULARITY_MS 1000
 #endif
@@ -54,7 +63,7 @@ int main(int argc, char **argv) {
 #define RAPL_BENCHMARK_RUNTIME_CLOCK std::chrono::high_resolution_clock
 #endif
 
-#ifdef RAPL_BENCHMARK_ENERGY
+#ifdef RAPL_BENCHMARK_ENERGY // TODO: No need to gate this probably.
 struct EnergySample {
     TODO_TIME_POINT duration;
     std::uint64_t energy;
@@ -64,6 +73,9 @@ struct EnergySample {
 struct Result {
 #if RAPL_BENCHMARK_RUNTIME
     typename RAPL_BENCHMARK_RUNTIME_CLOCK::rep runtime_ms;
+#endif
+#if RAPL_BENCHMARK_RUSAGE
+    struct rusage rusage;
 #endif
 #if RAPL_BENCHMARK_COUNTERS
     std::vector<std::uint64_t> counters;
@@ -82,6 +94,9 @@ struct glz::meta<Result> {
         std::apply([](auto... args) { return glz::object(args...); }, std::tuple{
 #if RAPL_BENCHMARK_RUNTIME
     "runtime_ms", &T::runtime_ms,
+#endif
+#if RAPL_BENCHMARK_RUSAGE
+    "rusage", &T::rusage,
 #endif
 #if RAPL_BENCHMARK_COUNTERS
     "counters", &T::counters,
@@ -105,6 +120,10 @@ inline Result measure(int argc, char** argv) {
     setup(argc, argv);
 
     // Setup measurement infrastructure.
+#if RAPL_BENCHMARK_RUSAGE
+    struct rusage start_rusage;
+    struct rusage end_rusage;
+#endif
 #if RAPL_BENCHMARK_COUNTERS
 #ifndef RAPL_BENCHMARK_COUNTERS_EVENTS
 #error "RAPL_BENCHMARK_COUNTERS_EVENTS must be defined."
@@ -117,6 +136,9 @@ inline Result measure(int argc, char** argv) {
 #if RAPL_BENCHMARK_COUNTERS
     group.enable();
 #endif
+#if RAPL_BENCHMARK_RUSAGE
+    getrusage(RUSAGE_SELF, &start_rusage);
+#endif
 #if RAPL_BENCHMARK_RUNTIME
     const auto start = RAPL_BENCHMARK_RUNTIME_CLOCK::now();
 #endif
@@ -127,13 +149,19 @@ inline Result measure(int argc, char** argv) {
 #if RAPL_BENCHMARK_RUNTIME
     const auto end = RAPL_BENCHMARK_RUNTIME_CLOCK::now();
 #endif
+#if RAPL_BENCHMARK_RUSAGE
+    getrusage(RUSAGE_SELF, &end_rusage);
+#endif
 #if RAPL_BENCHMARK_COUNTERS
     group.disable();
 #endif
 
-// Populate results.
+    // Populate results.
 #if RAPL_BENCHMARK_RUNTIME
     result.runtime_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+#endif
+#if RAPL_BENCHMARK_RUSAGE
+    result.rusage = end_rusage - start_rusage;
 #endif
 #if RAPL_BENCHMARK_COUNTERS
     result.counters = group.read();

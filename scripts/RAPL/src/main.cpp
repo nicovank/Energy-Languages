@@ -11,6 +11,9 @@
 #include <utility>
 #include <vector>
 
+#include <sys/resource.h>
+#include <sys/time.h>
+
 #include <glaze/core/common.hpp>
 #include <glaze/json/write.hpp>
 
