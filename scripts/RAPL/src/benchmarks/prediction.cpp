@@ -63,7 +63,7 @@ void setup(int argc, char** argv) {
     } catch (const std::exception& err) {
         std::cerr << err.what() << std::endl;
         std::cerr << program;
-        exit(EXIT_FAILURE);
+        std::exit(EXIT_FAILURE);
     }
 
     n = program.get<std::uint64_t>("n");

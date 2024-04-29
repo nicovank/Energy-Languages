@@ -132,7 +132,7 @@ perf::Group::Group(const std::vector<std::pair<int, int>>& events) {
     const auto leader = syscall(SYS_perf_event_open, &pe, 0, -1, -1, 0);
     if (leader == -1) {
         std::cerr << "perf_event_open failed for event " << perf::toString(pe.type, pe.config) << std::endl;
-        exit(EXIT_FAILURE);
+        std::exit(EXIT_FAILURE);
     }
     descriptors.push_back(leader);
 
@@ -148,7 +148,7 @@ perf::Group::Group(const std::vector<std::pair<int, int>>& events) {
         const auto fd = syscall(SYS_perf_event_open, &pe, 0, -1, leader, 0);
         if (fd == -1) {
             std::cerr << "perf_event_open failed for event " << perf::toString(pe.type, pe.config) << std::endl;
-            exit(EXIT_FAILURE);
+            std::exit(EXIT_FAILURE);
         }
         descriptors.push_back(fd);
     }
@@ -163,7 +163,7 @@ perf::Group::~Group() {
 void perf::Group::enable() {
     if (ioctl(descriptors[0], PERF_EVENT_IOC_ENABLE, PERF_IOC_FLAG_GROUP)) {
         std::cerr << "ioctl(ENABLE) failed" << std::endl;
-        exit(EXIT_FAILURE);
+        std::exit(EXIT_FAILURE);
     }
     enabled = true;
 }
@@ -171,7 +171,7 @@ void perf::Group::enable() {
 void perf::Group::disable() {
     if (ioctl(descriptors[0], PERF_EVENT_IOC_DISABLE, PERF_IOC_FLAG_GROUP)) {
         std::cerr << "ioctl(DISABLE) failed" << std::endl;
-        exit(EXIT_FAILURE);
+        std::exit(EXIT_FAILURE);
     }
     enabled = false;
 }
@@ -180,7 +180,7 @@ void perf::Group::reset() {
     for (const auto fd : descriptors) {
         if (ioctl(fd, PERF_EVENT_IOC_RESET, PERF_IOC_FLAG_GROUP)) {
             std::cerr << "ioctl(RESET) failed" << std::endl;
-            exit(EXIT_FAILURE);
+            std::exit(EXIT_FAILURE);
         }
     }
 }
@@ -198,7 +198,7 @@ std::vector<std::uint64_t> perf::Group::read() const {
     for (std::size_t i = 0; i < descriptors.size(); ++i) {
         if (::read(descriptors[i], &values[i], sizeof(std::uint64_t)) != sizeof(std::uint64_t)) {
             std::cerr << "read failed" << std::endl;
-            exit(EXIT_FAILURE);
+            std::exit(EXIT_FAILURE);
         }
     }
 

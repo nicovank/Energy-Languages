@@ -19,7 +19,7 @@ const std::unordered_map<int, int>& getLowestNumberedCpuByPackageMap() {
             int package;
             if (!(file >> package)) {
                 std::cerr << "Error finding out which package CPU " << i << " belongs to" << std::endl;
-                exit(EXIT_FAILURE);
+                std::exit(EXIT_FAILURE);
             }
 
             packages.emplace(package, i);
@@ -37,7 +37,7 @@ int cpu::getNCpus() {
         std::ifstream file("/proc/cpuinfo");
         if (!file) {
             std::cerr << "Error opening /proc/cpuinfo" << std::endl;
-            exit(EXIT_FAILURE);
+            std::exit(EXIT_FAILURE);
         }
 
         int n = 0;
