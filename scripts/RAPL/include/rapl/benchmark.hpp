@@ -1,26 +1,35 @@
 /*
 A thin wrapper to make building benchmarks with runtime/counters/enery
 measurements easier. A benchmark file should look like this.
+
 ```
 // To enable runtime measurements.
 #define RAPL_BENCHMARK_RUNTIME 1
+
 // To enable energy measurements.
 #define RAPL_BENCHMARK_COUNTERS 1
+
 // To enable energy measurements.
 #define RAPL_BENCHMARK_ENERGY 1
+
 // Specify which events to enable.
 #define RAPL_BENCHMARK_COUNTERS_EVENTS {{PERF_TYPE_HARDWARE, PERF_COUNT_HW_CPU_CYCLES}}
+
 // Make sure to include header after defining options.
 #include <rapl/benchmark.hpp>
+
 void setup(int argc, char **argv) {
     // Initialize the benchmark.
 }
+
 void run() {
     // Actual benchmark.
 }
+
 void teardown() {
     // Cleanup.
 }
+
 int main(int argc, char **argv) {
     const auto result = RAPL_BENCHMARK_MEASURE(argc, argv);
 }

@@ -1,9 +1,10 @@
 #include <algorithm>
-#include <chrono>
 #include <cstdint>
+#include <cstdlib>
 #include <deque>
 #include <iostream>
 #include <random>
+#include <utility>
 #include <vector>
 
 #include <cstdlib>
@@ -14,14 +15,16 @@
 
 #define RAPL_BENCHMARK_RUNTIME 1
 
-#include <linux/perf_event.h>
 #define RAPL_BENCHMARK_COUNTERS 1
-#define RAPL_BENCHMARK_COUNTERS_EVENTS                                                                                 \
-    {                                                                                                                  \
-        {PERF_TYPE_HARDWARE, PERF_COUNT_HW_CPU_CYCLES}, {PERF_TYPE_HARDWARE, PERF_COUNT_HW_BRANCH_INSTRUCTIONS}, {     \
-            PERF_TYPE_HARDWARE, PERF_COUNT_HW_BRANCH_MISSES                                                            \
-        }                                                                                                              \
-    }
+
+// clang-format off
+#include <linux/perf_event.h>
+#define RAPL_BENCHMARK_COUNTERS_EVENTS {                                                                               \
+        {PERF_TYPE_HARDWARE, PERF_COUNT_HW_CPU_CYCLES},                                                                \
+        {PERF_TYPE_HARDWARE, PERF_COUNT_HW_BRANCH_INSTRUCTIONS},                                                       \
+        {PERF_TYPE_HARDWARE, PERF_COUNT_HW_BRANCH_MISSES}                                                              \
+}
+// clang-format on
 
 #include <rapl/benchmark.hpp>
 
@@ -102,8 +105,11 @@ void teardown() {}
 
 int main(int argc, char** argv) {
     const auto result = RAPL_BENCHMARK_MEASURE(argc, argv);
+
+    const auto events = std::vector<std::pair<int, int>>(RAPL_BENCHMARK_COUNTERS_EVENTS);
+
     std::cout << "Runtime: " << result.runtime_ms << std::endl;
-    for (std::size_t i = 0; i < result.counters.size(); ++i) {
-        std::cout << "Counter " << i << ": " << result.counters[i] << std::endl;
+    for (std::size_t i = 0; i < events.size(); ++i) {
+        std::cout << perf::toString(events.at(i)) << ": " << result.counters[i] << std::endl;
     }
 }
