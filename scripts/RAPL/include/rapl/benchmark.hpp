@@ -78,11 +78,11 @@ struct Result {
     struct rusage rusage;
 #endif
 #if RAPL_BENCHMARK_COUNTERS
-    std::vector<std::uint64_t> counters;
+    std::vector<std::pair<std::string, std::uint64_t>> counters;
 #endif
 #if RAPL_BENCHMARK_ENERGY
     static_assert(false);
-    std::deque<EnergySample> energy_samples;
+    std::vector<EnergySample> energy_samples;
 #endif
 };
 
@@ -128,7 +128,8 @@ inline Result measure(int argc, char** argv) {
 #ifndef RAPL_BENCHMARK_COUNTERS_EVENTS
 #error "RAPL_BENCHMARK_COUNTERS_EVENTS must be defined."
 #endif
-    perf::Group group(RAPL_BENCHMARK_COUNTERS_EVENTS);
+    const auto events = std::vector<std::pair<int, int>>(RAPL_BENCHMARK_COUNTERS_EVENTS);
+    perf::Group group(events);
     group.reset();
 #endif
 
@@ -164,7 +165,11 @@ inline Result measure(int argc, char** argv) {
     result.rusage = end_rusage - start_rusage;
 #endif
 #if RAPL_BENCHMARK_COUNTERS
-    result.counters = group.read();
+    result.counters.reserve(events.size());
+    const auto counters = group.read();
+    for (std::size_t i = 0; i < events.size(); ++i) {
+        result.counters.emplace_back(perf::toString(events.at(i)), counters.at(i));
+    }
 #endif
 
     return result;

@@ -12,6 +12,7 @@
 #include <argparse/argparse.hpp>
 #include <benchmark/benchmark.h>
 #include <fmt/core.h>
+#include <glaze/json/write.hpp>
 
 #define RAPL_BENCHMARK_RUNTIME 1
 
@@ -108,10 +109,9 @@ void teardown() {}
 int main(int argc, char** argv) {
     const auto result = RAPL_BENCHMARK_MEASURE(argc, argv);
 
-    const auto events = std::vector<std::pair<int, int>>(RAPL_BENCHMARK_COUNTERS_EVENTS);
-
-    std::cout << "Runtime: " << result.runtime_ms << std::endl;
-    for (std::size_t i = 0; i < events.size(); ++i) {
-        std::cout << perf::toString(events.at(i)) << ": " << result.counters[i] << std::endl;
+    // if (!(std::ofstream(argv[1], std::ios_base::app) << glz::write_json(result) << "\n")) {
+    if (!(std::cout << glz::write_json(result) << std::endl)) {
+        std::cerr << "write failed" << std::endl;
+        return 1;
     }
 }
