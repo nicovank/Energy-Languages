@@ -42,18 +42,9 @@ int main(int argc, char **argv) {
 
 #include <chrono>
 #include <cstdint>
-#include <deque>
 #include <vector>
 
 #include <glaze/core/common.hpp>
-
-#include <rapl/perf.hpp>
-
-#if RAPL_BENCHMARK_RUSAGE
-#include <rapl/rusage.hpp>
-#include <sys/resource.h>
-#include <sys/time.h>
-#endif
 
 #ifndef RAPL_BENCHMARK_ENERGY_GRANULARITY_MS
 #define RAPL_BENCHMARK_ENERGY_GRANULARITY_MS 1000
@@ -63,10 +54,37 @@ int main(int argc, char **argv) {
 #define RAPL_BENCHMARK_RUNTIME_CLOCK std::chrono::high_resolution_clock
 #endif
 
-#ifdef RAPL_BENCHMARK_ENERGY // TODO: No need to gate this probably.
-struct EnergySample {
-    TODO_TIME_POINT duration;
-    std::uint64_t energy;
+#if RAPL_BENCHMARK_RUSAGE
+#include <rapl/rusage.hpp>
+#include <sys/resource.h>
+#include <sys/time.h>
+#endif
+
+#if RAPL_BENCHMARK_COUNTERS
+#include <rapl/perf.hpp>
+#endif
+
+#if RAPL_BENCHMARK_ENERGY
+#include <deque>
+#include <mutex>
+#include <thread>
+
+#include <rapl/cpu.hpp>
+#include <rapl/rapl.hpp>
+#include <rapl/utils.hpp>
+
+struct [[maybe_unused]] EnergySample {
+    typename RAPL_BENCHMARK_RUNTIME_CLOCK::rep duration_ms;
+    rapl::DoubleSample energy;
+
+    EnergySample(typename RAPL_BENCHMARK_RUNTIME_CLOCK::rep duration_ms, rapl::DoubleSample energy)
+        : duration_ms(duration_ms), energy(energy) {}
+};
+
+template <>
+struct glz::meta<EnergySample> {
+    using T = EnergySample;
+    [[maybe_unused]] static constexpr auto value = glz::object("duration_ms", &T::duration_ms, "energy", &T::energy);
 };
 #endif
 
@@ -81,7 +99,6 @@ struct Result {
     std::vector<std::pair<std::string, std::uint64_t>> counters;
 #endif
 #if RAPL_BENCHMARK_ENERGY
-    static_assert(false);
     std::vector<EnergySample> energy_samples;
 #endif
 };
@@ -102,7 +119,6 @@ struct glz::meta<Result> {
     "counters", &T::counters,
 #endif
 #if RAPL_BENCHMARK_ENERGY
-    static_assert(false);
     "energy_samples", &T::energy_samples,
 #endif
     });
@@ -132,8 +148,47 @@ inline Result measure(int argc, char** argv) {
     perf::Group group(events);
     group.reset();
 #endif
+#if RAPL_BENCHMARK_ENERGY
+    auto previous_energy_sample = std::vector<rapl::U32Sample>(cpu::getNPackages());
+    std::mutex energy_lock;
+    typename RAPL_BENCHMARK_RUNTIME_CLOCK::time_point last_energy_timestamp;
+    std::deque<EnergySample> energy_samples;
+#endif
 
     // Actually start measurements.
+#if RAPL_BENCHMARK_ENERGY
+    {
+        std::lock_guard<std::mutex> guard(energy_lock);
+        last_energy_timestamp = RAPL_BENCHMARK_RUNTIME_CLOCK::now();
+        for (int package = 0; package < cpu::getNPackages(); ++package) {
+            previous_energy_sample.at(package) = rapl::sample(package);
+        }
+    }
+
+    KillableTimer timer;
+    auto subprocess = std::thread([&] {
+        for (;;) {
+            if (!timer.wait(std::chrono::milliseconds(RAPL_BENCHMARK_ENERGY_GRANULARITY_MS))) {
+                break;
+            }
+
+            std::lock_guard<std::mutex> guard(energy_lock);
+            const auto now = RAPL_BENCHMARK_RUNTIME_CLOCK::now();
+            const auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_energy_timestamp);
+            last_energy_timestamp = now;
+            for (int package = 0; package < cpu::getNPackages(); ++package) {
+                const auto sample = rapl::sample(package);
+                const auto energy = rapl::scale(sample - previous_energy_sample.at(package), package);
+                energy_samples.emplace_back(duration_ms.count(), energy);
+                previous_energy_sample.at(package) = sample;
+            }
+        }
+    });
+    ScopeExit _([&] {
+        timer.kill();
+        subprocess.join();
+    });
+#endif
 #if RAPL_BENCHMARK_COUNTERS
     group.enable();
 #endif
@@ -156,6 +211,16 @@ inline Result measure(int argc, char** argv) {
 #if RAPL_BENCHMARK_COUNTERS
     group.disable();
 #endif
+#if RAPL_BENCHMARK_ENERGY
+    std::lock_guard<std::mutex> guard(energy_lock);
+    const auto now = RAPL_BENCHMARK_RUNTIME_CLOCK::now();
+    const auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_energy_timestamp);
+    for (int package = 0; package < cpu::getNPackages(); ++package) {
+        const auto sample = rapl::sample(package);
+        const auto energy = rapl::scale(sample - previous_energy_sample.at(package), package);
+        energy_samples.emplace_back(duration_ms.count(), energy);
+    }
+#endif
 
     // Populate results.
 #if RAPL_BENCHMARK_RUNTIME
@@ -170,6 +235,9 @@ inline Result measure(int argc, char** argv) {
     for (std::size_t i = 0; i < events.size(); ++i) {
         result.counters.emplace_back(perf::toString(events.at(i)), counters.at(i));
     }
+#endif
+#if RAPL_BENCHMARK_ENERGY
+    result.energy_samples = std::vector<EnergySample>(energy_samples.begin(), energy_samples.end());
 #endif
 
     return result;

@@ -20,6 +20,8 @@
 
 #define RAPL_BENCHMARK_COUNTERS 1
 
+#define RAPL_BENCHMARK_ENERGY 1
+
 // clang-format off
 #include <linux/perf_event.h>
 #define RAPL_BENCHMARK_COUNTERS_EVENTS {                                                                               \
