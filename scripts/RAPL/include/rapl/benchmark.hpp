@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
 #include <rapl/rapl.hpp>
 #include <rapl/utils.hpp>
 
-struct [[maybe_unused]] EnergySample {
+struct EnergySample {
     typename RAPL_BENCHMARK_RUNTIME_CLOCK::rep duration_ms;
     rapl::DoubleSample energy;
 
