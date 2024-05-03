@@ -16,4 +16,4 @@ measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../scripts/RAPL/build/rapl "$(JSON)" $(LUA) fannkuchredux.luac 12
+	sudo ../../scripts/RAPL/build/rapl --json "$(JSON)" $(LUA) fannkuchredux.luac 12

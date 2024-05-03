@@ -12,4 +12,4 @@ measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../scripts/RAPL/build/rapl "$(JSON)" env GOGC=off ./fannkuchredux_run 12
+	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" env GOGC=off ./fannkuchredux_run 12

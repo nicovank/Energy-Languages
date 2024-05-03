@@ -12,4 +12,4 @@ measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../scripts/RAPL/build/rapl "$(JSON)" $(LUAJIT) knucleotide.out 0 < ../../../knucleotide-input25000000.txt
+	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(LUAJIT) knucleotide.out 0 < ../../../knucleotide-input25000000.txt

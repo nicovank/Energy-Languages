@@ -12,4 +12,4 @@ measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../scripts/RAPL/build/rapl "$(JSON)" $(LUAJIT) spectralnorm.out 5500
+	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(LUAJIT) spectralnorm.out 5500
