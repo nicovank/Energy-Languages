@@ -60,7 +60,12 @@ void run() {
     status = std::system(command.c_str());
 }
 
-void teardown() {}
+void teardown() {
+    if (status != 0) {
+        std::cerr << "The underlying program failed." << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
+}
 
 int main(int argc, char** argv) {
     [[maybe_unused]] const auto result = RAPL_BENCHMARK_MEASURE(argc, argv);
