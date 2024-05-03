@@ -1,106 +1,71 @@
-#include <chrono>
+#include <algorithm>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
-#include <mutex>
 #include <string>
-#include <thread>
-#include <tuple>
-#include <utility>
 #include <vector>
 
 #include <sys/resource.h>
 #include <sys/time.h>
 
-#include <glaze/core/common.hpp>
+#include <argparse/argparse.hpp>
 #include <glaze/json/write.hpp>
 
-#include <rapl/cpu.hpp>
-#include <rapl/rapl.hpp>
-#include <rapl/rusage.hpp>
-#include <rapl/utils.hpp>
+#define RAPL_BENCHMARK_RUNTIME 1
 
-using Clock = std::chrono::high_resolution_clock;
+#define RAPL_BENCHMARK_RUSAGE 1
 
-struct Result {
-    Clock::rep runtime;
-    rapl::DoubleSample energy;
-    struct rusage rusage;
-};
+#define RAPL_BENCHMARK_COUNTERS 1
 
-int main(int argc, char* argv[]) {
-    if (argc < 3) {
-        std::cerr << "Usage: ./rapl <json-file> <command> [args...]" << std::endl;
-        return 1;
+#define RAPL_BENCHMARK_ENERGY 1
+
+// clang-format off
+#include <linux/perf_event.h>
+#define RAPL_BENCHMARK_COUNTERS_EVENTS {                                                                               \
+        {PERF_TYPE_HARDWARE, PERF_COUNT_HW_CPU_CYCLES},                                                                \
+        {PERF_TYPE_HARDWARE, PERF_COUNT_HW_BRANCH_INSTRUCTIONS},                                                       \
+        {PERF_TYPE_HARDWARE, PERF_COUNT_HW_BRANCH_MISSES}                                                              \
+}
+// clang-format on
+
+#include <rapl/benchmark.hpp>
+
+namespace {
+std::string json;
+std::string command;
+int status;
+} // namespace
+
+void setup(int argc, char** argv) {
+    auto program = argparse::ArgumentParser("RAPL", "", argparse::default_arguments::help);
+
+    program.add_argument("--json").required().help("the filename where the results are written").metavar("PATH");
+    program.add_argument("command").required().remaining().help("the command to run").metavar("COMMAND...");
+
+    try {
+        program.parse_args(argc, argv);
+        json = program.get<std::string>("--json");
+        // FIXME C++23: Use std::ranges::views::join_with.
+        const auto parts = program.get<std::vector<std::string>>("command");
+        command = std::accumulate(parts.begin(), parts.end(), std::string(),
+                                  [](const auto& a, const auto& b) { return a + " " + b; });
+    } catch (const std::exception& err) {
+        std::cerr << err.what() << std::endl;
+        std::cerr << program;
+        std::exit(EXIT_FAILURE);
     }
+}
 
-    std::string command = argv[2];
-    for (int i = 3; i < argc; ++i) {
-        command.append(" ");
-        command.append(argv[i]);
-    }
+void run() {
+    status = std::system(command.c_str());
+}
 
-    Result result;
-    std::vector<rapl::U32Sample> previous;
-    std::mutex lock;
+void teardown() {}
 
-    {
-        std::lock_guard<std::mutex> guard(lock);
-        for (int package = 0; package < cpu::getNPackages(); ++package) {
-            previous.emplace_back(rapl::sample(package));
-        }
-    }
+int main(int argc, char** argv) {
+    [[maybe_unused]] const auto result = RAPL_BENCHMARK_MEASURE(argc, argv);
 
-    KillableTimer timer;
-    std::thread subprocess = std::thread([&] {
-        for (;;) {
-            if (!timer.wait(std::chrono::seconds(1))) {
-                break;
-            }
-
-            std::lock_guard<std::mutex> guard(lock);
-            for (int package = 0; package < cpu::getNPackages(); ++package) {
-                const auto sample = rapl::sample(package);
-                result.energy += rapl::scale(sample - previous[package], package);
-                previous[package] = sample;
-            }
-        }
-    });
-    ScopeExit _([&] {
-        timer.kill();
-        subprocess.join();
-    });
-
-    struct rusage start_usage;
-    struct rusage end_usage;
-
-    if (getrusage(RUSAGE_CHILDREN, &start_usage) != 0) {
-        std::cerr << "getrusage failed" << std::endl;
-        return 1;
-    }
-    const auto start = Clock::now();
-    const auto status = std::system(command.c_str());
-    const auto end = Clock::now();
-    if (getrusage(RUSAGE_CHILDREN, &end_usage) != 0) {
-        std::cerr << "getrusage failed" << std::endl;
-        return 1;
-    }
-
-    std::lock_guard<std::mutex> guard(lock);
-    for (int package = 0; package < cpu::getNPackages(); ++package) {
-        const auto sample = rapl::sample(package);
-        result.energy += rapl::scale(sample - previous[package], package);
-    }
-
-    if (status != 0) {
-        std::cerr << "child process failed" << std::endl;
-        return 1;
-    }
-
-    result.runtime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    result.rusage = end_usage - start_usage;
-
-    if (!(std::ofstream(argv[1], std::ios_base::app) << glz::write_json(result) << "\n")) {
+    if (!(std::ofstream(json, std::ios_base::app) << glz::write_json(result) << "\n")) {
         std::cerr << "write failed" << std::endl;
         return 1;
     }

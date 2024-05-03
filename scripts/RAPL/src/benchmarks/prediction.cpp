@@ -7,8 +7,6 @@
 #include <utility>
 #include <vector>
 
-#include <cstdlib>
-
 #include <argparse/argparse.hpp>
 #include <benchmark/benchmark.h>
 #include <fmt/core.h>

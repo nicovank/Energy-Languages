@@ -68,6 +68,7 @@ endif()
 
 add_executable(rapl src/main.cpp)
 target_compile_options(rapl PRIVATE -Wall -Wextra -Wpedantic -Werror)
+target_link_libraries(rapl PRIVATE argparse)
 target_link_libraries(rapl PRIVATE rapl_lib)
 target_link_libraries(rapl PRIVATE glaze::glaze)
 target_link_libraries(rapl PRIVATE Threads::Threads)
