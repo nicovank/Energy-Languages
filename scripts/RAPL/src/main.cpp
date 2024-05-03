@@ -28,35 +28,6 @@ struct Result {
     struct rusage rusage;
 };
 
-template <>
-struct glz::meta<rapl::DoubleSample> {
-    using T = rapl::DoubleSample;
-    // clang-format off
-    [[maybe_unused]] static constexpr auto value =
-        std::apply([](auto... args) { return glz::object(args...); }, std::tuple{
-#ifdef RAPL_MSR_PKG_SUPPORTED
-        "pkg", &T::pkg,
-#endif
-#ifdef RAPL_MSR_PP0_SUPPORTED
-        "pp0", &T::pp0,
-#endif
-#ifdef RAPL_MSR_PP1_SUPPORTED
-        "pp1", &T::pp1,
-#endif
-#ifdef RAPL_MSR_DRAM_SUPPORTED
-        "dram", &T::dram,
-#endif
-    });
-    // clang-format on
-};
-
-template <>
-struct glz::meta<Result> {
-    using T = Result;
-    [[maybe_unused]] static constexpr auto value
-        = glz::object("runtime", &T::runtime, "energy", &T::energy, "rusage", &T::rusage);
-};
-
 int main(int argc, char* argv[]) {
     if (argc < 3) {
         std::cerr << "Usage: ./rapl <json-file> <command> [args...]" << std::endl;
