@@ -16,11 +16,8 @@
 #define RAPL_BENCHMARK_RUSAGE 1
 
 #define RAPL_BENCHMARK_COUNTERS 1
-
-#define RAPL_BENCHMARK_ENERGY 1
-
-// clang-format off
 #include <linux/perf_event.h>
+// clang-format off
 #define RAPL_BENCHMARK_COUNTERS_EVENTS {                                                                               \
         {PERF_TYPE_HARDWARE, PERF_COUNT_HW_CPU_CYCLES},                                                                \
         {PERF_TYPE_HARDWARE, PERF_COUNT_HW_INSTRUCTIONS},                                                              \
@@ -30,6 +27,9 @@
         {PERF_TYPE_HARDWARE, PERF_COUNT_HW_BRANCH_MISSES}                                                              \
 }
 // clang-format on
+
+#define RAPL_BENCHMARK_ENERGY 1
+#define RAPL_BENCHMARK_ENERGY_GRANULARITY_MS 100
 
 #include <rapl/benchmark.hpp>
 
