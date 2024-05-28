@@ -58,8 +58,8 @@ RUN tar -xJf Python-${PYTHON_VERSION}.tar.xz
 RUN cd Python-${PYTHON_VERSION} && ./configure --enable-optimizations --with-lto && make && make install
 RUN rm -rf Python-${PYTHON_VERSION}.tar.xz Python-${PYTHON_VERSION}.tar.xz.asc Python-${PYTHON_VERSION}
 
-# Python scripts dependencies.
-COPY requirements.txt /root/LangBench/
+# Python dependencies.
+COPY Python/requirements.txt /root/LangBench/
 RUN python3 -m pip install --upgrade pip
 RUN apt install -y libgmp-dev libmpc-dev
 RUN python3 -m pip install -r /root/LangBench/requirements.txt

@@ -97,8 +97,8 @@ RUN tar -xJf Python-${PYTHON_VERSION}.tar.xz
 RUN cd Python-${PYTHON_VERSION} && ./configure --enable-optimizations --with-lto && make && make install
 RUN rm -rf Python-${PYTHON_VERSION}.tar.xz Python-${PYTHON_VERSION}.tar.xz.asc Python-${PYTHON_VERSION}
 
-# Python scripts dependencies.
-COPY requirements.txt /root/Energy-Languages/
+# Python dependencies.
+COPY Python/requirements.txt /root/Energy-Languages/
 RUN python3 -m pip install --upgrade pip
 RUN python3 -m pip install -r /root/Energy-Languages/requirements.txt
 
