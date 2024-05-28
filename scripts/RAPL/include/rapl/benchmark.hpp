@@ -58,6 +58,9 @@ int main(int argc, char **argv) {
 #include <rapl/rusage.hpp>
 #include <sys/resource.h>
 #include <sys/time.h>
+#ifndef RAPL_BENCHMARK_RUSAGE_WHO
+#define RAPL_BENCHMARK_RUSAGE_WHO RUSAGE_SELF
+#endif
 #endif
 
 #if RAPL_BENCHMARK_COUNTERS
@@ -171,7 +174,7 @@ inline Result measure(int argc, char** argv) {
     group.enable();
 #endif
 #if RAPL_BENCHMARK_RUSAGE
-    getrusage(RUSAGE_SELF, &start_rusage);
+    getrusage(RAPL_BENCHMARK_RUSAGE_WHO, &start_rusage);
 #endif
 #if RAPL_BENCHMARK_RUNTIME
     const auto start = RAPL_BENCHMARK_RUNTIME_CLOCK::now();
@@ -184,7 +187,7 @@ inline Result measure(int argc, char** argv) {
     const auto end = RAPL_BENCHMARK_RUNTIME_CLOCK::now();
 #endif
 #if RAPL_BENCHMARK_RUSAGE
-    getrusage(RUSAGE_SELF, &end_rusage);
+    getrusage(RAPL_BENCHMARK_RUSAGE_WHO, &end_rusage);
 #endif
 #if RAPL_BENCHMARK_COUNTERS
     group.disable();
