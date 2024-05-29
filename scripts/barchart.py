@@ -1,7 +1,6 @@
 import argparse
 import collections
 import json
-import math
 import os
 import statistics
 
@@ -29,11 +28,13 @@ def main(args):
     benchmarks = sorted(list({b for l in data.values() for b in l.keys()}))
     runtimes = {
         benchmark: {
-            language: statistics.geometric_mean(
-                [r["runtime"] for r in data[language][benchmark]]
+            language: (
+                statistics.geometric_mean(
+                    [r["runtime"] for r in data[language][benchmark]]
+                )
+                if benchmark in data[language]
+                else 0
             )
-            if benchmark in data[language]
-            else 0
             for language in args.languages
         }
         for benchmark in benchmarks
