@@ -1,7 +1,4 @@
 import argparse
-import collections
-import json
-import os
 import statistics
 
 import matplotlib.pyplot as plt
@@ -9,22 +6,11 @@ from rich.console import Console
 from rich.table import Table
 import scipy
 
+from . import utils
+
 
 def main(args):
-    data = collections.defaultdict(lambda: collections.defaultdict(list))
-    for language in args.languages:
-        LANGUAGES_ROOT = os.path.join(args.data_root, language)
-        assert os.path.isdir(LANGUAGES_ROOT)
-        for benchmark in os.listdir(LANGUAGES_ROOT):
-            path = os.path.join(LANGUAGES_ROOT, benchmark)
-            assert os.path.isfile(path) and path.endswith(".json")
-            benchmark = benchmark[:-5]
-            with open(path, "r") as file:
-                for line in file:
-                    line = json.loads(line)
-                    data[language][benchmark].append(line)
-
-    benchmarks = sorted(list({b for l in data.values() for b in l.keys()}))
+    data, benchmarks = utils.parse(args.data_root, args.languages)
 
     table = Table(title=f"Average CPU usage for all (language, benchmark) pairs")
     table.add_column("Benchmark")
@@ -44,7 +30,7 @@ def main(args):
                     cpu_usage(
                         timeval_to_seconds(r["rusage"]["ru_utime"]),
                         timeval_to_seconds(r["rusage"]["ru_stime"]),
-                        1e-3 * r["runtime"],
+                        1e-3 * r["runtime_ms"],
                     )
                     for r in data[language][benchmark]
                 ]
@@ -73,7 +59,7 @@ def main(args):
             language: {
                 benchmark: statistics.geometric_mean(
                     [
-                        r["energy"]["pkg"] / (1e-3 * r["runtime"])
+                        r["energy"]["pkg"] / (1e-3 * r["runtime_ms"])
                         for r in data[language][benchmark]
                     ]
                 )
@@ -109,12 +95,7 @@ def main(args):
             #     s=50,
             #     label=language.replace("#", "\\#"),
             # )
-        ax.scatter(
-            all_xs,
-            all_ys,
-            marker=".",
-            s=50
-        )
+        ax.scatter(all_xs, all_ys, marker=".", s=50)
 
         regression = scipy.stats.linregress(all_xs, all_ys)
         print("Regression slope :", regression.slope)
