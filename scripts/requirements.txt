@@ -6,3 +6,4 @@ scipy==1.13.1
 
 black==24.4.2
 mypy==1.10.0
+pandas-stubs==2.2.2.240514

@@ -5,7 +5,7 @@ from typing import Dict
 import matplotlib.pyplot as plt
 from rich.console import Console
 from rich.table import Table
-import scipy
+import scipy  # type: ignore
 
 from . import utils
 
