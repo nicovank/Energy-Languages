@@ -1,6 +1,8 @@
-black==24.4.2
 matplotlib==3.9.0
 numpy==1.26.4
 pandas==2.2.2
 rich==13.7.1
 scipy==1.13.1
+
+black==24.4.2
+mypy==1.10.0
