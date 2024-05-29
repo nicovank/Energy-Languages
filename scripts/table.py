@@ -78,7 +78,7 @@ def main(args: argparse.Namespace) -> None:
             {
                 language: {
                     benchmark: statistics.geometric_mean(
-                        [e["runtime"] for e in subdata]
+                        [e["runtime_ms"] for e in subdata]
                     )
                     for benchmark, subdata in data[language].items()
                 }
@@ -95,7 +95,7 @@ def main(args: argparse.Namespace) -> None:
             {
                 language: {
                     benchmark: statistics.geometric_mean(
-                        [e["energy"]["pkg"] for e in subdata]
+                        [sum([s["energy"]["pkg"] for s in e["energy_samples"]]) for e in subdata]
                     )
                     for benchmark, subdata in data[language].items()
                 }
