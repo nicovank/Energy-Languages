@@ -15,7 +15,7 @@ def main(args: argparse.Namespace) -> None:
         language: {
             benchmark: 0.001
             * statistics.geometric_mean(
-                [r["runtime"] for r in data[language][benchmark]]
+                [r["runtime_ms"] for r in data[language][benchmark]]
             )
             for benchmark in benchmarks
             if benchmark in data[language]
@@ -26,7 +26,7 @@ def main(args: argparse.Namespace) -> None:
     energies = {
         language: {
             benchmark: statistics.geometric_mean(
-                [r["energy"]["pkg"] for r in data[language][benchmark]]
+                [sum([s["energy"]["pkg"] for s in r["energy_samples"]]) for r in data[language][benchmark]]
             )
             for benchmark in benchmarks
             if benchmark in data[language]
