@@ -4,12 +4,11 @@ import json
 import os
 
 from cycler import cycler
-import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
 
-def main(args):
+def main(args: argparse.Namespace) -> None:
     experiments_root = os.path.join(args.data_root, "experiments")
     java_n_experiments = [
         e for e in os.listdir(experiments_root) if e.startswith("Java-")

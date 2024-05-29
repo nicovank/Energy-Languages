@@ -1,15 +1,20 @@
 import argparse
-import collections
-import json
-import os
 import statistics
+from typing import Any, Dict
 
 from rich.console import Console
 from rich.table import Table
 from rich.text import Text
 
+from . import utils
 
-def table(title, args, data, means):
+
+def table(
+    title: str,
+    args: argparse.Namespace,
+    data: Dict[str, Dict[str, Any]],
+    means: Dict[str, Dict[str, float]],
+) -> Table:
     table = Table(title=title)
     table.add_column("Benchmark")
     for language in args.languages:
@@ -62,19 +67,8 @@ def table(title, args, data, means):
     return table
 
 
-def main(args):
-    data = collections.defaultdict(lambda: collections.defaultdict(list))
-    for language in args.languages:
-        LANGUAGES_ROOT = os.path.join(args.data_root, language)
-        assert os.path.isdir(LANGUAGES_ROOT)
-        for benchmark in os.listdir(LANGUAGES_ROOT):
-            path = os.path.join(LANGUAGES_ROOT, benchmark)
-            assert os.path.isfile(path) and path.endswith(".json")
-            benchmark = benchmark[:-5]
-            with open(path, "r") as file:
-                for line in file:
-                    line = json.loads(line)
-                    data[language][benchmark].append(line)
+def main(args: argparse.Namespace) -> None:
+    data, _ = utils.parse(args.data_root, args.languages)
 
     Console().print(
         table(

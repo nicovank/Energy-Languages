@@ -2,6 +2,7 @@ import argparse
 import os
 import random
 import subprocess
+from typing import Any
 
 from rich.console import Console
 from rich.progress import *
@@ -17,7 +18,14 @@ progress_columns = [
 ]
 
 
-def run_benchmark(language, benchmark, timeout, type, env=os.environ, verbose=False):
+def run_benchmark(
+    language: str,
+    benchmark: str,
+    timeout: float,
+    type: str,
+    env: Any = os.environ,
+    verbose: bool = False,
+) -> int:
     # Todd Mytkowicz, Amer Diwan, Matthias Hauswirth, and Peter F. Sweeney. 2009.
     # Producing wrong data without doing anything obviously wrong!
     # SIGPLAN Not. 44, 3 (March 2009), 265–276. https://doi.org/10.1145/1508284.1508275
@@ -36,7 +44,7 @@ def run_benchmark(language, benchmark, timeout, type, env=os.environ, verbose=Fa
         return -1
 
 
-def main(args):
+def main(args: argparse.Namespace) -> None:
     for language in args.languages:
         benchmarks = sorted(
             [
@@ -169,6 +177,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.iterations > 0 and not os.path.exists(RAPL_ROOT):
-        raise "Could not find the RAPL executable. Make sure you build it first."
+        raise RuntimeError(
+            "Could not find the RAPL executable. Make sure you build it first."
+        )
 
     main(args)

@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from . import utils
 
 
-def main(args):
+def main(args: argparse.Namespace) -> None:
     data, benchmarks = utils.parse(args.data_root, args.languages)
 
     runtimes = {
@@ -49,9 +49,9 @@ def main(args):
         if args.axin_xmax:
             axins = ax.inset_axes([0.02, 0.48, 0.5, 0.5])
 
-        max_x = 0
-        axin_max_x = 0
-        axin_max_y = 0
+        max_x = 0.0
+        axin_max_x = 0.0
+        axin_max_y = 0.0
         for i, language in enumerate(args.languages):
             for j, benchmark in enumerate(benchmarks):
                 if benchmark not in data[language]:

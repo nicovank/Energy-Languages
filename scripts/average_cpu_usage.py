@@ -1,5 +1,6 @@
 import argparse
 import statistics
+from typing import Dict
 
 import matplotlib.pyplot as plt
 from rich.console import Console
@@ -9,7 +10,7 @@ import scipy
 from . import utils
 
 
-def main(args):
+def main(args: argparse.Namespace) -> None:
     data, benchmarks = utils.parse(args.data_root, args.languages)
 
     table = Table(title=f"Average CPU usage for all (language, benchmark) pairs")
@@ -17,10 +18,12 @@ def main(args):
     for language in args.languages:
         table.add_column(f"{language}")
 
-    def timeval_to_seconds(tv):
+    def timeval_to_seconds(tv: Dict[str, float]) -> float:
         return tv["tv_sec"] + 1e-6 * tv["tv_usec"]
 
-    def cpu_usage(user_cpu_time, kernel_cpu_time, runtime):
+    def cpu_usage(
+        user_cpu_time: float, kernel_cpu_time: float, runtime: float
+    ) -> float:
         return (user_cpu_time + kernel_cpu_time) / runtime
 
     cpu_usages = {
