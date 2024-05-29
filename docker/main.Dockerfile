@@ -98,9 +98,11 @@ RUN cd Python-${PYTHON_VERSION} && ./configure --enable-optimizations --with-lto
 RUN rm -rf Python-${PYTHON_VERSION}.tar.xz Python-${PYTHON_VERSION}.tar.xz.asc Python-${PYTHON_VERSION}
 
 # Python dependencies.
-COPY Python/requirements.txt /root/Energy-Languages/
 RUN python3 -m pip install --upgrade pip
+COPY Python/requirements.txt /root/Energy-Languages/
 RUN python3 -m pip install -r /root/Energy-Languages/requirements.txt
+COPY scripts/requirements.txt /root/LangBench/
+RUN python3 -m pip install -r /root/LangBench/requirements.txt
 
 # PyPy.
 ARG PYPY_VERSION=7.3.12

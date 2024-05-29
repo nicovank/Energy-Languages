@@ -59,9 +59,11 @@ RUN cd Python-${PYTHON_VERSION} && ./configure --enable-optimizations --with-lto
 RUN rm -rf Python-${PYTHON_VERSION}.tar.xz Python-${PYTHON_VERSION}.tar.xz.asc Python-${PYTHON_VERSION}
 
 # Python dependencies.
-COPY Python/requirements.txt /root/LangBench/
 RUN python3 -m pip install --upgrade pip
 RUN apt install -y libgmp-dev libmpc-dev
+COPY Python/requirements.txt /root/LangBench/
+RUN python3 -m pip install -r /root/LangBench/requirements.txt
+COPY scripts/requirements.txt /root/LangBench/
 RUN python3 -m pip install -r /root/LangBench/requirements.txt
 
 WORKDIR /root/LangBench
