@@ -62,7 +62,7 @@ def main(args: argparse.Namespace) -> None:
             language: {
                 benchmark: statistics.geometric_mean(
                     [
-                        r["energy"]["pkg"] / (1e-3 * r["runtime_ms"])
+                        sum([s["energy"]["pkg"] for s in r["energy_samples"]]) / (1e-3 * r["runtime_ms"])
                         for r in data[language][benchmark]
                     ]
                 )
@@ -102,7 +102,7 @@ def main(args: argparse.Namespace) -> None:
 
         regression = scipy.stats.linregress(all_xs, all_ys)
         print("Regression slope :", regression.slope)
-        print("Regression ravlue:", regression.rvalue)
+        print("Regression rvalue:", regression.rvalue)
         print("Regression stderr:", regression.stderr)
 
         # ax.legend()
