@@ -15,7 +15,7 @@ def main(args: argparse.Namespace) -> None:
         benchmark: {
             language: (
                 statistics.geometric_mean(
-                    [r["runtime"] for r in data[language][benchmark]]
+                    [r["runtime_ms"] for r in data[language][benchmark]]
                 )
                 if benchmark in data[language]
                 else 0
