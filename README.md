@@ -47,3 +47,17 @@ Here is an example running all languages/benchmarks pairs, outputting data in ``
     --iterations 21 \
     --timeout 600
 ```
+
+Running additional experiments.
+```bash
+% sudo docker run -it --privileged -v `pwd`/data/`hostname -s`/docker-default:/root/data energy-languages \
+    --languages "experiments/C as C++" "experiments/Go-no-GC" "experiments/JavaScript as TypeScript" "experiments/LuaJIT" "experiments/PyPy" \
+    --warmup 3 \
+    --iterations 21 \
+    --timeout 600
+```
+
+Running Java-N experiments.
+```bash
+% sudo ./scripts/docker-java-n.sh
+```
