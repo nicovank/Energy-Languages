@@ -1,36 +1,42 @@
 import argparse
-from typing import Any
-
-import numpy as np
-import pandas
+import collections
+import json
+import statistics
 
 
 def main(args: argparse.Namespace) -> None:
-    data = pandas.read_csv(
-        args.path,
-        delimiter=",",
-        names=["timestamp", "energy"],
-        dtype={"timestamp": np.int64, "energy": np.float64},
-    )
+    with open(args.path) as f:
+        data = json.load(f)
 
-    def get_values(id: str) -> np.ndarray[Any, Any]:
-        series = data.get(id)
-        assert series is not None
-        return series.values.astype(np.float64)
+    keys = list(data["energy_samples"][0]["energy"].keys())
+    energy = collections.defaultdict(list)
+    duration = []
+    for sample in data["energy_samples"]:
+        for entry in keys:
+            energy[entry].append(sample["energy"][entry])
+        duration.append(sample["duration_ms"] / 1e3)
 
-    timestamp = get_values("timestamp")
-    energy = get_values("energy")
+    if "pkg" in keys and "dram" in keys:
+        keys.append("pkg + dram")
+        energy["pkg + dram"] = [
+            pkg + dram for pkg, dram in zip(energy["pkg"], energy["dram"])
+        ]
 
-    timestamp /= 1e9
-
-    assert all(timestamp[i] <= timestamp[i + 1] for i in range(len(timestamp) - 1))
-
-    data = energy[1:] / np.diff(timestamp)
-    print(f"Geometric mean: {np.exp(np.log(data).mean()):.2f} J")
-    print(f"Sigma: {np.std(data):.2f} J")
+    for entry in keys:
+        print(
+            "{} [J/s]: {:.2f} ± {:.2f}".format(
+                entry,
+                statistics.mean(
+                    [e / d for e, d in zip(energy[entry], duration)]
+                ),
+                statistics.stdev(
+                    [e / d for e, d in zip(energy[entry], duration)]
+                ),
+            )
+        )
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--path", type=str, required=True)
+    parser.add_argument("path", type=str)
     main(parser.parse_args())
