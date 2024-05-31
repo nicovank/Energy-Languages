@@ -1,6 +1,6 @@
 import argparse
 import statistics
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from rich.console import Console
 from rich.table import Table
@@ -14,18 +14,21 @@ def table(
     args: argparse.Namespace,
     data: Dict[str, Dict[str, Any]],
     means: Dict[str, Dict[str, float]],
+    baseline: Optional[str],
 ) -> Table:
     table = Table(title=title)
     table.add_column("Benchmark")
     for language in args.languages:
         table.add_column(
-            f"{language} / {args.baseline}" if language != args.baseline else language
+            f"{language} / {baseline}"
+            if baseline and language != baseline
+            else language
         )
 
     benchmarks = sorted(list({b for l in data.values() for b in l.keys()}))
     missing_benchmarks = []
     for benchmark in benchmarks:
-        if benchmark not in data[args.baseline]:
+        if baseline and benchmark not in data[baseline]:
             missing_benchmarks.append(benchmark)
             continue
 
@@ -33,36 +36,39 @@ def table(
         for language in args.languages:
             if benchmark not in data[language]:
                 entries.append("")
-            elif language == args.baseline:
+            elif language == baseline:
                 entries.append(f"{means[language][benchmark]:.2f}")
             else:
-                normalized = (
-                    means[language][benchmark] / means[args.baseline][benchmark]
+                entry = (
+                    (means[language][benchmark] / means[baseline][benchmark])
+                    if baseline
+                    else means[language][benchmark]
                 )
-                entries.append(f"{normalized:.2f}")
+                entries.append(f"{entry:.2f}")
         table.add_row(*(benchmark, *entries))
 
-    for benchmark in missing_benchmarks:
-        text = Text(benchmark)
-        text.stylize("strike")
-        table.add_row(text)
+    if baseline:
+        for benchmark in missing_benchmarks:
+            text = Text(benchmark)
+            text.stylize("strike")
+            table.add_row(text)
 
-    per_language_normalized_means = {
-        language: statistics.geometric_mean(
-            [
-                means[language][b] / means[args.baseline][b]
-                for b in benchmarks
-                if b in means[language] and b in means[args.baseline]
-            ]
+        per_language_normalized_means = {
+            language: statistics.geometric_mean(
+                [
+                    means[language][b] / means[baseline][b]
+                    for b in benchmarks
+                    if b in means[language] and b in means[baseline]
+                ]
+            )
+            for language in args.languages
+        }
+
+        table.add_row()
+        table.add_row(
+            "Geometric Mean",
+            *[f"{per_language_normalized_means[l]:.2f}" for l in args.languages],
         )
-        for language in args.languages
-    }
-
-    table.add_row()
-    table.add_row(
-        "Geometric Mean",
-        *[f"{per_language_normalized_means[l]:.2f}" for l in args.languages],
-    )
 
     return table
 
@@ -84,6 +90,7 @@ def main(args: argparse.Namespace) -> None:
                 }
                 for language in args.languages
             },
+            args.baseline,
         )
     )
 
@@ -104,6 +111,30 @@ def main(args: argparse.Namespace) -> None:
                 }
                 for language in args.languages
             },
+            args.baseline,
+        )
+    )
+
+    Console().print(
+        table(
+            "Branch miss rate [%]",
+            args,
+            data,
+            {
+                language: {
+                    benchmark: 100
+                    * statistics.median(
+                        [
+                            e["counters"]["PERF_COUNT_HW_BRANCH_MISSES"]
+                            / e["counters"]["PERF_COUNT_HW_BRANCH_INSTRUCTIONS"]
+                            for e in subdata
+                        ]
+                    )
+                    for benchmark, subdata in data[language].items()
+                }
+                for language in args.languages
+            },
+            None,
         )
     )
 
