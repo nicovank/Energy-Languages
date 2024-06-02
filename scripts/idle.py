@@ -26,12 +26,8 @@ def main(args: argparse.Namespace) -> None:
         print(
             "{} [J/s]: {:.2f} ± {:.2f}".format(
                 entry,
-                statistics.mean(
-                    [e / d for e, d in zip(energy[entry], duration)]
-                ),
-                statistics.stdev(
-                    [e / d for e, d in zip(energy[entry], duration)]
-                ),
+                statistics.mean([e / d for e, d in zip(energy[entry], duration)]),
+                statistics.stdev([e / d for e, d in zip(energy[entry], duration)]),
             )
         )
 
