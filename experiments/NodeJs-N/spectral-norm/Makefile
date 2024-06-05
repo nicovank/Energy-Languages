@@ -3,6 +3,10 @@ NODE := node
 endif
 
 compile:
+ifndef NNNNN
+	$(error NNNNN is not defined)
+endif
+	sed s/NNNNN/$(NNNNN)/ spectralnorm.java.in > spectralnorm.java
 
 run:
 	$(NODE) spectralnorm.js 5500

@@ -3,6 +3,10 @@ NODE := node
 endif
 
 compile:
+ifndef NNNNN
+	$(error NNNNN is not defined)
+endif
+	sed s/NNNNN/$(NNNNN)/ binarytrees.java.in > binarytrees.java
 
 run:
 	$(NODE) binarytrees.js 21

@@ -3,6 +3,10 @@ NODE := node
 endif
 
 compile:
+ifndef NNNNN
+	$(error NNNNN is not defined)
+endif
+	sed s/NNNNN/$(NNNNN)/ fasta.java.in > fasta.java
 
 run:
 	$(NODE) fasta.js 25000000
