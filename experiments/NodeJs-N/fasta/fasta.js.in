@@ -212,31 +212,34 @@ class Fasta
     }
 }
 
-const ac = [{s: 'a', p: 0.27}, {s: 'c', p: 0.12}, {s: 'g', p: 0.12},
-    {s: 't', p: 0.27}, {s: 'B', p: 0.02}, {s: 'D', p: 0.02},
-    {s: 'H', p: 0.02}, {s: 'K', p: 0.02}, {s: 'M', p: 0.02},
-    {s: 'N', p: 0.02}, {s: 'R', p: 0.02}, {s: 'S', p: 0.02},
-    {s: 'V', p: 0.02}, {s: 'W', p: 0.02}, {s: 'Y', p: 0.02}];
+// Number of iterations: NNNNN (will be replaced when running make)
+for (let i = 0; i < NNNNN; ++i) {
+    const ac = [{s: 'a', p: 0.27}, {s: 'c', p: 0.12}, {s: 'g', p: 0.12},
+        {s: 't', p: 0.27}, {s: 'B', p: 0.02}, {s: 'D', p: 0.02},
+        {s: 'H', p: 0.02}, {s: 'K', p: 0.02}, {s: 'M', p: 0.02},
+        {s: 'N', p: 0.02}, {s: 'R', p: 0.02}, {s: 'S', p: 0.02},
+        {s: 'V', p: 0.02}, {s: 'W', p: 0.02}, {s: 'Y', p: 0.02}];
 
-const hs = [{s: 'a', p: 0.3029549426680}, {s: 'c', p: 0.1979883004921},
-    {s: 'g', p: 0.1975473066391}, {s: 't', p: 0.3015094502008}];
+    const hs = [{s: 'a', p: 0.3029549426680}, {s: 'c', p: 0.1979883004921},
+        {s: 'g', p: 0.1975473066391}, {s: 't', p: 0.3015094502008}];
 
-const fasta = new Fasta(process.stdout);
-const n = parseInt(process.argv[2]);
-const random = new RandomGenerator;
+    const fasta = new Fasta(process.stdout);
+    const n = parseInt(process.argv[2]);
+    const random = new RandomGenerator;
 
-fasta.repeat(
-    'GGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTG'
-        +'GGAGGCCGAGGCGGGCGGATCACCTGAGGTCAGGAGTTCGA'
-        +'GACCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAA'
-        +'AATACAAAAATTAGCCGGGCGTGGTGGCGCGCGCCTGTAAT'
-        +'CCCAGCTACTCGGGAGGCTGAGGCAGGAGAATCGCTTGAAC'
-        +'CCGGGAGGCGGAGGTTGCAGTGAGCCGAGATCGCGCCACTG'
-        +'CACTCCAGCCTGGGCGACAGAGCGAGACTCCGTCTCAAAAA',
-    '>ONE Homo sapiens alu',
-    n * 2
-).then(() => {
-    return fasta.generate(ac, '>TWO IUB ambiguity codes', random, n * 3);
-}).then(() => {
-    return fasta.generate(hs, '>THREE Homo sapiens frequency', random, n * 5);
-});
+    fasta.repeat(
+        'GGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTG'
+            +'GGAGGCCGAGGCGGGCGGATCACCTGAGGTCAGGAGTTCGA'
+            +'GACCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAA'
+            +'AATACAAAAATTAGCCGGGCGTGGTGGCGCGCGCCTGTAAT'
+            +'CCCAGCTACTCGGGAGGCTGAGGCAGGAGAATCGCTTGAAC'
+            +'CCGGGAGGCGGAGGTTGCAGTGAGCCGAGATCGCGCCACTG'
+            +'CACTCCAGCCTGGGCGACAGAGCGAGACTCCGTCTCAAAAA',
+        '>ONE Homo sapiens alu',
+        n * 2
+    ).then(() => {
+        return fasta.generate(ac, '>TWO IUB ambiguity codes', random, n * 3);
+    }).then(() => {
+        return fasta.generate(hs, '>THREE Homo sapiens frequency', random, n * 5);
+    });
+}

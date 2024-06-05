@@ -47,6 +47,9 @@ function fannkuch(n) {
    } while (true);
 }
 
-var n = +process.argv[2];
-var pf = fannkuch(n);
-console.log(pf[0] + "\n" + "Pfannkuchen(" + n + ") = " + pf[1]);
+// Number of iterations: NNNNN (will be replaced when running make)
+for (let i = 0; i < NNNNN; ++i) {
+   var n = +process.argv[2];
+   var pf = fannkuch(n);
+   console.log(pf[0] + "\n" + "Pfannkuchen(" + n + ") = " + pf[1]);
+}

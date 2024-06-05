@@ -26,25 +26,27 @@ function bottomUpTree(depth){
    }
 }
 
+// Number of iterations: NNNNN (will be replaced when running make)
+for (let i = 0; i < NNNNN; ++i) {
+   var minDepth = 4;
+   var n = +process.argv[2];
+   var maxDepth = Math.max(minDepth + 2, n);
+   var stretchDepth = maxDepth + 1;
 
-var minDepth = 4;
-var n = +process.argv[2];
-var maxDepth = Math.max(minDepth + 2, n);
-var stretchDepth = maxDepth + 1;
+   var check = bottomUpTree(stretchDepth).itemCheck();
+   console.log("stretch tree of depth " + stretchDepth + "\t check: " + check);
 
-var check = bottomUpTree(stretchDepth).itemCheck();
-console.log("stretch tree of depth " + stretchDepth + "\t check: " + check);
+   var longLivedTree = bottomUpTree(maxDepth);
+   for (var depth=minDepth; depth<=maxDepth; depth+=2){
+      var iterations = 1 << (maxDepth - depth + minDepth);
 
-var longLivedTree = bottomUpTree(maxDepth);
-for (var depth=minDepth; depth<=maxDepth; depth+=2){
-   var iterations = 1 << (maxDepth - depth + minDepth);
-
-   check = 0;
-   for (var i=1; i<=iterations; i++){
-      check += bottomUpTree(depth).itemCheck();
+      check = 0;
+      for (var i=1; i<=iterations; i++){
+         check += bottomUpTree(depth).itemCheck();
+      }
+      console.log(iterations + "\t trees of depth " + depth + "\t check: " + check);
    }
-   console.log(iterations + "\t trees of depth " + depth + "\t check: " + check);
-}
 
-console.log("long lived tree of depth " + maxDepth + "\t check: " 
-   + longLivedTree.itemCheck());
+   console.log("long lived tree of depth " + maxDepth + "\t check: " 
+      + longLivedTree.itemCheck());
+}

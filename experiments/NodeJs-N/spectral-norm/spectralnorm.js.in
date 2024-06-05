@@ -47,4 +47,7 @@ function spectralnorm(n) {
   return Math.sqrt(vBv/vv);
 }
 
-console.log(spectralnorm(+process.argv[2]).toFixed(9));
+// Number of iterations: NNNNN (will be replaced when running make)
+for (let i = 0; i < NNNNN; ++i) {
+  console.log(spectralnorm(+process.argv[2]).toFixed(9));
+}
