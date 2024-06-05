@@ -27,7 +27,7 @@ function bottomUpTree(depth){
 }
 
 // Number of iterations: NNNNN (will be replaced when running make)
-for (let i = 0; i < NNNNN; ++i) {
+for (let n_iterations__ = 0; n_iterations__ < NNNNN; ++n_iterations__) {
    var minDepth = 4;
    var n = +process.argv[2];
    var maxDepth = Math.max(minDepth + 2, n);

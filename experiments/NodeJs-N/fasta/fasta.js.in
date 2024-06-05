@@ -213,7 +213,7 @@ class Fasta
 }
 
 // Number of iterations: NNNNN (will be replaced when running make)
-for (let i = 0; i < NNNNN; ++i) {
+for (let n_iterations__ = 0; n_iterations__ < NNNNN; ++n_iterations__) {
     const ac = [{s: 'a', p: 0.27}, {s: 'c', p: 0.12}, {s: 'g', p: 0.12},
         {s: 't', p: 0.27}, {s: 'B', p: 0.02}, {s: 'D', p: 0.02},
         {s: 'H', p: 0.02}, {s: 'K', p: 0.02}, {s: 'M', p: 0.02},
