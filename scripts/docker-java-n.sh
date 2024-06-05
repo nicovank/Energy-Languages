@@ -2,8 +2,9 @@
 
 set -euxo pipefail
 
-if [ -d "experiments/$1-N" ]; then
+if [ ! -d "experiments/$1-N" ]; then
   echo "experiments/$1-N does exist."
+  exit 1
 fi
 
 for i in {1..20}
