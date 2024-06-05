@@ -6,7 +6,7 @@ compile:
 ifndef NNNNN
 	$(error NNNNN is not defined)
 endif
-	sed s/NNNNN/$(NNNNN)/ fannkuchredux.java.in > fannkuchredux.java
+	sed s/NNNNN/$(NNNNN)/ fannkuchredux.js.in > fannkuchredux.js
 
 run:
 	$(NODE) fannkuchredux.js 12

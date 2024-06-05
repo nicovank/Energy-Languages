@@ -6,7 +6,7 @@ compile:
 ifndef NNNNN
 	$(error NNNNN is not defined)
 endif
-	sed s/NNNNN/$(NNNNN)/ spectralnorm.java.in > spectralnorm.java
+	sed s/NNNNN/$(NNNNN)/ spectralnorm.js.in > spectralnorm.js
 
 run:
 	$(NODE) spectralnorm.js 5500

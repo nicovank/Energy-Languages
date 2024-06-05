@@ -13,5 +13,5 @@ do
         --languages experiments/$1-N \
         --warmup 1 \
         --iterations 7
-    mv "$(pwd)/data/$(hostname -s)/docker-default/experiments/$1-N $(pwd)/data/$(hostname -s)/docker-default/experiments/$1-$i"
+    mv "$(pwd)/data/$(hostname -s)/docker-default/experiments/$1-N" "$(pwd)/data/$(hostname -s)/docker-default/experiments/$1-$i"
 done

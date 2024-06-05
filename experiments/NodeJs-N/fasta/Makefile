@@ -6,7 +6,7 @@ compile:
 ifndef NNNNN
 	$(error NNNNN is not defined)
 endif
-	sed s/NNNNN/$(NNNNN)/ fasta.java.in > fasta.java
+	sed s/NNNNN/$(NNNNN)/ fasta.js.in > fasta.js
 
 run:
 	$(NODE) fasta.js 25000000

@@ -6,7 +6,7 @@ compile:
 ifndef NNNNN
 	$(error NNNNN is not defined)
 endif
-	sed s/NNNNN/$(NNNNN)/ nbody.java.in > nbody.java
+	sed s/NNNNN/$(NNNNN)/ nbody.js.in > nbody.js
 
 run:
 	$(NODE) nbody.js 50000000
