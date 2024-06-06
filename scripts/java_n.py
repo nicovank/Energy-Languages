@@ -34,24 +34,23 @@ def main(args: argparse.Namespace) -> None:
         fig, ax = plt.subplots()
         fig.set_size_inches(5, 4)
 
-        for n in sorted(data.keys()):
-            x = np.sort(np.array(list(data.keys())))
-            runtime = [[r["runtime"] for r in data[n]] for n in x]
-            energy = [[r["energy"]["pkg"] for r in data[n]] for n in x]
+        x = np.sort(np.array(list(data.keys())))
+        runtime = [[r["runtime_ms"] for r in data[n]] for n in x]
 
-            y = np.median(runtime, axis=1) / x
-            sigma = np.std(runtime, axis=1) / x
+        y = np.median(runtime, axis=1) / x
+        sigma = np.std(runtime, axis=1) / x
+        print(x, y, sigma)
 
-            ax.errorbar(
-                x,
-                y,
-                sigma,
-                linestyle="",
-                elinewidth=0.5,
-                capsize=2,
-                capthick=0.5,
-            )
-            ax.scatter(x, y, s=20)
+        ax.errorbar(
+            x,
+            y,
+            sigma,
+            linestyle="",
+            elinewidth=0.5,
+            capsize=2,
+            capthick=0.5,
+        )
+        ax.scatter(x, y, s=20)
 
         if not args.no_title:
             ax.set_title(
