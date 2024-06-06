@@ -79,7 +79,9 @@ def main(args: argparse.Namespace) -> None:
         for benchmark in benchmarks:
             codes = []
             if args.warmup > 0:
-                with Progress(*progress_columns, console=console, transient=True) as progress:
+                with Progress(
+                    *progress_columns, console=console, transient=True
+                ) as progress:
                     task = progress.add_task(
                         f"{language}::{benchmark}::Warmup", total=args.warmup
                     )
@@ -108,7 +110,9 @@ def main(args: argparse.Namespace) -> None:
                     continue
 
             if args.iterations > 0:
-                with Progress(*progress_columns, console=console, transient=True) as progress:
+                with Progress(
+                    *progress_columns, console=console, transient=True
+                ) as progress:
                     task = progress.add_task(
                         f"{language}::{benchmark}::Measure", total=args.iterations
                     )
