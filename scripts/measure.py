@@ -5,7 +5,7 @@ import subprocess
 from typing import Any
 
 from rich.console import Console
-from rich.progress import *
+from rich.progress import BarColumn, MofNCompleteColumn, Progress, TextColumn
 
 ROOT = os.path.join(os.path.dirname(__file__), "..")
 RAPL_ROOT = os.path.join(ROOT, "scripts", "RAPL", "build", "rapl")
@@ -55,7 +55,7 @@ def main(args: argparse.Namespace) -> None:
             ]
         )
 
-        with Progress(*progress_columns, console=console) as progress:
+        with Progress(*progress_columns, console=console, transient=True) as progress:
             task = progress.add_task(f"{language}::Compile", total=len(benchmarks))
             for benchmark in list(benchmarks):
                 directory = os.path.join(ROOT, language, benchmark)
@@ -79,7 +79,9 @@ def main(args: argparse.Namespace) -> None:
         for benchmark in benchmarks:
             codes = []
             if args.warmup > 0:
-                with Progress(*progress_columns, console=console) as progress:
+                with Progress(
+                    *progress_columns, console=console, transient=True
+                ) as progress:
                     task = progress.add_task(
                         f"{language}::{benchmark}::Warmup", total=args.warmup
                     )
@@ -108,7 +110,9 @@ def main(args: argparse.Namespace) -> None:
                     continue
 
             if args.iterations > 0:
-                with Progress(*progress_columns, console=console) as progress:
+                with Progress(
+                    *progress_columns, console=console, transient=True
+                ) as progress:
                     task = progress.add_task(
                         f"{language}::{benchmark}::Measure", total=args.iterations
                     )
