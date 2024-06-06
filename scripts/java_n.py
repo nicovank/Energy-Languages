@@ -11,7 +11,7 @@ import numpy as np
 def main(args: argparse.Namespace) -> None:
     experiments_root = os.path.join(args.data_root, "experiments")
     java_n_experiments = [
-        e for e in os.listdir(experiments_root) if e.startswith("Java-")
+        e for e in os.listdir(experiments_root) if e.startswith(f"{args.language}-")
     ]
     data = collections.defaultdict(list)
     for experiment in java_n_experiments:
@@ -54,7 +54,9 @@ def main(args: argparse.Namespace) -> None:
             ax.scatter(x, y, s=20)
 
         if not args.no_title:
-            ax.set_title(f"Runtime per iteration for {args.benchmark} (Java)")
+            ax.set_title(
+                f"Runtime per iteration for {args.benchmark} ({args.language})"
+            )
         ax.set_ylabel("Time per iteration [ms]")
         ax.set_xlabel("Number of iterations")
         ax.set_axisbelow(True)
@@ -68,6 +70,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--data-root", type=str, required=True)
     parser.add_argument("--benchmark", type=str, required=True)
+    parser.add_argument("--language", type=str, default="Java")
     parser.add_argument("--format", type=str, default="png")
     parser.add_argument("--no-title", action="store_true")
     main(parser.parse_args())
