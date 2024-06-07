@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
+#include <numeric>
 #include <random>
 #include <thread>
 #include <vector>
@@ -124,4 +125,7 @@ int main(int argc, char** argv) {
                    + 1e-6 * (result.rusage.ru_utime.tv_usec + result.rusage.ru_stime.tv_usec))
                   / (1e-3 * result.runtime_ms))
               << std::endl;
+    const auto energy = std::accumulate(result.energy_samples.begin(), result.energy_samples.end(), 0.0,
+                                        [](double sum, const auto& sample) { return sum + sample.energy.pkg; });
+    std::cout << "Energy consumed: " << energy << " J" << std::endl;
 }
