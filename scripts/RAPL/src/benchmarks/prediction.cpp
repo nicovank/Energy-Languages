@@ -4,7 +4,6 @@
 #include <deque>
 #include <iostream>
 #include <random>
-#include <utility>
 #include <vector>
 
 #include <argparse/argparse.hpp>
