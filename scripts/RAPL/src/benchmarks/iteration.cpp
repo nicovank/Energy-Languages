@@ -1,46 +1,44 @@
 #include <chrono>
-#include <cstddef>
 #include <cstdint>
-#include <cstring>
+#include <cstdlib>
 #include <iostream>
 #include <random>
 #include <thread>
 #include <vector>
 
-#include <linux/hw_breakpoint.h>
-#include <linux/perf_event.h>
-#include <sys/ioctl.h>
-#include <sys/syscall.h>
-#include <unistd.h>
-
 #include <argparse/argparse.hpp>
 #include <benchmark/benchmark.h>
 
-#include <rapl/perf.hpp>
-#include <rapl/rapl.hpp>
+#define RAPL_BENCHMARK_RUNTIME 1
 
-#ifndef RAPL_MSR_PKG_SUPPORTED
-#error "This tool requires MSR PKG domain support"
-#endif
+#define RAPL_BENCHMARK_RUSAGE 1
 
-#define CACHE_LINE_SIZE sysconf(_SC_LEVEL3_CACHE_LINESIZE)
-#define LL_CACHE_SIZE sysconf(_SC_LEVEL3_CACHE_SIZE)
+#define RAPL_BENCHMARK_COUNTERS 1
 
-void work(std::chrono::seconds duration, std::vector<std::uint8_t> memory) {
-    std::uint64_t sum = 0;
-    std::size_t index = 0;
-    auto start = std::chrono::high_resolution_clock::now();
-    while (std::chrono::high_resolution_clock::now() - start < duration) {
-        for (int i = 0; i < 1'000; ++i) {
-            index += CACHE_LINE_SIZE;
-            sum += memory[index % memory.size()];
-            memory[index % memory.size()] = index;
-        }
-    }
-    benchmark::DoNotOptimize(sum);
+#define RAPL_BENCHMARK_ENERGY 1
+
+#include <linux/perf_event.h>
+// clang-format off
+#define RAPL_BENCHMARK_COUNTERS_EVENTS {                                                                               \
+        {PERF_TYPE_HARDWARE, PERF_COUNT_HW_CPU_CYCLES},                                                                \
+        {PERF_TYPE_HARDWARE, PERF_COUNT_HW_INSTRUCTIONS},                                                              \
+        {PERF_TYPE_HARDWARE, PERF_COUNT_HW_CACHE_REFERENCES},                                                          \
+        {PERF_TYPE_HARDWARE, PERF_COUNT_HW_CACHE_MISSES},                                                              \
+        {PERF_TYPE_HARDWARE, PERF_COUNT_HW_BRANCH_INSTRUCTIONS},                                                       \
+        {PERF_TYPE_HARDWARE, PERF_COUNT_HW_BRANCH_MISSES},                                                             \
+        {PERF_TYPE_HARDWARE, PERF_COUNT_HW_REF_CPU_CYCLES}                                                             \
 }
+// clang-format on
 
-int main(int argc, char** argv) {
+#include <rapl/benchmark.hpp>
+
+namespace {
+std::uint8_t cores;
+std::uint64_t duration;
+std::vector<std::vector<std::uint64_t>> memory;
+}; // namespace
+
+void setup(int argc, char** argv) {
     auto program = argparse::ArgumentParser("benchmark", "", argparse::default_arguments::help);
 
     program.add_argument("-c", "--cores")
@@ -55,55 +53,55 @@ int main(int argc, char** argv) {
         .metavar("SECONDS")
         .scan<'d', std::uint64_t>();
 
-    program.add_argument("-p", "--miss-rate")
+    program.add_argument("-n", "--number-objects")
         .required()
-        .help("approximate LLC cache miss rate")
-        .metavar("P")
-        .scan<'g', double>();
+        .help("the number of objects to use")
+        .metavar("N")
+        .scan<'d', std::uint64_t>();
 
     try {
         program.parse_args(argc, argv);
     } catch (const std::exception& err) {
         std::cerr << err.what() << std::endl;
         std::cerr << program;
-        return EXIT_FAILURE;
+        std::exit(EXIT_FAILURE);
     }
 
-    const auto cores = program.get<std::uint8_t>("cores");
-    const auto duration = program.get<std::uint64_t>("duration");
-    const auto misses = program.get<double>("miss-rate");
+    cores = program.get<std::uint8_t>("cores");
+    duration = program.get<std::uint64_t>("duration");
+    const auto n = program.get<std::uint64_t>("number-objects");
 
     if (cores == 0) {
         std::cerr << "[ERROR] Can't run a benchmark on zero cores." << std::endl;
-        return EXIT_FAILURE;
+        std::exit(EXIT_FAILURE);
     }
 
-    if (misses < 0 || misses > 1) {
-        std::cerr << "[ERROR] Invalid cache miss percentage." << std::endl;
-        return EXIT_FAILURE;
+    if (n == 0) {
+        std::cerr << "[ERROR] Need at least one allocation." << std::endl;
+        std::exit(EXIT_FAILURE);
     }
 
     auto generator = std::default_random_engine(std::random_device()());
 
-    const std::vector<std::pair<int, int>> events
-        = {{PERF_TYPE_HARDWARE, PERF_COUNT_HW_CPU_CYCLES},          {PERF_TYPE_HARDWARE, PERF_COUNT_HW_INSTRUCTIONS},
-           {PERF_TYPE_HARDWARE, PERF_COUNT_HW_CACHE_REFERENCES},    {PERF_TYPE_HARDWARE, PERF_COUNT_HW_CACHE_MISSES},
-           {PERF_TYPE_HARDWARE, PERF_COUNT_HW_BRANCH_INSTRUCTIONS}, {PERF_TYPE_HARDWARE, PERF_COUNT_HW_BRANCH_MISSES},
-           {PERF_TYPE_HARDWARE, PERF_COUNT_HW_REF_CPU_CYCLES}};
-    perf::Group group(events);
-
-    std::cout << "[INFO] Creating scratch memory..." << std::endl;
-    auto memory = std::vector<std::vector<std::uint8_t>>(cores, std::vector<std::uint8_t>(LL_CACHE_SIZE));
+    memory.resize(cores);
     for (auto& buffer : memory) {
-        for (auto& byte : buffer) {
-            byte = std::uniform_int_distribution<std::uint8_t>()(generator);
+        for (std::uint64_t i = 0; i < n; ++i) {
+            buffer.push_back(std::uniform_int_distribution<std::uint64_t>()(generator));
         }
     }
+}
 
-    std::cout << "[INFO] Starting benchmark..." << std::endl;
-    group.reset();
-    group.enable();
+void work(std::chrono::seconds duration, std::vector<std::uint64_t> memory) {
+    std::uint64_t sum = 0;
+    auto start = std::chrono::high_resolution_clock::now();
+    for (std::size_t i = 0; std::chrono::high_resolution_clock::now() - start < duration; ++i) {
+        sum += i ^ memory[i % memory.size()] + 13 * i;
+        memory[i % memory.size()] = sum;
+    }
+    benchmark::DoNotOptimize(sum);
+}
 
+void run() {
     std::vector<std::thread> threads;
     for (std::uint8_t i = 0; i < cores - 1; ++i) {
         threads.emplace_back(work, std::chrono::seconds(duration), std::move(memory.at(i)));
@@ -112,10 +110,17 @@ int main(int argc, char** argv) {
     for (auto& thread : threads) {
         thread.join();
     }
+}
 
-    group.disable();
-    const auto counters = group.read();
-    for (std::size_t i = 0; i < events.size(); ++i) {
-        std::cout << perf::toString(events[i].first, events[i].second) << ": " << counters[i] << std::endl;
-    }
+void teardown() {}
+
+int main(int argc, char** argv) {
+    const auto result = RAPL_BENCHMARK_MEASURE(argc, argv);
+
+    std::cout << "Total runtime: " << result.runtime_ms << " ms" << std::endl;
+    std::cout << "CPU utilization: "
+              << ((result.rusage.ru_utime.tv_sec + result.rusage.ru_stime.tv_sec
+                   + 1e-6 * (result.rusage.ru_utime.tv_usec + result.rusage.ru_stime.tv_usec))
+                  / (1e-3 * result.runtime_ms))
+              << std::endl;
 }

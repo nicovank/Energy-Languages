@@ -8,7 +8,6 @@
 
 #include <argparse/argparse.hpp>
 #include <benchmark/benchmark.h>
-#include <fmt/core.h>
 #include <glaze/json/write.hpp>
 
 #define RAPL_BENCHMARK_RUNTIME 1
@@ -19,8 +18,8 @@
 
 #define RAPL_BENCHMARK_ENERGY 1
 
-// clang-format off
 #include <linux/perf_event.h>
+// clang-format off
 #define RAPL_BENCHMARK_COUNTERS_EVENTS {                                                                               \
         {PERF_TYPE_HARDWARE, PERF_COUNT_HW_CPU_CYCLES},                                                                \
         {PERF_TYPE_HARDWARE, PERF_COUNT_HW_BRANCH_INSTRUCTIONS},                                                       \
