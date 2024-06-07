@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <cstdlib>
@@ -95,7 +96,7 @@ void work(std::chrono::seconds duration, std::vector<std::uint64_t> memory) {
     std::uint64_t sum = 0;
     auto start = std::chrono::high_resolution_clock::now();
     for (std::size_t i = 0; std::chrono::high_resolution_clock::now() - start < duration; ++i) {
-        sum += i ^ memory[i % memory.size()] + 13 * i;
+        sum += (i ^ memory[i % memory.size()]) + 13 * i;
         memory[i % memory.size()] = sum;
     }
     benchmark::DoNotOptimize(sum);
@@ -123,4 +124,5 @@ int main(int argc, char** argv) {
                    + 1e-6 * (result.rusage.ru_utime.tv_usec + result.rusage.ru_stime.tv_usec))
                   / (1e-3 * result.runtime_ms))
               << std::endl;
+    std::cout << "Energy consumed: " << result.energy.energy << " J" << std::endl;
 }
