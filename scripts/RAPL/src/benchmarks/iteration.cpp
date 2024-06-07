@@ -124,5 +124,4 @@ int main(int argc, char** argv) {
                    + 1e-6 * (result.rusage.ru_utime.tv_usec + result.rusage.ru_stime.tv_usec))
                   / (1e-3 * result.runtime_ms))
               << std::endl;
-    std::cout << "Energy consumed: " << result.energy.energy << " J" << std::endl;
 }
