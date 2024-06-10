@@ -27,3 +27,11 @@ def parse(
 
     benchmarks: List[str] = sorted(list({b for l in data.values() for b in l.keys()}))
     return data, benchmarks
+
+
+def timeval_to_seconds(tv: Dict[str, float]) -> float:
+    return tv["tv_sec"] + 1e-6 * tv["tv_usec"]
+
+
+def cpu_usage(user_cpu_time: float, kernel_cpu_time: float, runtime: float) -> float:
+    return (user_cpu_time + kernel_cpu_time) / runtime

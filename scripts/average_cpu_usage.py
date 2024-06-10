@@ -18,21 +18,13 @@ def main(args: argparse.Namespace) -> None:
     for language in args.languages:
         table.add_column(f"{language}")
 
-    def timeval_to_seconds(tv: Dict[str, float]) -> float:
-        return tv["tv_sec"] + 1e-6 * tv["tv_usec"]
-
-    def cpu_usage(
-        user_cpu_time: float, kernel_cpu_time: float, runtime: float
-    ) -> float:
-        return (user_cpu_time + kernel_cpu_time) / runtime
-
     cpu_usages = {
         language: {
             benchmark: statistics.geometric_mean(
                 [
-                    cpu_usage(
-                        timeval_to_seconds(r["rusage"]["ru_utime"]),
-                        timeval_to_seconds(r["rusage"]["ru_stime"]),
+                    utils.cpu_usage(
+                        utils.timeval_to_seconds(r["rusage"]["ru_utime"]),
+                        utils.timeval_to_seconds(r["rusage"]["ru_stime"]),
                         1e-3 * r["runtime_ms"],
                     )
                     for r in data[language][benchmark]
