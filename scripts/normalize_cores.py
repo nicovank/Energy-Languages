@@ -1,5 +1,6 @@
 import argparse
 import statistics
+from typing import List
 
 import matplotlib.pyplot as plt
 import scipy
@@ -56,8 +57,8 @@ def main(args: argparse.Namespace) -> None:
                 )
 
     # Group by language:
-    xs_grouped = []
-    ys_grouped = []
+    xs_grouped: List[List[float]] = []
+    ys_grouped: List[List[float]] = []
 
     for language in args.languages:
         xs_grouped.append([])
