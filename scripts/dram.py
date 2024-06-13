@@ -24,7 +24,8 @@ def main(args: argparse.Namespace) -> None:
 
             dram_energy_per_second = statistics.median(
                 [
-                    sum([s["energy"]["dram"] for s in r["energy_samples"]]) / (1e-3 * r["runtime_ms"])
+                    sum([s["energy"]["dram"] for s in r["energy_samples"]])
+                    / (1e-3 * r["runtime_ms"])
                     for r in data[language][benchmark]
                 ]
             )

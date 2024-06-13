@@ -3,7 +3,7 @@ import statistics
 from typing import List
 
 import matplotlib.pyplot as plt
-import scipy # type: ignore
+import scipy  # type: ignore
 
 from . import utils
 
