@@ -52,7 +52,9 @@ def main(args: argparse.Namespace) -> None:
                 d
                 for d in os.listdir(os.path.join(BENCHMARKS_ROOT, language))
                 if os.path.isdir(os.path.join(BENCHMARKS_ROOT, language, d))
-                and os.path.exists(os.path.join(BENCHMARKS_ROOT, language, d, "Makefile"))
+                and os.path.exists(
+                    os.path.join(BENCHMARKS_ROOT, language, d, "Makefile")
+                )
             ]
         )
 
