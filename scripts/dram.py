@@ -33,14 +33,12 @@ def main(args: argparse.Namespace) -> None:
             xs.append(memory_operations_per_second)
             ys.append(dram_energy_per_second)
 
-            # print(language, benchmark, dram_energy / memory_operations_per_second)
-
     plt.rcParams.update({"text.usetex": True, "font.family": "serif"})
     with plt.style.context("bmh"):
         plt.scatter(xs, ys)
 
-        # plt.xlabel("Average cores used")
-        # plt.ylabel("Average power [W]")
+        plt.xlabel("Memory operations per second [1/s]")
+        plt.ylabel("Power [W]")
         plt.ylim(bottom=0)
         plt.savefig(f"dram.{args.format}", format=args.format)
 
