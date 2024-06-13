@@ -105,42 +105,42 @@ def main(args: argparse.Namespace) -> None:
     plt.rcParams.update({"text.usetex": True, "font.family": "serif"})
     with plt.style.context("bmh"):
         plt.scatter(xs, ys)
-        plt.plot(
-            list(range(1, 17)),
-            [
-                34.1687,
-                46.5196,
-                50.3137,
-                52.3241,
-                54.5677,
-                56.5167,
-                58.4932,
-                60.9066,
-                63.8334,
-                66.3835,
-                68.3035,
-                70.4256,
-                73.0678,
-                75.3255,
-                77.6687,
-                79.6539,
-            ],
-            color="red",
-            linestyle="dashed",
-        )
+        # plt.plot(
+        #     list(range(1, 17)),
+        #     [
+        #         34.1687,
+        #         46.5196,
+        #         50.3137,
+        #         52.3241,
+        #         54.5677,
+        #         56.5167,
+        #         58.4932,
+        #         60.9066,
+        #         63.8334,
+        #         66.3835,
+        #         68.3035,
+        #         70.4256,
+        #         73.0678,
+        #         75.3255,
+        #         77.6687,
+        #         79.6539,
+        #     ],
+        #     color="red",
+        #     linestyle="dashed",
+        # )
 
         # Plot grouped"
         # for i, language in enumerate(args.languages):
         #     plt.scatter(xs_grouped[i], ys_grouped[i], label=language.replace("#", "\\#"))
         # plt.legend()
 
-        # slope, intercept, _, p_value, _ = scipy.stats.linregress(xs, ys)
-        # plt.plot(
-        #     [min(xs), max(xs)],
-        #     [intercept + slope * min(xs), intercept + slope * max(xs)],
-        #     color="red",
-        # )
-        # print(f"p-value: {p_value}")
+        slope, intercept, rvalue, _, _ = scipy.stats.linregress(xs, ys)
+        plt.plot(
+            [min(xs), max(xs)],
+            [intercept + slope * min(xs), intercept + slope * max(xs)],
+            color="red",
+        )
+        print(f"rvalue: {rvalue}")
 
         plt.xlabel("Average cores used")
         plt.ylabel("Average power [W]")

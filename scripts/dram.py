@@ -2,6 +2,7 @@ import argparse
 import statistics
 
 import matplotlib.pyplot as plt
+import scipy  # type: ignore
 
 from . import utils
 
@@ -36,6 +37,14 @@ def main(args: argparse.Namespace) -> None:
     plt.rcParams.update({"text.usetex": True, "font.family": "serif"})
     with plt.style.context("bmh"):
         plt.scatter(xs, ys)
+
+        slope, intercept, rvalue, _, _ = scipy.stats.linregress(xs, ys)
+        plt.plot(
+            [min(xs), max(xs)],
+            [intercept + slope * min(xs), intercept + slope * max(xs)],
+            color="red",
+        )
+        print(f"rvalue: {rvalue}")
 
         plt.xlabel("Memory operations per second [1/s]")
         plt.ylabel("Power [W]")
