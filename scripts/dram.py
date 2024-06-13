@@ -15,24 +15,33 @@ def main(args: argparse.Namespace) -> None:
 
     for language in args.languages:
         for benchmark in data[language].keys():
-            memory_operations_per_second = statistics.median(
-                [
-                    r["counters"]["PERF_COUNT_HW_CACHE_MISSES"]
-                    / (1e-3 * r["runtime_ms"])
-                    for r in data[language][benchmark]
-                ]
-            )
+            if args.no_mean:
+                for r in data[language][benchmark]:
+                    xs.append(
+                        r["counters"]["PERF_COUNT_HW_CACHE_MISSES"]
+                        / (1e-3 * r["runtime_ms"])
+                    )
+                    ys.append(
+                        sum([s["energy"]["dram"] for s in r["energy_samples"]])
+                        / (1e-3 * r["runtime_ms"])
+                    )
+            else:
+                xs.append(statistics.median(
+                    [
+                        r["counters"]["PERF_COUNT_HW_CACHE_MISSES"]
+                        / (1e-3 * r["runtime_ms"])
+                        for r in data[language][benchmark]
+                    ]
+                ))
+                ys.append(statistics.median(
+                    [
+                        sum([s["energy"]["dram"] for s in r["energy_samples"]])
+                        / (1e-3 * r["runtime_ms"])
+                        for r in data[language][benchmark]
+                    ]
+                ))
 
-            dram_energy_per_second = statistics.median(
-                [
-                    sum([s["energy"]["dram"] for s in r["energy_samples"]])
-                    / (1e-3 * r["runtime_ms"])
-                    for r in data[language][benchmark]
-                ]
-            )
-
-            xs.append(memory_operations_per_second)
-            ys.append(dram_energy_per_second)
+            
 
     plt.rcParams.update({"text.usetex": True, "font.family": "serif"})
     with plt.style.context("bmh"):
@@ -73,5 +82,6 @@ if __name__ == "__main__":
             "Lua",
         ],
     )
+    parser.add_argument("--no-mean", action="store_true")
     parser.add_argument("--format", type=str, default="png")
     main(parser.parse_args())
