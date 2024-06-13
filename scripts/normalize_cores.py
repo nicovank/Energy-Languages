@@ -8,7 +8,7 @@ from . import utils
 
 
 def main(args: argparse.Namespace) -> None:
-    data, benchmarks = utils.parse(args.data_root, args.languages)
+    data, _ = utils.parse(args.data_root, args.languages)
     # x-value: average cpu usage
     # y-value: average energy usage / average runtime
 
@@ -104,9 +104,29 @@ def main(args: argparse.Namespace) -> None:
     plt.rcParams.update({"text.usetex": True, "font.family": "serif"})
     with plt.style.context("bmh"):
         plt.scatter(xs, ys)
-        plt.plot(list(range(1, 17)), [
-            34.1687, 46.5196, 50.3137, 52.3241, 54.5677, 56.5167, 58.4932, 60.9066, 63.8334, 66.3835, 68.3035, 70.4256, 73.0678, 75.3255, 77.6687, 79.6539
-        ], color="red", linestyle='dashed',)
+        plt.plot(
+            list(range(1, 17)),
+            [
+                34.1687,
+                46.5196,
+                50.3137,
+                52.3241,
+                54.5677,
+                56.5167,
+                58.4932,
+                60.9066,
+                63.8334,
+                66.3835,
+                68.3035,
+                70.4256,
+                73.0678,
+                75.3255,
+                77.6687,
+                79.6539,
+            ],
+            color="red",
+            linestyle="dashed",
+        )
 
         # Plot grouped"
         # for i, language in enumerate(args.languages):
