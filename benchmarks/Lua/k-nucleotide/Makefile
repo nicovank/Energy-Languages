@@ -10,10 +10,10 @@ compile:
 	$(LUAC) -o knucleotide.luac knucleotide.lua
 
 run:
-	$(LUA) knucleotide.luac 0 < ../../knucleotide-input25000000.txt
+	$(LUA) knucleotide.luac 0 < ../../../knucleotide-input25000000.txt
 
 measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../scripts/RAPL/build/rapl --json "$(JSON)" $(LUA) knucleotide.luac 0 < ../../knucleotide-input25000000.txt
+	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(LUA) knucleotide.luac 0 < ../../../knucleotide-input25000000.txt
