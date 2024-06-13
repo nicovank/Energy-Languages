@@ -7,7 +7,7 @@ from typing import Any
 from rich.console import Console
 from rich.progress import BarColumn, MofNCompleteColumn, Progress, TextColumn
 
-ROOT = os.path.join(os.path.dirname(__file__), "..")
+ROOT = os.path.join(os.path.dirname(__file__), "..", "benchmarks")
 RAPL_ROOT = os.path.join(ROOT, "scripts", "RAPL", "build", "rapl")
 
 console = Console(markup=False)
