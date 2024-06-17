@@ -8,8 +8,7 @@ from rich.console import Console
 from rich.progress import BarColumn, MofNCompleteColumn, Progress, TextColumn
 
 ROOT = os.path.join(os.path.dirname(__file__), "..")
-BENCHMARKS_ROOT = os.path.join(ROOT, "benchmarks")
-RAPL_ROOT = os.path.join(ROOT, "scripts", "RAPL", "build", "rapl")
+RAPL_EXE = os.path.join(ROOT, "scripts", "RAPL", "build", "rapl")
 
 console = Console(markup=False)
 progress_columns = [
@@ -20,6 +19,7 @@ progress_columns = [
 
 
 def run_benchmark(
+    args: argparse.Namespace,
     language: str,
     benchmark: str,
     timeout: float,
@@ -37,7 +37,7 @@ def run_benchmark(
             stdin=subprocess.DEVNULL,
             stdout=subprocess.DEVNULL,
             stderr=(None if verbose else subprocess.DEVNULL),
-            cwd=os.path.join(BENCHMARKS_ROOT, language, benchmark),
+            cwd=os.path.join(args.benchmark_root, language, benchmark),
             timeout=timeout,
             env=env,
         ).returncode
@@ -50,10 +50,10 @@ def main(args: argparse.Namespace) -> None:
         benchmarks = sorted(
             [
                 d
-                for d in os.listdir(os.path.join(BENCHMARKS_ROOT, language))
-                if os.path.isdir(os.path.join(BENCHMARKS_ROOT, language, d))
+                for d in os.listdir(os.path.join(args.benchmark_root, language))
+                if os.path.isdir(os.path.join(args.benchmark_root, language, d))
                 and os.path.exists(
-                    os.path.join(BENCHMARKS_ROOT, language, d, "Makefile")
+                    os.path.join(args.benchmark_root, language, d, "Makefile")
                 )
             ]
         )
@@ -61,7 +61,7 @@ def main(args: argparse.Namespace) -> None:
         with Progress(*progress_columns, console=console, transient=True) as progress:
             task = progress.add_task(f"{language}::Compile", total=len(benchmarks))
             for benchmark in list(benchmarks):
-                directory = os.path.join(BENCHMARKS_ROOT, language, benchmark)
+                directory = os.path.join(args.benchmark_root, language, benchmark)
                 compilation = subprocess.run(
                     ["make", "compile"],
                     cwd=directory,
@@ -90,6 +90,7 @@ def main(args: argparse.Namespace) -> None:
                     )
                     for i in range(args.warmup):
                         status = run_benchmark(
+                            args,
                             language,
                             benchmark,
                             args.timeout,
@@ -127,6 +128,7 @@ def main(args: argparse.Namespace) -> None:
                         env = {**os.environ, "JSON": json}
 
                         status = run_benchmark(
+                            args,
                             language,
                             benchmark,
                             args.timeout,
@@ -146,6 +148,12 @@ def main(args: argparse.Namespace) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Runs the measurements.")
 
+    parser.add_argument(
+        "--benchmark-root",
+        metavar="PATH",
+        default=os.path.join(ROOT, "benchmarks"),
+        help="Top-level directory with language subdirectories",
+    )
     parser.add_argument(
         "--languages",
         required=True,
@@ -183,7 +191,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    if args.iterations > 0 and not os.path.exists(RAPL_ROOT):
+    if args.iterations > 0 and not os.path.exists(RAPL_EXE):
         raise RuntimeError(
             "Could not find the RAPL executable. Make sure you build it first."
         )
