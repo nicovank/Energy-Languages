@@ -8,6 +8,7 @@ from rich.console import Console
 from rich.progress import BarColumn, MofNCompleteColumn, Progress, TextColumn
 
 ROOT = os.path.join(os.path.dirname(__file__), "..")
+BENCHMARKS_ROOT = os.path.join(ROOT, "benchmarks")
 RAPL_ROOT = os.path.join(ROOT, "scripts", "RAPL", "build", "rapl")
 
 console = Console(markup=False)
@@ -36,7 +37,7 @@ def run_benchmark(
             stdin=subprocess.DEVNULL,
             stdout=subprocess.DEVNULL,
             stderr=(None if verbose else subprocess.DEVNULL),
-            cwd=os.path.join(ROOT, language, benchmark),
+            cwd=os.path.join(BENCHMARKS_ROOT, language, benchmark),
             timeout=timeout,
             env=env,
         ).returncode
@@ -49,16 +50,18 @@ def main(args: argparse.Namespace) -> None:
         benchmarks = sorted(
             [
                 d
-                for d in os.listdir(os.path.join(ROOT, language))
-                if os.path.isdir(os.path.join(ROOT, language, d))
-                and os.path.exists(os.path.join(ROOT, language, d, "Makefile"))
+                for d in os.listdir(os.path.join(BENCHMARKS_ROOT, language))
+                if os.path.isdir(os.path.join(BENCHMARKS_ROOT, language, d))
+                and os.path.exists(
+                    os.path.join(BENCHMARKS_ROOT, language, d, "Makefile")
+                )
             ]
         )
 
         with Progress(*progress_columns, console=console, transient=True) as progress:
             task = progress.add_task(f"{language}::Compile", total=len(benchmarks))
             for benchmark in list(benchmarks):
-                directory = os.path.join(ROOT, language, benchmark)
+                directory = os.path.join(BENCHMARKS_ROOT, language, benchmark)
                 compilation = subprocess.run(
                     ["make", "compile"],
                     cwd=directory,

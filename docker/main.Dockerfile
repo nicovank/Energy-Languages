@@ -99,7 +99,7 @@ RUN rm -rf Python-${PYTHON_VERSION}.tar.xz Python-${PYTHON_VERSION}.tar.xz.asc P
 
 # Python dependencies.
 RUN python3 -m pip install --upgrade pip
-COPY Python/requirements.txt /root/Energy-Languages/
+COPY benchmarks/Python/requirements.txt /root/Energy-Languages/
 RUN python3 -m pip install -r /root/Energy-Languages/requirements.txt
 COPY scripts/requirements.txt /root/LangBench/
 RUN python3 -m pip install -r /root/LangBench/requirements.txt
@@ -124,9 +124,9 @@ RUN cd lua-${LUA_VERSION} && make && make install
 RUN rm lua-${LUA_VERSION}.tar.gz
 
 # LuaJIT.
-ARG LUAJIT_BRANCH=v2.1
-RUN git clone --branch ${LUAJIT_BRANCH} https://luajit.org/git/luajit.git
-RUN cd luajit && make && make install
+ARG LUAJIT_COMMIT=93e87998b24021b94de8d1c8db244444c46fb6e9
+RUN git clone https://luajit.org/git/luajit.git
+RUN cd luajit && git checkout ${LUAJIT_COMMIT} && make && make install
 RUN rm -rf luajit
 
 WORKDIR /root/Energy-Languages
