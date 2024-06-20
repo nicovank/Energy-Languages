@@ -10,10 +10,10 @@ compile:
 	$(JAVAC) -d . binarytrees.java
 
 run:
-	$(JAVA) binarytrees 21
+	$(JAVA) binarytrees 27
 
 measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(JAVA) binarytrees 21
+	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(JAVA) binarytrees 27

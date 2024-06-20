@@ -5,10 +5,10 @@ endif
 compile:
 
 run:
-	php -n -d memory_limit=4096M binarytrees.php 21
+	php -n -d memory_limit=4096M binarytrees.php 27
 
 measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" php -n -d memory_limit=4096M binarytrees.php 21
+	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" php -n -d memory_limit=4096M binarytrees.php 27
