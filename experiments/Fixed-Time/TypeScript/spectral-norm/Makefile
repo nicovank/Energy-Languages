@@ -11,10 +11,10 @@ compile:
 	$(TSC) --alwaysStrict -t ESNEXT spectralnorm.ts
 
 run:
-	$(NODE) spectralnorm.js 5500
+	$(NODE) spectralnorm.js 150000
 
 measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(NODE) spectralnorm.js 5500
+	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(NODE) spectralnorm.js 150000
