@@ -83,7 +83,7 @@ RUN apt install -y pkg-config build-essential autoconf bison re2c libxml2-dev li
 RUN wget --no-verbose https://www.php.net/distributions/php-${PHP_VERSION}.tar.gz
 RUN echo "${PHP_CHECKSUM} php-${PHP_VERSION}.tar.gz" | sha256sum --check
 RUN tar -xzf php-${PHP_VERSION}.tar.gz
-RUN cd php-${PHP_VERSION} && ./configure --enable-pcntl --enable-shmop --enable-sysvmsg --with-gmp && make && make install
+RUN cd php-${PHP_VERSION} && ./configure --enable-pcntl --enable-shmop --enable-sysvmsg --with-gmp && make -j && make install
 RUN rm -rf php-${PHP_VERSION}.tar.gz php-${PHP_VERSION}
 
 # Python.
@@ -94,7 +94,7 @@ RUN wget --no-verbose https://www.python.org/ftp/python/${PYTHON_VERSION}/Python
 RUN wget --no-verbose https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz.asc
 RUN gpg --verify Python-${PYTHON_VERSION}.tar.xz.asc Python-${PYTHON_VERSION}.tar.xz
 RUN tar -xJf Python-${PYTHON_VERSION}.tar.xz
-RUN cd Python-${PYTHON_VERSION} && ./configure --enable-optimizations --with-lto && make && make install
+RUN cd Python-${PYTHON_VERSION} && ./configure --enable-optimizations --with-lto && make -j && make install
 RUN rm -rf Python-${PYTHON_VERSION}.tar.xz Python-${PYTHON_VERSION}.tar.xz.asc Python-${PYTHON_VERSION}
 
 # Python dependencies.
@@ -120,13 +120,13 @@ ARG LUA_CHECKSUM=7d5ea1b9cb6aa0b59ca3dde1c6adcb57ef83a1ba8e5432c0ecd06bf439b3ad8
 RUN wget --no-verbose https://www.lua.org/ftp/lua-${LUA_VERSION}.tar.gz
 RUN echo "${LUA_CHECKSUM} lua-${LUA_VERSION}.tar.gz" | sha256sum --check
 RUN tar -xzf lua-${LUA_VERSION}.tar.gz
-RUN cd lua-${LUA_VERSION} && make && make install
+RUN cd lua-${LUA_VERSION} && make -j && make install
 RUN rm lua-${LUA_VERSION}.tar.gz
 
 # LuaJIT.
 ARG LUAJIT_COMMIT=93e87998b24021b94de8d1c8db244444c46fb6e9
 RUN git clone https://luajit.org/git/luajit.git
-RUN cd luajit && git checkout ${LUAJIT_COMMIT} && make && make install
+RUN cd luajit && git checkout ${LUAJIT_COMMIT} && make -j && make install
 RUN rm -rf luajit
 
 WORKDIR /root/Energy-Languages
