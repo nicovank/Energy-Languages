@@ -6,10 +6,10 @@ compile:
 	$(LUAJIT) -b nbody.lua nbody.out
 
 run:
-	$(LUAJIT) nbody.out 50000000
+	$(LUAJIT) nbody.out 1000000000
 
 measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(LUAJIT) nbody.out 50000000
+	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(LUAJIT) nbody.out 1000000000

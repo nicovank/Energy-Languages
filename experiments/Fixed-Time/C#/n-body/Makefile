@@ -8,10 +8,10 @@ compile:
 	$(DOTNET) build build/ -c Release --no-incremental
 
 run:
-	$(DOTNET) run -c Release --project build/ --no-build -- 50000000
+	$(DOTNET) run -c Release --project build/ --no-build -- 1000000000
 
 measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(DOTNET) run -c Release --project build/ --no-build -- 50000000
+	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(DOTNET) run -c Release --project build/ --no-build -- 1000000000

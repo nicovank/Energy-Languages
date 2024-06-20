@@ -5,10 +5,10 @@ endif
 compile:
 
 run:
-	$(NODE) nbody.js 50000000
+	$(NODE) nbody.js 1000000000
 
 measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(NODE) nbody.js 50000000
+	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(NODE) nbody.js 1000000000

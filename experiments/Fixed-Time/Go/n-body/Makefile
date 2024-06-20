@@ -6,10 +6,10 @@ compile:
 	$(GO) build -o nbody_run nbody.go
 
 run:
-	./nbody_run 50000000
+	./nbody_run 1000000000
 
 measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" ./nbody_run 50000000
+	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" ./nbody_run 1000000000

@@ -10,10 +10,10 @@ compile:
 	$(LUAC) -o nbody.luac nbody.lua
 
 run:
-	$(LUA) nbody.luac 50000000
+	$(LUA) nbody.luac 1000000000
 
 measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(LUA) nbody.luac 50000000
+	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(LUA) nbody.luac 1000000000
