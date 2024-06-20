@@ -6,10 +6,10 @@ compile:
 	$(GO) build -o pidigits_run pidigits.go
 
 run:
-	./pidigits_run 10000
+	./pidigits_run 100000
 
 measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" ./pidigits_run 10000
+	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" ./pidigits_run 100000

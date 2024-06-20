@@ -5,10 +5,10 @@ endif
 compile:
 
 run:
-	php -c . pidigits.php 10000
+	php -c . pidigits.php 100000
 
 measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" php -c . pidigits.php 10000
+	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" php -c . pidigits.php 100000

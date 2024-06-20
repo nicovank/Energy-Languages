@@ -6,10 +6,10 @@ compile:
 	$(PYTHON) -m compileall -o 2 pidigits.py
 
 run:
-	$(PYTHON) -OO pidigits.py 10000
+	$(PYTHON) -OO pidigits.py 100000
 
 measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(PYTHON) -OO pidigits.py 10000
+	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(PYTHON) -OO pidigits.py 100000

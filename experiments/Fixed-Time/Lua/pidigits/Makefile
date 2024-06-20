@@ -10,10 +10,10 @@ compile:
 	$(LUAC) -o pidigits.luac pidigits.lua
 
 run:
-	$(LUA) pidigits.luac 10000
+	$(LUA) pidigits.luac 100000
 
 measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(LUA) pidigits.luac 10000
+	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(LUA) pidigits.luac 100000
