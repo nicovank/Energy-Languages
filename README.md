@@ -41,8 +41,8 @@ The following options are available:
 
 Here is an example running all languages/benchmarks pairs.
 ```bash
-% sudo docker run -it --privileged -v `pwd`/data/`hostname -s`/docker-default:/root/data energy-languages \
-    --languages C C++ Rust Go Java C\# JavaScript TypeScript PHP Python Lua \
+% sudo docker run -it --rm --privileged -v `pwd`/data/`hostname -s`/docker-default:/root/data energy-languages \
+    --languages C C++ Rust Go Java C\# JavaScript TypeScript PHP Python PyPy Lua LuaJIT \
     --warmup 3 \
     --iterations 21 \
     --timeout 600
@@ -50,8 +50,9 @@ Here is an example running all languages/benchmarks pairs.
 
 Running additional experiments.
 ```bash
-% sudo docker run -it --privileged -v `pwd`/data/`hostname -s`/docker-default:/root/data energy-languages \
-    --languages "experiments/C as C++" "experiments/Go-no-GC" "experiments/JavaScript as TypeScript" "experiments/LuaJIT" "experiments/PyPy" \
+% sudo docker run -it --rm --privileged -v `pwd`/data/`hostname -s`/docker-default:/root/data energy-languages \
+    --benchmark-root experiments
+    --languages "C as C++" "Go-no-GC" "JavaScript as TypeScript" \
     --warmup 3 \
     --iterations 21 \
     --timeout 600
