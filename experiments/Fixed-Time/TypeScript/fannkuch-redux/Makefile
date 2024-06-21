@@ -17,4 +17,4 @@ measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(NODE) fannkuchredux.js 12
+	sudo ../../../../scripts/RAPL/build/rapl --json "$(JSON)" $(NODE) fannkuchredux.js 12

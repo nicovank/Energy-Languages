@@ -6,10 +6,10 @@ compile:
 	$(PYTHON) -m compileall -o 2 knucleotide.py
 
 run:
-	$(PYTHON) -OO knucleotide.py 0 < ../../../knucleotide-input800000000.txt
+	$(PYTHON) -OO knucleotide.py 0 < ../../../../knucleotide-input800000000.txt
 
 measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(PYTHON) -OO knucleotide.py 0 < ../../../knucleotide-input800000000.txt
+	sudo ../../../../scripts/RAPL/build/rapl --json "$(JSON)" $(PYTHON) -OO knucleotide.py 0 < ../../../../knucleotide-input800000000.txt

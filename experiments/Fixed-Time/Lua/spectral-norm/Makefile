@@ -16,4 +16,4 @@ measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(LUA) spectralnorm.luac 150000
+	sudo ../../../../scripts/RAPL/build/rapl --json "$(JSON)" $(LUA) spectralnorm.luac 150000

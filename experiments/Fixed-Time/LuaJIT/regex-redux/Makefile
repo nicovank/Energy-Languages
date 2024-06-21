@@ -6,10 +6,10 @@ compile:
 	$(LUAJIT) -b regexredux.lua regexredux.out
 
 run:
-	$(LUAJIT) regexredux.out 0 < ../../../regexredux-input5000000.txt
+	$(LUAJIT) regexredux.out 0 < ../../../../regexredux-input5000000.txt
 
 measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(LUAJIT) regexredux.out 0 < ../../../regexredux-input5000000.txt
+	sudo ../../../../scripts/RAPL/build/rapl --json "$(JSON)" $(LUAJIT) regexredux.out 0 < ../../../../regexredux-input5000000.txt
