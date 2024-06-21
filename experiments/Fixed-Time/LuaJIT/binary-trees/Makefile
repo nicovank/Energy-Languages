@@ -12,4 +12,4 @@ measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(LUAJIT) binarytrees.out 27
+	sudo ../../../../scripts/RAPL/build/rapl --json "$(JSON)" $(LUAJIT) binarytrees.out 27

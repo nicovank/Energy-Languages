@@ -11,4 +11,4 @@ measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" php -n spectralnorm.php 150000
+	sudo ../../../../scripts/RAPL/build/rapl --json "$(JSON)" php -n spectralnorm.php 150000

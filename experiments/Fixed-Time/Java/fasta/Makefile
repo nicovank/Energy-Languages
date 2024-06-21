@@ -16,4 +16,4 @@ measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(JAVA) fasta 2000000000
+	sudo ../../../../scripts/RAPL/build/rapl --json "$(JSON)" $(JAVA) fasta 2000000000
