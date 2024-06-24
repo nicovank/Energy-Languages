@@ -32,15 +32,20 @@ def run_benchmark(
     # SIGPLAN Not. 44, 3 (March 2009), 265–276. https://doi.org/10.1145/1508284.1508275
     env["RANDOMIZED_ENVIRONMENT_OFFSET"] = "".join(["X"] * random.randint(0, 4096))
     try:
-        return subprocess.run(
+        process = subprocess.run(
             ["make", type],
             stdin=subprocess.DEVNULL,
-            stdout=subprocess.DEVNULL,
-            stderr=(None if verbose else subprocess.DEVNULL),
-            cwd=os.path.join(args.benchmark_root, language, benchmark),
+            stdout=(subprocess.PIPE if verbose else subprocess.DEVNULL),
+            stderr=(subprocess.STDOUT if verbose else subprocess.DEVNULL),
+            cwd=os.path.abspath(os.path.join(args.benchmark_root, language, benchmark)),
             timeout=timeout,
             env=env,
-        ).returncode
+        )
+
+        if verbose:
+            console.print(process.stdout.decode("utf-8"))
+        
+        return process.returncode
     except subprocess.TimeoutExpired:
         return -1
 
