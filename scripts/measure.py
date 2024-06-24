@@ -44,7 +44,7 @@ def run_benchmark(
 
         if verbose:
             console.print(process.stdout.decode("utf-8"))
-        
+
         return process.returncode
     except subprocess.TimeoutExpired:
         return -1
