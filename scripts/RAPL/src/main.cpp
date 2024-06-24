@@ -79,7 +79,7 @@ void setup(int argc, char** argv) {
 }
 
 void run() {
-    pid_t pid = fork();
+    const auto pid = fork();
 
     if (pid == -1) {
         std::cerr << "fork failed" << std::endl;
