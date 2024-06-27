@@ -46,14 +46,12 @@ def main(args: argparse.Namespace) -> None:
             os.path.join(ROOT, "scripts/RAPL"),
             "-B",
             os.path.join(ROOT, "scripts/RAPL/build"),
-            "-G",
-            "Ninja",
             "-DCMAKE_BUILD_TYPE=Release",
         ],
         stdout=(subprocess.DEVNULL if not args.verbose else None),
     )
     subprocess.check_call(
-        ["cmake", "--build", os.path.join(ROOT, "scripts/RAPL/build")],
+        ["cmake", "--build", os.path.join(ROOT, "scripts/RAPL/build"), "--parallel"],
         stdout=(subprocess.DEVNULL if not args.verbose else None),
     )
 
