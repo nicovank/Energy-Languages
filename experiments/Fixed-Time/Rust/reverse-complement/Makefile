@@ -4,10 +4,10 @@ compile:
 	RUSTFLAGS="$(RUSTFLAGS)" cargo build --release
 
 run:
-	./target/release/reverse-complement 0 < ../../../../revcomp-input25000000.txt
+	./target/release/reverse-complement 0 < ../../../../fasta-25000000.txt
 
 measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../../scripts/RAPL/build/rapl --json "$(JSON)" ./target/release/reverse-complement 0 < ../../../../revcomp-input25000000.txt
+	sudo ../../../../scripts/RAPL/build/rapl --json "$(JSON)" ./target/release/reverse-complement 0 < ../../../../fasta-25000000.txt

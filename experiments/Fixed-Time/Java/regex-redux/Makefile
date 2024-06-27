@@ -10,7 +10,7 @@ compile:
 	$(JAVAC) -d . regexredux.java
 
 run:
-	$(JAVA) regexredux 0 < ../../../../regexredux-input5000000.txt
+	$(JAVA) regexredux 0 < ../../../../fasta-5000000.txt
 
 measure:
 ifndef JSON
