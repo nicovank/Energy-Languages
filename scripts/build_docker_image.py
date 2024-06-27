@@ -33,8 +33,7 @@ def generate_input_files() -> None:
 
 def main(args: argparse.Namespace) -> None:
     if not os.geteuid() == 0:
-        print("[ERROR] This script should be run as root.")
-        exit(1)
+        print("[WARNING] This script should be run as root.")
 
     print("Checking input files ...")
     generate_input_files()

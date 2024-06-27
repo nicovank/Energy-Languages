@@ -26,4 +26,4 @@ jobs:
           python-version: '3.12'
 
       - name: Build Docker Image
-        run: sudo python -m scripts.build_docker_image --verbose
+        run: python -m scripts.build_docker_image --verbose
