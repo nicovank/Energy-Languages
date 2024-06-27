@@ -101,8 +101,8 @@ RUN rm -rf Python-${PYTHON_VERSION}.tar.xz Python-${PYTHON_VERSION}.tar.xz.asc P
 RUN python3 -m pip install --upgrade pip
 COPY benchmarks/Python/requirements.txt /root/Energy-Languages/
 RUN python3 -m pip install -r /root/Energy-Languages/requirements.txt
-COPY scripts/requirements.txt /root/LangBench/
-RUN python3 -m pip install -r /root/LangBench/requirements.txt
+COPY scripts/requirements.txt /root/Energy-Languages/
+RUN python3 -m pip install -r /root/Energy-Languages/requirements.txt
 
 # PyPy.
 ARG PYPY_VERSION=7.3.12
@@ -130,6 +130,10 @@ RUN cd luajit && git checkout ${LUAJIT_COMMIT} && make -j && make install
 RUN rm -rf luajit
 
 WORKDIR /root/Energy-Languages
-COPY . .
-RUN ./gen-input.sh
-ENTRYPOINT [ "./docker/bench.sh" ]
+COPY fasta-5000000.txt .
+COPY fasta-25000000.txt .
+COPY fasta-800000000.txt .
+COPY benchmarks .
+COPY experiments .
+COPY scripts .
+ENTRYPOINT [ "python3", "-m", "scripts.measure", "-o", "/root/data" ]

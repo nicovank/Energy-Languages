@@ -67,7 +67,8 @@ COPY scripts/requirements.txt /root/LangBench/
 RUN python3 -m pip install -r /root/LangBench/requirements.txt
 
 WORKDIR /root/LangBench
+# TODO: Fix copy below.
 COPY . .
 RUN python3 ./benchmark-data/file-server/generate.py
 RUN make -C ./benchmark-data/file-server/client/
-ENTRYPOINT [ "./docker/bench.sh" ]
+ENTRYPOINT [ "python3", "-m", "scripts.measure", "-o", "/root/data" ]

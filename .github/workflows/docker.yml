@@ -6,11 +6,13 @@ on:
     paths:
      - "docker/**"
      - ".github/workflows/docker.yml"
+     - "scripts/build_docker_image.py"
   pull_request:
     branches: ["master"]
     paths:
      - "docker/**"
      - ".github/workflows/docker.yml"
+     - "scripts/build_docker_image.py"
 
 jobs:
   build-docker-image:
@@ -20,4 +22,4 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build Docker Image
-        run: sudo docker build -f $GITHUB_WORKSPACE/docker/main.Dockerfile -t energy-languages $GITHUB_WORKSPACE
+        run: sudo python3.12 -m scripts.build_docker_image --verbose
