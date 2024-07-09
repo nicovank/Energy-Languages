@@ -42,7 +42,6 @@ int main(int argc, char **argv) {
 
 #include <chrono>
 #include <cstdint>
-#include <string>
 #include <vector>
 
 #include <glaze/core/common.hpp>
@@ -92,10 +91,6 @@ struct glz::meta<EnergySample> {
 };
 #endif
 
-#if RAPL_BENCHMARK_CUSTOM_DATA
-#include <unordered_map>
-#endif
-
 struct Result {
 #if RAPL_BENCHMARK_RUNTIME
     typename RAPL_BENCHMARK_RUNTIME_CLOCK::rep runtime_ms;
@@ -108,9 +103,6 @@ struct Result {
 #endif
 #if RAPL_BENCHMARK_ENERGY
     std::vector<EnergySample> energy_samples;
-#endif
-#if RAPL_BENCHMARK_CUSTOM_DATA
-    std::unordered_map<std::string, std::string> custom;
 #endif
 };
 
