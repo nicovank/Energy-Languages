@@ -81,6 +81,9 @@ target_link_libraries(rapl PRIVATE argparse)
 target_link_libraries(rapl PRIVATE glaze::glaze)
 target_link_libraries(rapl PRIVATE rapl_lib)
 
+add_executable(time-limiter src/time-limiter.cpp)
+target_compile_options(time-limiter PRIVATE -Wall -Wextra -Wpedantic -Werror)
+
 add_executable(benchmark_iteration src/benchmarks/iteration.cpp)
 target_compile_options(benchmark_iteration PRIVATE -Wall -Wextra -Wpedantic -Werror)
 target_link_libraries(benchmark_iteration PRIVATE argparse)
