@@ -130,10 +130,10 @@ RUN cd luajit && git checkout ${LUAJIT_COMMIT} && make -j && make install
 RUN rm -rf luajit
 
 WORKDIR /root/Energy-Languages
-COPY fasta-5000000.txt .
-COPY fasta-25000000.txt .
-COPY fasta-800000000.txt .
-COPY benchmarks .
-COPY experiments .
-COPY scripts .
+COPY fasta-5000000.txt fasta-5000000.txt
+COPY fasta-25000000.txt fasta-25000000.txt
+COPY fasta-800000000.txt fasta-800000000.txt
+COPY benchmarks benchmarks
+COPY experiments experiments
+COPY scripts scripts
 ENTRYPOINT [ "python3", "-m", "scripts.measure", "-o", "/root/data" ]
