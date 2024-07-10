@@ -13,4 +13,4 @@ endif
 ifndef SECONDS
 	$(error SECONDS is not defined)
 endif
-	sudo ../../../../scripts/RAPL/build/time-limiter $(SECONDS) ../../../../scripts/RAPL/build/rapl --json "$(JSON)" ./target/release/reverse-complement 0 < ../../../../fasta-25000000.txt
+	sudo ../../../../scripts/RAPL/build/rapl --json "$(JSON)" ../../../../scripts/RAPL/build/time-limiter $(SECONDS) ./target/release/reverse-complement 0 < ../../../../fasta-25000000.txt

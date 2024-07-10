@@ -13,4 +13,4 @@ endif
 ifndef SECONDS
 	$(error SECONDS is not defined)
 endif
-	sudo ../../../../scripts/RAPL/build/time-limiter $(SECONDS) ../../../../scripts/RAPL/build/rapl --json "$(JSON)" ./binarytrees_run 27
+	sudo ../../../../scripts/RAPL/build/rapl --json "$(JSON)" ../../../../scripts/RAPL/build/time-limiter $(SECONDS) ./binarytrees_run 27

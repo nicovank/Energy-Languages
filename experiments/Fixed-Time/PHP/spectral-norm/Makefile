@@ -14,4 +14,4 @@ endif
 ifndef SECONDS
 	$(error SECONDS is not defined)
 endif
-	sudo ../../../../scripts/RAPL/build/time-limiter $(SECONDS) ../../../../scripts/RAPL/build/rapl --json "$(JSON)" php -n spectralnorm.php 150000
+	sudo ../../../../scripts/RAPL/build/rapl --json "$(JSON)" ../../../../scripts/RAPL/build/time-limiter $(SECONDS) php -n spectralnorm.php 150000

@@ -19,4 +19,4 @@ endif
 ifndef SECONDS
 	$(error SECONDS is not defined)
 endif
-	sudo ../../../../scripts/RAPL/build/time-limiter $(SECONDS) ../../../../scripts/RAPL/build/rapl --json "$(JSON)" $(JAVA) regexredux 0 < ../../../../regexredux-input5000000.txt
+	sudo ../../../../scripts/RAPL/build/rapl --json "$(JSON)" ../../../../scripts/RAPL/build/time-limiter $(SECONDS) $(JAVA) regexredux 0 < ../../../../regexredux-input5000000.txt

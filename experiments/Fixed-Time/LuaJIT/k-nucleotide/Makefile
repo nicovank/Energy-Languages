@@ -15,4 +15,4 @@ endif
 ifndef SECONDS
 	$(error SECONDS is not defined)
 endif
-	sudo ../../../../scripts/RAPL/build/time-limiter $(SECONDS) ../../../../scripts/RAPL/build/rapl --json "$(JSON)" $(LUAJIT) knucleotide.out 0 < ../../../../fasta-800000000.txt
+	sudo ../../../../scripts/RAPL/build/rapl --json "$(JSON)" ../../../../scripts/RAPL/build/time-limiter $(SECONDS) $(LUAJIT) knucleotide.out 0 < ../../../../fasta-800000000.txt
