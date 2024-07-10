@@ -17,4 +17,7 @@ measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../../scripts/RAPL/build/rapl --json "$(JSON)" $(NODE) nbody.js 1000000000
+ifndef SECONDS
+	$(error SECONDS is not defined)
+endif
+	sudo ../../../../scripts/RAPL/build/time-limiter $(SECONDS) ../../../../scripts/RAPL/build/rapl --json "$(JSON)" $(NODE) nbody.js 1000000000
