@@ -7,8 +7,15 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def file_hash(path: str) -> str:
-    with open(path, "rb", buffering=0) as f:
-        return hashlib.file_digest(f, "sha256").hexdigest()
+    sha256 = hashlib.sha256()
+    with open(path, "rb") as f:
+        while True:
+            data = f.read(65536)
+            if not data:
+                break
+            sha256.update(data)
+
+    return sha256.hexdigest()
 
 
 def generate_input_files() -> None:
