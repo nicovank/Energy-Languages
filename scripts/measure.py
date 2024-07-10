@@ -141,7 +141,7 @@ def main(args: argparse.Namespace) -> None:
                             args,
                             language,
                             benchmark,
-                            args.timeout if not args.fixed_time else 0,
+                            args.timeout if not args.fixed_time else None,
                             "measure",
                             env,
                             args.verbose,
