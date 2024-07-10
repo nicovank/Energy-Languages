@@ -2,6 +2,7 @@ import argparse
 import os
 import random
 import subprocess
+import time
 from typing import Any
 
 from rich.console import Console
@@ -146,6 +147,9 @@ def main(args: argparse.Namespace) -> None:
                             env,
                             args.verbose,
                         )
+                        if args.fixed_time:
+                            # Let the process die in peace.
+                            time.sleep(1)
                         if status == -1:
                             console.print(
                                 f"{language}::{benchmark} Run #{i} timed out."
