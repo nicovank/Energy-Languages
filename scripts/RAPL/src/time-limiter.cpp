@@ -28,7 +28,6 @@ std::vector<pid_t> get_child_processes(pid_t pid) {
             if (auto* file = fopen(path.c_str(), "r")) {
                 pid_t ppid;
                 if (fscanf(file, "%*d %*s %*c %d", &ppid) != 1) {
-                    std::cerr << "Failed to read parent PID from " << path << std::endl;
                     fclose(file);
                     continue;
                 }
