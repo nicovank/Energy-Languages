@@ -134,7 +134,7 @@ def main(args: argparse.Namespace) -> None:
                         )
 
                         env = {**os.environ, "JSON": json}
-                        if args.fixed_times:
+                        if args.fixed_time:
                             env["SECONDS"] = args.timeout
 
                         status = run_benchmark(
