@@ -63,6 +63,9 @@ def main(args: argparse.Namespace) -> None:
             ]
         )
 
+        if args.benchmarks:
+            benchmarks = [b for b in benchmarks if b in args.benchmarks]
+
         with Progress(*progress_columns, console=console, transient=True) as progress:
             task = progress.add_task(f"{language}::Compile", total=len(benchmarks))
             for benchmark in list(benchmarks):
@@ -165,6 +168,12 @@ if __name__ == "__main__":
         metavar="PL",
         nargs="+",
         help="List of PLs to measure. Names must match directory names",
+    )
+    parser.add_argument(
+        "--benchmarks",
+        metavar="NAME",
+        nargs="+",
+        help="Specific list of benchmarks to run",
     )
     parser.add_argument(
         "--iterations",
