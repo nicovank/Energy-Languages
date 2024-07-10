@@ -9,7 +9,8 @@ run:
 measure:
 ifndef JSON
 	$(error JSON is not defined)
-endififndef SECONDS
+endif
+ifndef SECONDS
 	$(error SECONDS is not defined)
 endif
 	sudo ../../../../scripts/RAPL/build/rapl --json "$(JSON)" ../../../../scripts/RAPL/build/time-limiter $(SECONDS) ./target/release/pidigits 100000
