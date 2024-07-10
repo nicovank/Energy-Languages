@@ -203,6 +203,8 @@ inline Result measure(int argc, char** argv) {
     }
 #endif
 
+    teardown();
+
     // Populate results.
 #if RAPL_BENCHMARK_RUNTIME
     result.runtime_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();

@@ -85,6 +85,7 @@ int main(int argc, char** argv) {
     // If process has already exited after delay, return failure.
     int status;
     if (waitpid(pid, &status, WNOHANG) != 0) {
+        std::cerr << "Process exited before timeout." << std::endl;
         return EXIT_FAILURE;
     }
 
