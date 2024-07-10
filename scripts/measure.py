@@ -134,12 +134,14 @@ def main(args: argparse.Namespace) -> None:
                         )
 
                         env = {**os.environ, "JSON": json}
+                        if args.fixed_times:
+                            env["SECONDS"] = args.timeout
 
                         status = run_benchmark(
                             args,
                             language,
                             benchmark,
-                            args.timeout,
+                            args.timeout if not args.fixed_time else 0,
                             "measure",
                             env,
                             args.verbose,
@@ -190,6 +192,11 @@ if __name__ == "__main__":
         help="Path to output directory",
     )
     parser.add_argument(
+        "--fixed-time",
+        action="store_true",
+        help="Indicate fixed-time is used. Make sure to also specify timeout.",
+    )
+    parser.add_argument(
         "--timeout",
         type=int,
         default=None,
@@ -209,5 +216,8 @@ if __name__ == "__main__":
         raise RuntimeError(
             "Could not find the RAPL executable. Make sure you build it first."
         )
+
+    if args.fixed_time and args.timeout is None:
+        raise RuntimeError("Fixed-time is enabled but no timeout is specified.")
 
     main(args)
