@@ -1,8 +1,6 @@
 import argparse
-import math
 import statistics
 
-import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 
 from . import utils
@@ -70,15 +68,16 @@ def main(args: argparse.Namespace) -> None:
         x = language_to_index[language]
         y = [
             sum([s["energy"]["pkg"] for s in r["energy_samples"]])
+            # sum([s["energy"]["dram"] for s in r["energy_samples"]])
             for benchmark in benchmarks
             if benchmark in data[language]
             for r in data[language][benchmark]
-            if utils.cpu_usage(
-                utils.timeval_to_seconds(r["rusage"]["ru_utime"]),
-                utils.timeval_to_seconds(r["rusage"]["ru_stime"]),
-                1e-3 * r["runtime_ms"],
-            )
-            < 1.2
+            # if utils.cpu_usage(
+            #     utils.timeval_to_seconds(r["rusage"]["ru_utime"]),
+            #     utils.timeval_to_seconds(r["rusage"]["ru_stime"]),
+            #     1e-3 * r["runtime_ms"],
+            # )
+            # < 1.2
         ]
 
         plt.scatter([x] * len(y), y, label=language)
