@@ -87,6 +87,7 @@ def main(args: argparse.Namespace) -> None:
         [pl.replace("#", "\\#") for pl in args.languages],
         rotation=45,
     )
+    plt.ylim(bottom=0)
     plt.xlabel("Language")
     plt.ylabel("Energy [J]")
     plt.tight_layout()
