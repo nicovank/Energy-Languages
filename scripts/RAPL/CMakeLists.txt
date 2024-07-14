@@ -54,7 +54,7 @@ else()
     message(STATUS "IPO/LTO is not supported")
 endif()
 
-add_library(rapl_lib STATIC src/cpu.cpp src/msr.cpp src/perf.cpp src/rapl.cpp src/rusage.cpp)
+add_library(rapl_lib STATIC src/cpu.cpp src/msr.cpp src/perf.cpp src/rapl.cpp)
 target_compile_options(rapl_lib PRIVATE -Wall -Wextra -Wpedantic -Werror)
 target_include_directories(rapl_lib PUBLIC include)
 target_link_libraries(rapl_lib PRIVATE glaze::glaze)
