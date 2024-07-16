@@ -57,8 +57,9 @@ def main(args: argparse.Namespace) -> None:
                 )
 
     plt.rcParams["font.family"] = "Linux Libertine"
+    plt.gcf().set_size_inches(8, 5)
     with plt.style.context("bmh"):
-        plt.scatter(xs, ys)
+        plt.scatter(xs, ys, s=10)
 
         slope, intercept, rvalue, _, _ = scipy.stats.linregress(xs, ys)
         print(f"slope: {slope}, intercept: {intercept}")
@@ -66,12 +67,14 @@ def main(args: argparse.Namespace) -> None:
             [min(xs), max(xs)],
             [intercept + slope * min(xs), intercept + slope * max(xs)],
             color="red",
+            linewidth=1,
         )
         print(f"rvalue: {rvalue}")
 
         plt.xlabel("Average cores used")
-        plt.ylabel("Average power [W]")
+        plt.ylabel("Average power draw [W]")
         plt.ylim(bottom=0)
+        plt.tight_layout()
         plt.savefig(f"normalize_cores.{args.format}", format=args.format)
 
 
@@ -98,5 +101,4 @@ if __name__ == "__main__":
     )
     parser.add_argument("--no-mean", action="store_true")
     parser.add_argument("--format", type=str, default="png")
-    parser.add_argument("--no-title", action="store_true")
     main(parser.parse_args())
