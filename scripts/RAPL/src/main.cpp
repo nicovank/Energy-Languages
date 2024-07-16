@@ -27,7 +27,7 @@
 // clang-format on
 
 #define RAPL_BENCHMARK_ENERGY 1
-#define RAPL_BENCHMARK_ENERGY_GRANULARITY_MS 100
+#define RAPL_BENCHMARK_ENERGY_GRANULARITY_MS 1000
 
 #include <rapl/benchmark.hpp>
 
