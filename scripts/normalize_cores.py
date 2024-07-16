@@ -1,7 +1,7 @@
 import argparse
 import statistics
-from typing import List
 
+import matplotlib
 import matplotlib.pyplot as plt
 import scipy  # type: ignore
 
@@ -56,83 +56,9 @@ def main(args: argparse.Namespace) -> None:
                     )
                 )
 
-    # Group by language:
-    xs_grouped: List[List[float]] = []
-    ys_grouped: List[List[float]] = []
-
-    for language in args.languages:
-        xs_grouped.append([])
-        ys_grouped.append([])
-        for benchmark in data[language].keys():
-            if args.no_mean:
-                for r in data[language][benchmark]:
-                    xs_grouped[-1].append(
-                        utils.cpu_usage(
-                            utils.timeval_to_seconds(r["rusage"]["ru_utime"]),
-                            utils.timeval_to_seconds(r["rusage"]["ru_stime"]),
-                            1e-3 * r["runtime_ms"],
-                        )
-                    )
-
-                    ys_grouped[-1].append(
-                        sum([s["energy"]["pkg"] for s in r["energy_samples"]])
-                        / (1e-3 * r["runtime_ms"])
-                    )
-            else:
-                xs_grouped[-1].append(
-                    statistics.mean(
-                        [
-                            utils.cpu_usage(
-                                utils.timeval_to_seconds(r["rusage"]["ru_utime"]),
-                                utils.timeval_to_seconds(r["rusage"]["ru_stime"]),
-                                1e-3 * r["runtime_ms"],
-                            )
-                            for r in data[language][benchmark]
-                        ]
-                    )
-                )
-
-                ys_grouped[-1].append(
-                    statistics.mean(
-                        [
-                            sum([s["energy"]["pkg"] for s in r["energy_samples"]])
-                            / (1e-3 * r["runtime_ms"])
-                            for r in data[language][benchmark]
-                        ]
-                    )
-                )
-
-    plt.rcParams.update({"text.usetex": True, "font.family": "serif"})
+    plt.rcParams["font.family"] = "Linux Libertine"
     with plt.style.context("bmh"):
         plt.scatter(xs, ys)
-        # plt.plot(
-        #     list(range(1, 17)),
-        #     [
-        #         34.1687,
-        #         46.5196,
-        #         50.3137,
-        #         52.3241,
-        #         54.5677,
-        #         56.5167,
-        #         58.4932,
-        #         60.9066,
-        #         63.8334,
-        #         66.3835,
-        #         68.3035,
-        #         70.4256,
-        #         73.0678,
-        #         75.3255,
-        #         77.6687,
-        #         79.6539,
-        #     ],
-        #     color="red",
-        #     linestyle="dashed",
-        # )
-
-        # Plot grouped"
-        # for i, language in enumerate(args.languages):
-        #     plt.scatter(xs_grouped[i], ys_grouped[i], label=language.replace("#", "\\#"))
-        # plt.legend()
 
         slope, intercept, rvalue, _, _ = scipy.stats.linregress(xs, ys)
         print(f"slope: {slope}, intercept: {intercept}")

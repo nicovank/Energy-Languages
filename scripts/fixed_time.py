@@ -63,7 +63,7 @@ def main(args: argparse.Namespace) -> None:
                     f"  {benchmark}: {runtimes[language][benchmark]:.2f} {cpu_usages[language][benchmark]:.2f} {energies[language][benchmark]:.2f}"
                 )
 
-    plt.rcParams.update({"text.usetex": True, "font.family": "serif"})
+    plt.rcParams["font.family"] = "Linux Libertine"
     for language in args.languages:
         x = language_to_index[language]
         y = [

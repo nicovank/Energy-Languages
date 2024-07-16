@@ -37,7 +37,7 @@ def main(args: argparse.Namespace) -> None:
         for language in args.languages
     }
 
-    plt.rcParams.update({"text.usetex": True, "font.family": "serif"})
+    plt.rcParams["font.family"] = "Linux Libertine"
     with plt.style.context("bmh"):
         markers = [".", "v", "^", "<", ">", "s", "*", "x", "D", "2", "+"]
         colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]

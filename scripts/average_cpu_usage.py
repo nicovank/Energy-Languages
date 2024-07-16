@@ -48,7 +48,7 @@ def main(args: argparse.Namespace) -> None:
     console = Console()
     console.print(table)
 
-    plt.rcParams.update({"text.usetex": True, "font.family": "serif"})
+    plt.rcParams["font.family"] = "Linux Libertine"
     with plt.style.context("bmh"):
         energy_over_time_ratio = {
             language: {

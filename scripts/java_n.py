@@ -23,7 +23,7 @@ def main(args: argparse.Namespace) -> None:
             for line in f:
                 data[n].append(json.loads(line))
 
-    plt.rcParams.update({"text.usetex": True, "font.family": "serif"})
+    plt.rcParams["font.family"] = "Linux Libertine"
     with plt.style.context("bmh"):
         plt.rc(
             "axes",

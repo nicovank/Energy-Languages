@@ -45,7 +45,7 @@ def main(args: argparse.Namespace) -> None:
                     )
                 )
 
-    plt.rcParams.update({"text.usetex": True, "font.family": "serif"})
+    plt.rcParams["font.family"] = "Linux Libertine"
     with plt.style.context("bmh"):
         plt.scatter(xs, ys)
 
