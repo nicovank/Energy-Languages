@@ -50,6 +50,7 @@ def main(args: argparse.Namespace) -> None:
         plt.scatter(xs, ys)
 
         slope, intercept, rvalue, _, _ = scipy.stats.linregress(xs, ys)
+        print(f"slope: {slope}, intercept: {intercept}")
         plt.plot(
             [min(xs), max(xs)],
             [intercept + slope * min(xs), intercept + slope * max(xs)],
