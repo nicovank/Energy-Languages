@@ -27,11 +27,8 @@ def main(args: argparse.Namespace) -> None:
         language: {
             benchmark: statistics.geometric_mean(
                 [
-                    utils.cpu_usage(
-                        utils.timeval_to_seconds(r["rusage"]["ru_utime"]),
-                        utils.timeval_to_seconds(r["rusage"]["ru_stime"]),
-                        1e-3 * r["runtime_ms"],
-                    )
+                    (r["counters"]["PERF_COUNT_SW_TASK_CLOCK"] / 1e9)
+                    / (r["runtime_ms"] / 1e3)
                     for r in data[language][benchmark]
                 ]
             )
