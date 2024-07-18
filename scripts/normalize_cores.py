@@ -65,7 +65,7 @@ def main(args: argparse.Namespace) -> None:
         )
         print(f"rvalue: {rvalue}")
 
-        plt.xlabel("Average cores used")
+        plt.xlabel("Average number of cores used")
         plt.ylabel("Average power draw [W]")
         plt.ylim(bottom=0)
         plt.tight_layout()

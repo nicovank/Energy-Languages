@@ -8,48 +8,77 @@ from . import utils
 
 
 def main(args: argparse.Namespace) -> None:
-    data, benchmarks = utils.parse(args.data_root, args.languages)
+    data, benchmarks = utils.parse(args.data_root, [args.a, args.b])
 
     benchmarks = sorted(list({b for l in data.values() for b in l.keys()}))
+
+    for benchmark in list(benchmarks):
+        if benchmark not in data[args.a]:
+            print(f"Missing benchmark {benchmark} in {args.a}")
+            benchmarks.remove(benchmark)
+        if benchmark not in data[args.b]:
+            print(f"Missing benchmark {benchmark} in {args.b}")
+            benchmarks.remove(benchmark)
+
     runtimes = {
         benchmark: {
             language: (
                 statistics.geometric_mean(
-                    [r["runtime_ms"] for r in data[language][benchmark]]
+                    [1e-3 * r["runtime_ms"] for r in data[language][benchmark]]
                 )
-                if benchmark in data[language]
-                else 0
             )
-            for language in args.languages
+            for language in [args.a, args.b]
         }
         for benchmark in benchmarks
     }
 
+    energies = {
+        language: {
+            benchmark: statistics.geometric_mean(
+                [
+                    sum(
+                        [
+                            s["energy"]["pkg"] + s["energy"]["dram"]
+                            for s in r["energy_samples"]
+                        ]
+                    )
+                    for r in data[language][benchmark]
+                ]
+            )
+            for benchmark in benchmarks
+            if benchmark in data[language]
+        }
+        for language in [args.a, args.b]
+    }
+
     plt.rcParams["font.family"] = "Linux Libertine"
     with plt.style.context("bmh"):
-        x = np.arange(len(benchmarks))
+        y = np.arange(len(benchmarks))
         width = 0.25
-        multiplier = 0
 
         fig, ax = plt.subplots(layout="constrained")
 
-        for language in args.languages:
-            offset = width * multiplier
-            rects = ax.bar(
-                x + offset,
-                [runtimes[benchmark][language] for benchmark in benchmarks],
-                width,
-                label=language,
-            )
-            multiplier += 1
+        ax.barh(
+            y + 3 * width / 2,
+            [runtimes[benchmark][args.a] for benchmark in benchmarks],
+            width,
+            label=args.a,
+        )
+
+        ax.barh(
+            y + width / 2,
+            [runtimes[benchmark][args.b] for benchmark in benchmarks],
+            width,
+            label=args.b,
+        )
 
         ax.legend()
-        ax.set_xticks(x + width, benchmarks)
-        ax.tick_params(axis="x", labelrotation=90, length=0)
-        ax.grid(visible=None, which="major", axis="x")
-        ax.set_ylabel("Runtime [ms]")
-        if not args.no_title:
-            plt.title("Benchmark Performance by Language")
+        ax.set_yticks(y + width, benchmarks)
+        ax.grid(visible=None, which="major", axis="y")
+        ax.yaxis.set_tick_params(length=0)
+        ax.set_xlabel("Runtime [s]")
+        ax.set_ylabel("Benchmark")
+        ax.set_xlim(right=100)
 
         plt.savefig(f"barchart.{args.format}", format=args.format)
 
@@ -58,11 +87,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--data-root", type=str, required=True)
     parser.add_argument(
-        "--languages",
+        "a",
         type=str,
-        nargs="+",
-        default=["C", "C++", "Rust"],
+        default="Lua",
+    )
+    parser.add_argument(
+        "b",
+        type=str,
+        default="LuaJIT",
     )
     parser.add_argument("--format", type=str, default="png")
-    parser.add_argument("--no-title", action="store_true")
     main(parser.parse_args())
