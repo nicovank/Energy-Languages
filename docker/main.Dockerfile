@@ -129,6 +129,30 @@ RUN git clone https://luajit.org/git/luajit.git
 RUN cd luajit && git checkout ${LUAJIT_COMMIT} && make -j && make install
 RUN rm -rf luajit
 
+# Ruby.
+# Most Ruby benchmarks rely on an older Ruby version.
+# We fix it to 2.7.8, the latest version where the required API is deprecated but exists.
+# Steps here are taken from rbenv.
+RUN wget --no-verbose https://www.openssl.org/source/old/1.1.1/openssl-1.1.1w.tar.gz
+RUN echo "76fbf3ca4370e12894a408ef75718f32cdab9671 openssl-1.1.1w.tar.gz" | sha1sum --check
+RUN tar -xzf openssl-1.1.1w.tar.gz
+RUN cd openssl-1.1.1w && ./config "--prefix=/ruby-openssl" "--openssldir=/ruby-openssl/ssl" zlib-dynamic no-ssl3 shared && make -j && make install_sw install_ssldirs
+RUN rm -rf openssl-1.1.1w.tar.gz openssl-1.1.1w
+RUN wget --no-verbose https://cache.ruby-lang.org/pub/ruby/2.7/ruby-2.7.8.tar.gz
+RUN echo "c2dab63cbc8f2a05526108ad419efa63a67ed4074dbbcf9fc2b1ca664cb45ba0 ruby-2.7.8.tar.gz" | sha256sum --check
+RUN tar -xzf ruby-2.7.8.tar.gz
+RUN cd ruby-2.7.8 && ./configure "--with-openssl-dir=/ruby-openssl" --enable-shared --with-ext=openssl,psych,+ && make -j && make install
+RUN rm -rf ruby-2.7.8.tar.gz ruby-2.7.8
+
+# JRuby.
+# On the other hand, the API seems perfectly fine on the latest JRuby version.
+ARG JRUBY_VERSION=9.4.8.0
+ARG JRUBY_CHECKSUM=347b6692bd9c91c480a45af25ce88d77be8b6e4ac4a77bc94870f2c5b54bc929
+RUN wget --no-verbose https://repo1.maven.org/maven2/org/jruby/jruby-dist/${JRUBY_VERSION}/jruby-dist-${JRUBY_VERSION}-bin.tar.gz
+RUN echo "${JRUBY_CHECKSUM} jruby-dist-${JRUBY_VERSION}-bin.tar.gz" | sha256sum --check
+RUN tar -C /usr/local --strip-components=1 -xzf jruby-dist-${JRUBY_VERSION}-bin.tar.gz
+RUN rm -rf jruby-dist-${JRUBY_VERSION}-bin.tar.gz
+
 WORKDIR /root/Energy-Languages
 COPY fasta-5000000.txt fasta-5000000.txt
 COPY fasta-25000000.txt fasta-25000000.txt
