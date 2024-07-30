@@ -13,8 +13,6 @@
 
 #define RAPL_BENCHMARK_RUNTIME 1
 
-#define RAPL_BENCHMARK_RUSAGE 1
-
 #define RAPL_BENCHMARK_COUNTERS 1
 
 #define RAPL_BENCHMARK_ENERGY 1
@@ -120,11 +118,7 @@ int main(int argc, char** argv) {
     const auto result = RAPL_BENCHMARK_MEASURE(argc, argv);
 
     std::cout << "Total runtime: " << result.runtime_ms << " ms" << std::endl;
-    std::cout << "CPU utilization: "
-              << ((result.rusage.ru_utime.tv_sec + result.rusage.ru_stime.tv_sec
-                   + 1e-6 * (result.rusage.ru_utime.tv_usec + result.rusage.ru_stime.tv_usec))
-                  / (1e-3 * result.runtime_ms))
-              << std::endl;
+    std::cout << "CPU utilization: [TODO]" << std::endl;
     const auto energy = std::accumulate(result.energy_samples.begin(), result.energy_samples.end(), 0.0,
                                         [](double sum, const auto& sample) { return sum + sample.energy.pkg; });
     std::cout << "Energy consumed: " << energy << " J" << std::endl;

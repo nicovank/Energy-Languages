@@ -45,21 +45,26 @@ def main(args: argparse.Namespace) -> None:
                     )
                 )
 
-    plt.rcParams.update({"text.usetex": True, "font.family": "serif"})
+    plt.rcParams["font.family"] = "Linux Libertine"
+    plt.gcf().set_size_inches(8, 5)
     with plt.style.context("bmh"):
-        plt.scatter(xs, ys)
+        plt.scatter(xs, ys, s=10)
 
         slope, intercept, rvalue, _, _ = scipy.stats.linregress(xs, ys)
+        print(f"slope: {slope}, intercept: {intercept}")
         plt.plot(
             [min(xs), max(xs)],
             [intercept + slope * min(xs), intercept + slope * max(xs)],
             color="red",
+            linewidth=1,
         )
         print(f"rvalue: {rvalue}")
 
-        plt.xlabel("Memory operations per second [1/s]")
+        plt.xlabel("LLC misses per second")
         plt.ylabel("Power [W]")
         plt.ylim(bottom=0)
+        # plt.xlim(right=0.5e8)
+        plt.tight_layout()
         plt.savefig(f"dram.{args.format}", format=args.format)
 
 

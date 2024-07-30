@@ -14,10 +14,10 @@ endif
 	$(JAVAC) -d . revcomp.java
 
 run:
-	$(JAVA) revcomp ../../../revcomp-input25000000.txt 0
+	$(JAVA) revcomp ../../../fasta-25000000.txt 0
 
 measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(JAVA) revcomp ../../../revcomp-input25000000.txt 0
+	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(JAVA) revcomp ../../../fasta-25000000.txt 0

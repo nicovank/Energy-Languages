@@ -115,29 +115,6 @@ def main(args: argparse.Namespace) -> None:
         )
     )
 
-    Console().print(
-        table(
-            "Branch miss rate [%]",
-            args,
-            data,
-            {
-                language: {
-                    benchmark: 100
-                    * statistics.median(
-                        [
-                            e["counters"]["PERF_COUNT_HW_BRANCH_MISSES"]
-                            / e["counters"]["PERF_COUNT_HW_BRANCH_INSTRUCTIONS"]
-                            for e in subdata
-                        ]
-                    )
-                    for benchmark, subdata in data[language].items()
-                }
-                for language in args.languages
-            },
-            None,
-        )
-    )
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

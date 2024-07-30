@@ -14,10 +14,10 @@ endif
 	$(JAVAC) -d . regexredux.java
 
 run:
-	$(JAVA) regexredux ../../../regexredux-input5000000.txt 0
+	$(JAVA) regexredux ../../../fasta-5000000.txt 0
 
 measure:
 ifndef JSON
 	$(error JSON is not defined)
 endif
-	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(JAVA) regexredux ../../../regexredux-input5000000.txt 0
+	sudo ../../../scripts/RAPL/build/rapl --json "$(JSON)" $(JAVA) regexredux ../../../fasta-5000000.txt 0

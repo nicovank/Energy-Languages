@@ -9,7 +9,7 @@ fi
 
 for i in {1..20}
 do
-    docker run -it --privileged -e NNNNN=$i -v `pwd`/data/`hostname -s`/docker-default:/root/data energy-languages \
+    docker run -it --rm --privileged -e NNNNN=$i -v `pwd`/data/`hostname -s`/docker-default:/root/data energy-languages \
         --languages experiments/$1-N \
         --warmup 1 \
         --iterations 7

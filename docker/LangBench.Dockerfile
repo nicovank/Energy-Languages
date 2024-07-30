@@ -55,7 +55,7 @@ RUN wget --quiet https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PY
 RUN wget --quiet https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz.asc
 RUN gpg --verify Python-${PYTHON_VERSION}.tar.xz.asc Python-${PYTHON_VERSION}.tar.xz
 RUN tar -xJf Python-${PYTHON_VERSION}.tar.xz
-RUN cd Python-${PYTHON_VERSION} && ./configure --enable-optimizations --with-lto && make && make install
+RUN cd Python-${PYTHON_VERSION} && ./configure --enable-optimizations --with-lto && make -j && make install
 RUN rm -rf Python-${PYTHON_VERSION}.tar.xz Python-${PYTHON_VERSION}.tar.xz.asc Python-${PYTHON_VERSION}
 
 # Python dependencies.
@@ -67,7 +67,8 @@ COPY scripts/requirements.txt /root/LangBench/
 RUN python3 -m pip install -r /root/LangBench/requirements.txt
 
 WORKDIR /root/LangBench
+# TODO: Fix copy below.
 COPY . .
 RUN python3 ./benchmark-data/file-server/generate.py
 RUN make -C ./benchmark-data/file-server/client/
-ENTRYPOINT [ "./docker/bench.sh" ]
+ENTRYPOINT [ "python3", "-m", "scripts.measure", "-o", "/root/data" ]

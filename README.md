@@ -29,7 +29,7 @@ Running the measurement tool requires:
 The easiest way to run these benchmarks is using Docker.
 ```bash
 % sudo modprobe msr # Enable msr kernel module.
-% sudo docker build -f docker/main.Dockerfile -t energy-languages .
+% sudo python3 -m scripts.build_docker_image
 % sudo docker run --privileged -v [OUTPUT_DIRECTORY]:/root/data energy-languages [OPTIONS]
 ```
 

@@ -2,6 +2,7 @@ import argparse
 import os
 import random
 import subprocess
+import time
 from typing import Any
 
 from rich.console import Console
@@ -32,15 +33,20 @@ def run_benchmark(
     # SIGPLAN Not. 44, 3 (March 2009), 265–276. https://doi.org/10.1145/1508284.1508275
     env["RANDOMIZED_ENVIRONMENT_OFFSET"] = "".join(["X"] * random.randint(0, 4096))
     try:
-        return subprocess.run(
+        process = subprocess.run(
             ["make", type],
             stdin=subprocess.DEVNULL,
-            stdout=subprocess.DEVNULL,
-            stderr=(None if verbose else subprocess.DEVNULL),
-            cwd=os.path.join(args.benchmark_root, language, benchmark),
+            stdout=(subprocess.PIPE if verbose else subprocess.DEVNULL),
+            stderr=(subprocess.STDOUT if verbose else subprocess.DEVNULL),
+            cwd=os.path.abspath(os.path.join(args.benchmark_root, language, benchmark)),
             timeout=timeout,
             env=env,
-        ).returncode
+        )
+
+        if verbose:
+            console.print(process.stdout.decode("utf-8"))
+
+        return process.returncode
     except subprocess.TimeoutExpired:
         return -1
 
@@ -57,6 +63,9 @@ def main(args: argparse.Namespace) -> None:
                 )
             ]
         )
+
+        if args.benchmarks:
+            benchmarks = [b for b in benchmarks if b in args.benchmarks]
 
         with Progress(*progress_columns, console=console, transient=True) as progress:
             task = progress.add_task(f"{language}::Compile", total=len(benchmarks))
@@ -126,16 +135,21 @@ def main(args: argparse.Namespace) -> None:
                         )
 
                         env = {**os.environ, "JSON": json}
+                        if args.fixed_time:
+                            env["SECONDS"] = str(args.timeout)
 
                         status = run_benchmark(
                             args,
                             language,
                             benchmark,
-                            args.timeout,
+                            args.timeout if not args.fixed_time else None,
                             "measure",
                             env,
                             args.verbose,
                         )
+                        if args.fixed_time:
+                            # Let the process die in peace.
+                            time.sleep(1)
                         if status == -1:
                             console.print(
                                 f"{language}::{benchmark} Run #{i} timed out."
@@ -162,6 +176,12 @@ if __name__ == "__main__":
         help="List of PLs to measure. Names must match directory names",
     )
     parser.add_argument(
+        "--benchmarks",
+        metavar="NAME",
+        nargs="+",
+        help="Specific list of benchmarks to run",
+    )
+    parser.add_argument(
         "--iterations",
         "-n",
         required=True,
@@ -174,6 +194,11 @@ if __name__ == "__main__":
         required=True,
         type=str,
         help="Path to output directory",
+    )
+    parser.add_argument(
+        "--fixed-time",
+        action="store_true",
+        help="Indicate fixed-time is used. Make sure to also specify timeout.",
     )
     parser.add_argument(
         "--timeout",
@@ -195,5 +220,8 @@ if __name__ == "__main__":
         raise RuntimeError(
             "Could not find the RAPL executable. Make sure you build it first."
         )
+
+    if args.fixed_time and args.timeout is None:
+        raise RuntimeError("Fixed-time is enabled but no timeout is specified.")
 
     main(args)
