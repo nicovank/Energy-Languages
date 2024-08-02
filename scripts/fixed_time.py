@@ -61,34 +61,28 @@ def main(args: argparse.Namespace) -> None:
                 )
 
     plt.rcParams["font.family"] = "Linux Libertine"
-    for language in args.languages:
-        x = language_to_index[language]
-        y = [
-            sum([s["energy"]["pkg"] for s in r["energy_samples"]])
-            # sum([s["energy"]["dram"] for s in r["energy_samples"]])
-            for benchmark in benchmarks
-            if benchmark in data[language]
-            for r in data[language][benchmark]
-            # if utils.cpu_usage(
-            #     utils.timeval_to_seconds(r["rusage"]["ru_utime"]),
-            #     utils.timeval_to_seconds(r["rusage"]["ru_stime"]),
-            #     1e-3 * r["runtime_ms"],
-            # )
-            # < 1.2
-        ]
+    with plt.style.context("bmh"):
+        for language in args.languages:
+            x = language_to_index[language]
+            y = [
+                sum([s["energy"]["pkg"] + s["energy"]["dram"] for s in r["energy_samples"]])
+                for benchmark in benchmarks
+                if benchmark in data[language]
+                for r in data[language][benchmark]
+            ]
 
-        plt.scatter([x] * len(y), y, label=language)
+            plt.scatter([x] * len(y), y, label=language)
 
-    plt.xticks(
-        range(len(args.languages)),
-        [pl.replace("#", "\\#") for pl in args.languages],
-        rotation=45,
-    )
-    plt.ylim(bottom=0)
-    plt.xlabel("Language")
-    plt.ylabel("Energy [J]")
-    plt.tight_layout()
-    plt.savefig(f"energy.{args.format}")
+        plt.xticks(
+            range(len(args.languages)),
+            [pl.replace("#", "\\#") for pl in args.languages],
+            rotation=45,
+        )
+        plt.ylim(bottom=0)
+        plt.xlabel("Language")
+        plt.ylabel("Energy [J]")
+        plt.tight_layout()
+        plt.savefig(f"fixed_time.{args.format}")
 
 
 if __name__ == "__main__":
