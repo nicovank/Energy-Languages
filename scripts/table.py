@@ -123,18 +123,7 @@ if __name__ == "__main__":
         "--languages",
         type=str,
         nargs="+",
-        default=[
-            "C",
-            "C++",
-            "Rust",
-            "Go",
-            "Java",
-            "C#",
-            "JavaScript",
-            "TypeScript",
-            "PHP",
-            "Python",
-        ],
+        required=True,
     )
     parser.add_argument("--baseline", type=str, default="C")
     main(parser.parse_args())

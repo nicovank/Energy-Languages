@@ -98,18 +98,7 @@ if __name__ == "__main__":
         "--languages",
         type=str,
         nargs="+",
-        default=[
-            "C",
-            "C++",
-            "Rust",
-            "Go",
-            "Java",
-            "C#",
-            "JavaScript",
-            "TypeScript",
-            "PHP",
-            "Python",
-        ],
+        required=True,
     )
     parser.add_argument("--format", type=str, default="png")
     parser.add_argument("--no-title", action="store_true")
