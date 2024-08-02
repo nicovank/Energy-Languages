@@ -65,7 +65,12 @@ def main(args: argparse.Namespace) -> None:
         for language in args.languages:
             x = language_to_index[language]
             y = [
-                sum([s["energy"]["pkg"] + s["energy"]["dram"] for s in r["energy_samples"]])
+                sum(
+                    [
+                        s["energy"]["pkg"] + s["energy"]["dram"]
+                        for s in r["energy_samples"]
+                    ]
+                )
                 for benchmark in benchmarks
                 if benchmark in data[language]
                 for r in data[language][benchmark]
