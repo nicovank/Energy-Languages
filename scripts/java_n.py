@@ -23,7 +23,7 @@ def main(args: argparse.Namespace) -> None:
             for line in f:
                 data[n].append(json.loads(line))
 
-    plt.rcParams["font.family"] = "Linux Libertine"
+    plt.rcParams["font.family"] = args.font
     with plt.style.context("bmh"):
         plt.rc(
             "axes",
@@ -70,6 +70,7 @@ if __name__ == "__main__":
     parser.add_argument("--data-root", type=str, required=True)
     parser.add_argument("--benchmark", type=str, required=True)
     parser.add_argument("--language", type=str, default="Java")
+    parser.add_argument("--font", type=str, default="Linux Libertine")
     parser.add_argument("--format", type=str, default="png")
     parser.add_argument("--no-title", action="store_true")
     main(parser.parse_args())

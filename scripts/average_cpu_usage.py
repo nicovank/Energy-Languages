@@ -48,7 +48,7 @@ def main(args: argparse.Namespace) -> None:
     console = Console()
     console.print(table)
 
-    plt.rcParams["font.family"] = "Linux Libertine"
+    plt.rcParams["font.family"] = args.font
     with plt.style.context("bmh"):
         energy_over_time_ratio = {
             language: {
@@ -112,6 +112,7 @@ if __name__ == "__main__":
         nargs="+",
         required=True,
     )
+    parser.add_argument("--font", type=str, default="Linux Libertine")
     parser.add_argument("--format", type=str, default="png")
     parser.add_argument("--no-title", action="store_true")
     main(parser.parse_args())

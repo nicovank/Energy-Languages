@@ -52,7 +52,7 @@ def main(args: argparse.Namespace) -> None:
                     )
                 )
 
-    plt.rcParams["font.family"] = "Linux Libertine"
+    plt.rcParams["font.family"] = args.font
     plt.gcf().set_size_inches(8, 5)
     with plt.style.context("bmh"):
         plt.scatter(xs, ys, s=10)
@@ -90,5 +90,6 @@ if __name__ == "__main__":
         required=True,
     )
     parser.add_argument("--no-mean", action="store_true")
+    parser.add_argument("--font", type=str, default="Linux Libertine")
     parser.add_argument("--format", type=str, default="png")
     main(parser.parse_args())

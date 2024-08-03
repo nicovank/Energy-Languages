@@ -49,7 +49,7 @@ def main(args: argparse.Namespace) -> None:
                     )
                 )
 
-    plt.rcParams["font.family"] = "Linux Libertine"
+    plt.rcParams["font.family"] = args.font
     plt.gcf().set_size_inches(8, 5)
     with plt.style.context("bmh"):
         plt.scatter(xs, ys, s=10)
@@ -67,7 +67,6 @@ def main(args: argparse.Namespace) -> None:
         plt.xlabel("LLC misses per second")
         plt.ylabel("Power [W]")
         plt.ylim(bottom=0)
-        # plt.xlim(right=0.5e8)
         plt.tight_layout()
         plt.savefig(f"dram.{args.format}", format=args.format)
 
@@ -82,6 +81,7 @@ if __name__ == "__main__":
         required=True,
     )
     parser.add_argument("--no-mean", action="store_true")
+    parser.add_argument("--font", type=str, default="Linux Libertine")
     parser.add_argument("--format", type=str, default="png")
     parser.add_argument("--xmax", type=int, default=math.inf)
     main(parser.parse_args())

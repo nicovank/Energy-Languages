@@ -51,7 +51,7 @@ def main(args: argparse.Namespace) -> None:
         for language in [args.a, args.b]
     }
 
-    plt.rcParams["font.family"] = "Linux Libertine"
+    plt.rcParams["font.family"] = args.font
     with plt.style.context("bmh"):
         y = np.arange(len(benchmarks))
         width = 0.25
@@ -96,5 +96,6 @@ if __name__ == "__main__":
         type=str,
         default="LuaJIT",
     )
+    parser.add_argument("--font", type=str, default="Linux Libertine")
     parser.add_argument("--format", type=str, default="png")
     main(parser.parse_args())

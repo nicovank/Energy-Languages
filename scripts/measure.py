@@ -150,6 +150,30 @@ def main(args: argparse.Namespace) -> None:
                         if args.fixed_time:
                             # Let the process die in peace.
                             time.sleep(1)
+                            # Assert nothing is still running...
+                            stdout = subprocess.check_output(
+                                [
+                                    "pgrep",
+                                    "-l",
+                                    "|".join(
+                                        [
+                                            "binarytrees",
+                                            "fannkuchredux",
+                                            "fasta",
+                                            "mandelbrot",
+                                            "nbody",
+                                            "pidigits",
+                                            "regexdna",
+                                            "revcomp",
+                                            "spectralnorm",
+                                        ]
+                                    ),
+                                ]
+                            )
+                            if len(stdout) > 0:
+                                print(f"Still running: {stdout}")
+                                sys.exit(-1)
+
                         if status == -1:
                             console.print(
                                 f"{language}::{benchmark} Run #{i} timed out."
