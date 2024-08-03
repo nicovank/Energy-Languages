@@ -3,7 +3,9 @@ import statistics
 
 import matplotlib
 import matplotlib.pyplot as plt
+import numpy as np
 import scipy  # type: ignore
+import sklearn
 
 from . import utils
 
@@ -55,15 +57,21 @@ def main(args: argparse.Namespace) -> None:
     with plt.style.context("bmh"):
         plt.scatter(xs, ys, s=10)
 
-        slope, intercept, rvalue, _, _ = scipy.stats.linregress(xs, ys)
-        print(f"slope: {slope}, intercept: {intercept}")
-        plt.plot(
-            [min(xs), max(xs)],
-            [intercept + slope * min(xs), intercept + slope * max(xs)],
-            color="red",
-            linewidth=1,
-        )
-        print(f"rvalue: {rvalue}")
+        def log_fit(x, a, b):
+            return a * np.log(x) + b
+
+        c, _ = scipy.optimize.curve_fit(log_fit, xs, ys)
+        x_fit = np.linspace(0, max(xs), 100)
+        y_power = log_fit(x_fit, *c)
+        print(f"{c[0]:.2f} * ln(x) + {c[1]:.2f}")
+        plt.plot(x_fit, y_power, color='red', linewidth=1)
+
+        # Calculate r2
+        residuals = ys - log_fit(xs, *c)
+        ss_res = np.sum(residuals ** 2)
+        ss_tot = np.sum((ys - np.mean(ys)) ** 2)
+        r2 = 1 - (ss_res / ss_tot)
+        print(f"r2: {r2}")
 
         plt.xlabel("Average number of cores used")
         plt.ylabel("Average power draw [W]")
