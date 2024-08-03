@@ -12,28 +12,14 @@ from . import utils
 
 def main(args: argparse.Namespace) -> None:
     data, _ = utils.parse(args.data_root, args.languages)
-    # x-value: average cpu usage
-    # y-value: average energy usage / average runtime
 
     xs = []
     ys = []
 
     for language in args.languages:
         for benchmark in data[language].keys():
-            if args.no_mean:
-                for r in data[language][benchmark]:
-                    xs.append(
-                        (r["counters"]["PERF_COUNT_SW_TASK_CLOCK"] / 1e9)
-                        / (r["runtime_ms"] / 1e3)
-                    )
-
-                    ys.append(
-                        sum([s["energy"]["pkg"] for s in r["energy_samples"]])
-                        / (1e-3 * r["runtime_ms"])
-                    )
-            else:
                 xs.append(
-                    statistics.mean(
+                    statistics.median(
                         [
                             (r["counters"]["PERF_COUNT_SW_TASK_CLOCK"] / 1e9)
                             / (r["runtime_ms"] / 1e3)
@@ -43,7 +29,7 @@ def main(args: argparse.Namespace) -> None:
                 )
 
                 ys.append(
-                    statistics.mean(
+                    statistics.median(
                         [
                             sum([s["energy"]["pkg"] for s in r["energy_samples"]])
                             / (1e-3 * r["runtime_ms"])
@@ -89,7 +75,6 @@ if __name__ == "__main__":
         nargs="+",
         required=True,
     )
-    parser.add_argument("--no-mean", action="store_true")
     parser.add_argument("--font", type=str, default="Linux Libertine")
     parser.add_argument("--format", type=str, default="png")
     main(parser.parse_args())
