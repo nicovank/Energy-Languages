@@ -152,28 +152,30 @@ def main(args: argparse.Namespace) -> None:
                             # Let the process die in peace.
                             time.sleep(1)
                             # Assert nothing is still running...
-                            stdout = subprocess.check_output(
+                            pgrep = subprocess.run(
                                 [
                                     "pgrep",
                                     "-l",
                                     "|".join(
                                         [
-                                            "binarytrees",
-                                            "fannkuchredux",
+                                            "binary",
+                                            "fannkuch",
                                             "fasta",
+                                            "nucleotide",
                                             "mandelbrot",
-                                            "nbody",
-                                            "pidigits",
-                                            "regexdna",
-                                            "revcomp",
-                                            "spectralnorm",
+                                            "body",
+                                            "digits",
+                                            "regex",
+                                            "comp",
+                                            "spectral",
                                         ]
                                     ),
                                 ],
                                 text=True,
+                                stdout=subprocess.PIPE,
                             )
-                            if len(stdout) > 0:
-                                print(f"Still running: {stdout}")
+                            if pgrep.returncode != 1:
+                                print(f"{pgrep.stdout}")
                                 sys.exit(-1)
 
                         if status == -1:
