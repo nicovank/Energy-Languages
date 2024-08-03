@@ -1,4 +1,5 @@
 import argparse
+import math
 import statistics
 
 import matplotlib.pyplot as plt
@@ -17,24 +18,27 @@ def main(args: argparse.Namespace) -> None:
         for benchmark in data[language].keys():
             if args.no_mean:
                 for r in data[language][benchmark]:
-                    xs.append(
-                        r["counters"]["PERF_COUNT_HW_CACHE_MISSES"]
-                        / (1e-3 * r["runtime_ms"])
+                    x = r["counters"]["PERF_COUNT_HW_CACHE_MISSES"] / (
+                        1e-3 * r["runtime_ms"]
                     )
+                    if x > args.xmax:
+                        continue
+                    xs.append(x)
                     ys.append(
                         sum([s["energy"]["dram"] for s in r["energy_samples"]])
                         / (1e-3 * r["runtime_ms"])
                     )
             else:
-                xs.append(
-                    statistics.median(
-                        [
-                            r["counters"]["PERF_COUNT_HW_CACHE_MISSES"]
-                            / (1e-3 * r["runtime_ms"])
-                            for r in data[language][benchmark]
-                        ]
-                    )
+                x = statistics.median(
+                    [
+                        r["counters"]["PERF_COUNT_HW_CACHE_MISSES"]
+                        / (1e-3 * r["runtime_ms"])
+                        for r in data[language][benchmark]
+                    ]
                 )
+                if x > args.xmax:
+                    continue
+                xs.append(x)
                 ys.append(
                     statistics.median(
                         [
@@ -79,4 +83,5 @@ if __name__ == "__main__":
     )
     parser.add_argument("--no-mean", action="store_true")
     parser.add_argument("--format", type=str, default="png")
+    parser.add_argument("--xmax", type=int, default=math.inf)
     main(parser.parse_args())
