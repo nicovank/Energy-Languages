@@ -50,13 +50,13 @@ def main(args: argparse.Namespace) -> None:
         for language in [args.a, args.b]
     }
 
-    runtime_bar = statistics.geometric_mean([
-        runtimes[args.b][b] / runtimes[args.a][b] for b in benchmarks
-    ])
+    runtime_bar = statistics.geometric_mean(
+        [runtimes[args.b][b] / runtimes[args.a][b] for b in benchmarks]
+    )
 
-    energy_bar = statistics.geometric_mean([
-        energies[args.b][b] / energies[args.a][b] for b in benchmarks
-    ])
+    energy_bar = statistics.geometric_mean(
+        [energies[args.b][b] / energies[args.a][b] for b in benchmarks]
+    )
 
     print(runtime_bar, energy_bar)
 
@@ -79,7 +79,9 @@ def main(args: argparse.Namespace) -> None:
         )
 
         plt.legend()
-        plt.yticks([width, width + 1], ["Relative runtime", "Relative energy consumption"])
+        plt.yticks(
+            [width, width + 1], ["Relative runtime", "Relative energy consumption"]
+        )
         plt.grid(visible=None, which="major", axis="y")
         plt.tick_params(axis="y", length=0)
 
