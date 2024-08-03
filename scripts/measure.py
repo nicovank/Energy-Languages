@@ -2,6 +2,7 @@ import argparse
 import os
 import random
 import subprocess
+import sys
 import time
 from typing import Any
 
@@ -168,7 +169,8 @@ def main(args: argparse.Namespace) -> None:
                                             "spectralnorm",
                                         ]
                                     ),
-                                ]
+                                ],
+                                text=True,
                             )
                             if len(stdout) > 0:
                                 print(f"Still running: {stdout}")

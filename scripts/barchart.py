@@ -21,20 +21,20 @@ def main(args: argparse.Namespace) -> None:
             benchmarks.remove(benchmark)
 
     runtimes = {
-        benchmark: {
-            language: (
-                statistics.geometric_mean(
+        language: {
+            benchmark: (
+                statistics.median(
                     [1e-3 * r["runtime_ms"] for r in data[language][benchmark]]
                 )
             )
-            for language in [args.a, args.b]
+            for benchmark in benchmarks
         }
-        for benchmark in benchmarks
+        for language in [args.a, args.b]
     }
 
     energies = {
         language: {
-            benchmark: statistics.geometric_mean(
+            benchmark: statistics.median(
                 [
                     sum(
                         [
@@ -46,39 +46,42 @@ def main(args: argparse.Namespace) -> None:
                 ]
             )
             for benchmark in benchmarks
-            if benchmark in data[language]
         }
         for language in [args.a, args.b]
     }
 
+    runtime_bar = statistics.geometric_mean([
+        runtimes[args.b][b] / runtimes[args.a][b] for b in benchmarks
+    ])
+
+    energy_bar = statistics.geometric_mean([
+        energies[args.b][b] / energies[args.a][b] for b in benchmarks
+    ])
+
+    print(runtime_bar, energy_bar)
+
     plt.rcParams["font.family"] = args.font
     with plt.style.context("bmh"):
-        y = np.arange(len(benchmarks))
         width = 0.25
 
-        fig, ax = plt.subplots(layout="constrained")
-
-        ax.barh(
-            y + 3 * width / 2,
-            [runtimes[benchmark][args.a] for benchmark in benchmarks],
+        plt.barh(
+            [3 * width / 2, 3 * width / 2 + 1],
+            [1, 1],
             width,
             label=args.a,
         )
 
-        ax.barh(
-            y + width / 2,
-            [runtimes[benchmark][args.b] for benchmark in benchmarks],
+        plt.barh(
+            [width / 2, width / 2 + 1],
+            [runtime_bar, energy_bar],
             width,
             label=args.b,
         )
 
-        ax.legend()
-        ax.set_yticks(y + width, benchmarks)
-        ax.grid(visible=None, which="major", axis="y")
-        ax.yaxis.set_tick_params(length=0)
-        ax.set_xlabel("Runtime [s]")
-        ax.set_ylabel("Benchmark")
-        ax.set_xlim(right=100)
+        plt.legend()
+        plt.yticks([width, width + 1], ["Relative runtime", "Relative energy consumption"])
+        plt.grid(visible=None, which="major", axis="y")
+        plt.tick_params(axis="y", length=0)
 
         plt.savefig(f"barchart.{args.format}", format=args.format)
 
