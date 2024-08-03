@@ -17,25 +17,25 @@ def main(args: argparse.Namespace) -> None:
 
     for language in args.languages:
         for benchmark in data[language].keys():
-                xs.append(
-                    statistics.median(
-                        [
-                            (r["counters"]["PERF_COUNT_SW_TASK_CLOCK"] / 1e9)
-                            / (r["runtime_ms"] / 1e3)
-                            for r in data[language][benchmark]
-                        ]
-                    )
+            xs.append(
+                statistics.median(
+                    [
+                        (r["counters"]["PERF_COUNT_SW_TASK_CLOCK"] / 1e9)
+                        / (r["runtime_ms"] / 1e3)
+                        for r in data[language][benchmark]
+                    ]
                 )
+            )
 
-                ys.append(
-                    statistics.median(
-                        [
-                            sum([s["energy"]["pkg"] for s in r["energy_samples"]])
-                            / (1e-3 * r["runtime_ms"])
-                            for r in data[language][benchmark]
-                        ]
-                    )
+            ys.append(
+                statistics.median(
+                    [
+                        sum([s["energy"]["pkg"] for s in r["energy_samples"]])
+                        / (1e-3 * r["runtime_ms"])
+                        for r in data[language][benchmark]
+                    ]
                 )
+            )
 
     plt.rcParams["font.family"] = args.font
     plt.gcf().set_size_inches(8, 5)
@@ -49,11 +49,11 @@ def main(args: argparse.Namespace) -> None:
         x_fit = np.linspace(0, max(xs), 100)
         y_power = log_fit(x_fit, *c)
         print(f"{c[0]:.2f} * ln(x) + {c[1]:.2f}")
-        plt.plot(x_fit, y_power, color='red', linewidth=1)
+        plt.plot(x_fit, y_power, color="red", linewidth=1)
 
         # Calculate r2
         residuals = ys - log_fit(xs, *c)
-        ss_res = np.sum(residuals ** 2)
+        ss_res = np.sum(residuals**2)
         ss_tot = np.sum((ys - np.mean(ys)) ** 2)
         r2 = 1 - (ss_res / ss_tot)
         print(f"r2: {r2}")
