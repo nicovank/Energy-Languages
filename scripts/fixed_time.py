@@ -14,9 +14,7 @@ def main(args: argparse.Namespace) -> None:
     runtimes = {
         language: {
             benchmark: 0.001
-            * statistics.geometric_mean(
-                [r["runtime_ms"] for r in data[language][benchmark]]
-            )
+            * statistics.median([r["runtime_ms"] for r in data[language][benchmark]])
             for benchmark in benchmarks
             if benchmark in data[language]
         }
@@ -25,7 +23,7 @@ def main(args: argparse.Namespace) -> None:
 
     cpu_usages = {
         language: {
-            benchmark: statistics.geometric_mean(
+            benchmark: statistics.median(
                 [
                     (r["counters"]["PERF_COUNT_SW_TASK_CLOCK"] / 1e9)
                     / (r["runtime_ms"] / 1e3)
@@ -40,9 +38,14 @@ def main(args: argparse.Namespace) -> None:
 
     energies = {
         language: {
-            benchmark: statistics.geometric_mean(
+            benchmark: statistics.median(
                 [
-                    sum([s["energy"]["pkg"] for s in r["energy_samples"]])
+                    sum(
+                        [
+                            s["energy"]["pkg"] + s["energy"]["dram"]
+                            for s in r["energy_samples"]
+                        ]
+                    )
                     for r in data[language][benchmark]
                 ]
             )
@@ -65,15 +68,19 @@ def main(args: argparse.Namespace) -> None:
         for language in args.languages:
             x = language_to_index[language]
             y = [
-                sum(
+                statistics.median(
                     [
-                        s["energy"]["pkg"] + s["energy"]["dram"]
-                        for s in r["energy_samples"]
+                        sum(
+                            [
+                                s["energy"]["pkg"] + s["energy"]["dram"]
+                                for s in r["energy_samples"]
+                            ]
+                        )
+                        for r in data[language][benchmark]
                     ]
                 )
                 for benchmark in benchmarks
                 if benchmark in data[language]
-                for r in data[language][benchmark]
             ]
 
             plt.scatter([x] * len(y), y, label=language)
