@@ -16,38 +16,25 @@ def main(args: argparse.Namespace) -> None:
 
     for language in args.languages:
         for benchmark in data[language].keys():
-            if args.no_mean:
-                for r in data[language][benchmark]:
-                    x = r["counters"]["PERF_COUNT_HW_CACHE_MISSES"] / (
-                        1e-3 * r["runtime_ms"]
-                    )
-                    if x > args.xmax:
-                        continue
-                    xs.append(x)
-                    ys.append(
-                        sum([s["energy"]["dram"] for s in r["energy_samples"]])
-                        / (1e-3 * r["runtime_ms"])
-                    )
-            else:
-                x = statistics.median(
+            x = statistics.median(
+                [
+                    r["counters"]["PERF_COUNT_HW_CACHE_MISSES"]
+                    / (1e-3 * r["runtime_ms"])
+                    for r in data[language][benchmark]
+                ]
+            )
+            if x > args.xmax:
+                continue
+            xs.append(x)
+            ys.append(
+                statistics.median(
                     [
-                        r["counters"]["PERF_COUNT_HW_CACHE_MISSES"]
+                        sum([s["energy"]["dram"] for s in r["energy_samples"]])
                         / (1e-3 * r["runtime_ms"])
                         for r in data[language][benchmark]
                     ]
                 )
-                if x > args.xmax:
-                    continue
-                xs.append(x)
-                ys.append(
-                    statistics.median(
-                        [
-                            sum([s["energy"]["dram"] for s in r["energy_samples"]])
-                            / (1e-3 * r["runtime_ms"])
-                            for r in data[language][benchmark]
-                        ]
-                    )
-                )
+            )
 
     plt.rcParams["font.family"] = args.font
     plt.gcf().set_size_inches(8, 5)
@@ -80,7 +67,6 @@ if __name__ == "__main__":
         nargs="+",
         required=True,
     )
-    parser.add_argument("--no-mean", action="store_true")
     parser.add_argument("--font", type=str, default="Linux Libertine")
     parser.add_argument("--format", type=str, default="png")
     parser.add_argument("--xmax", type=int, default=math.inf)
