@@ -20,7 +20,9 @@ def main(args: argparse.Namespace) -> None:
     for language in args.languages:
         for benchmark in data[language].keys():
             for r in data[language][benchmark]:
-                ratio = sum([s["energy"]["dram"] for s in r["energy_samples"]]) / sum([s["energy"]["pkg"] for s in r["energy_samples"]])
+                ratio = sum([s["energy"]["dram"] for s in r["energy_samples"]]) / sum(
+                    [s["energy"]["pkg"] for s in r["energy_samples"]]
+                )
                 min_ratio = min(min_ratio, ratio)
                 max_ratio = max(max_ratio, ratio)
             x = statistics.median(
@@ -43,7 +45,9 @@ def main(args: argparse.Namespace) -> None:
                 )
             )
 
-    print(f"% of DRAM energy over CPU energy: {min_ratio * 100:.2f}% - {max_ratio * 100:.2f}%")
+    print(
+        f"% of DRAM energy over CPU energy: {min_ratio * 100:.2f}% - {max_ratio * 100:.2f}%"
+    )
 
     plt.rcParams["font.family"] = args.font
     plt.gcf().set_size_inches(8, 5)
