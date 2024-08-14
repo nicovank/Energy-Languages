@@ -66,10 +66,10 @@ int main(int argc, char **argv) {
 
 struct EnergySample {
     typename RAPL_BENCHMARK_RUNTIME_CLOCK::rep duration_ms;
-    rapl::DoubleSample energy;
+    std::vector<rapl::DoubleSample> energy;
 
-    EnergySample(typename RAPL_BENCHMARK_RUNTIME_CLOCK::rep duration_ms, rapl::DoubleSample energy)
-        : duration_ms(duration_ms), energy(energy) {}
+    EnergySample(typename RAPL_BENCHMARK_RUNTIME_CLOCK::rep duration_ms, std::vector<rapl::DoubleSample> energy)
+        : duration_ms(duration_ms), energy(std::move(energy)) {}
 };
 
 template <>
@@ -138,12 +138,14 @@ inline Result measure(int argc, char** argv) {
             const auto now = RAPL_BENCHMARK_RUNTIME_CLOCK::now();
             const auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_energy_timestamp);
             last_energy_timestamp = now;
+            std::vector<rapl::DoubleSample> per_pkg_samples;
+            per_pkg_samples.reserve(cpu::getNPackages());
             for (int package = 0; package < cpu::getNPackages(); ++package) {
                 const auto sample = rapl::sample(package);
-                const auto energy = rapl::scale(sample - previous_energy_sample.at(package), package);
-                energy_samples.emplace_back(duration_ms.count(), energy);
+                per_pkg_samples.emplace_back(rapl::scale(sample - previous_energy_sample.at(package), package));
                 previous_energy_sample.at(package) = sample;
             }
+            energy_samples.emplace_back(duration_ms.count(), per_pkg_samples);
         }
     });
     ScopeExit _([&] {
@@ -171,11 +173,14 @@ inline Result measure(int argc, char** argv) {
     std::lock_guard<std::mutex> guard(energy_lock);
     const auto now = RAPL_BENCHMARK_RUNTIME_CLOCK::now();
     const auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_energy_timestamp);
+    std::vector<rapl::DoubleSample> per_pkg_samples;
+    per_pkg_samples.reserve(cpu::getNPackages());
     for (int package = 0; package < cpu::getNPackages(); ++package) {
         const auto sample = rapl::sample(package);
-        const auto energy = rapl::scale(sample - previous_energy_sample.at(package), package);
-        energy_samples.emplace_back(duration_ms.count(), energy);
+        per_pkg_samples.emplace_back(rapl::scale(sample - previous_energy_sample.at(package), package));
+        previous_energy_sample.at(package) = sample;
     }
+    energy_samples.emplace_back(duration_ms.count(), per_pkg_samples);
 #endif
 
     teardown();

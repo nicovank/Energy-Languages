@@ -119,7 +119,5 @@ int main(int argc, char** argv) {
 
     std::cout << "Total runtime: " << result.runtime_ms << " ms" << std::endl;
     std::cout << "CPU utilization: [TODO]" << std::endl;
-    const auto energy = std::accumulate(result.energy_samples.begin(), result.energy_samples.end(), 0.0,
-                                        [](double sum, const auto& sample) { return sum + sample.energy.pkg; });
-    std::cout << "Energy consumed: " << energy << " J" << std::endl;
+    std::cout << "Energy consumed: [TODO]" << std::endl;
 }
