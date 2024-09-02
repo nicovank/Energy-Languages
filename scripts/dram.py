@@ -20,7 +20,9 @@ def main(args: argparse.Namespace) -> None:
     for language in args.languages:
         for benchmark in data[language].keys():
             for r in data[language][benchmark]:
-                ratio = sum([sum(e["dram"] for e in s["energy"]) for s in r["energy_samples"]]) / sum(
+                ratio = sum(
+                    [sum(e["dram"] for e in s["energy"]) for s in r["energy_samples"]]
+                ) / sum(
                     [sum(e["pkg"] for e in s["energy"]) for s in r["energy_samples"]]
                 )
                 min_ratio = min(min_ratio, ratio)
@@ -38,7 +40,12 @@ def main(args: argparse.Namespace) -> None:
             ys.append(
                 statistics.median(
                     [
-                        sum([sum(e["dram"] for e in s["energy"]) for s in r["energy_samples"]])
+                        sum(
+                            [
+                                sum(e["dram"] for e in s["energy"])
+                                for s in r["energy_samples"]
+                            ]
+                        )
                         / (1e-3 * r["runtime_ms"])
                         for r in data[language][benchmark]
                     ]
