@@ -30,7 +30,7 @@ def main(args: argparse.Namespace) -> None:
             ys.append(
                 statistics.median(
                     [
-                        sum([s["energy"]["pkg"] for s in r["energy_samples"]])
+                        sum([sum(e["pkg"] for e in s["energy"]) for s in r["energy_samples"]])
                         / (1e-3 * r["runtime_ms"])
                         for r in data[language][benchmark]
                     ]
