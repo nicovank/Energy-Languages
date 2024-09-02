@@ -15,7 +15,7 @@ def main(args: argparse.Namespace) -> None:
     ys = []
 
     min_ratio = math.inf
-    max_ratio = 0
+    max_ratio = 0.0
 
     for language in args.languages:
         for benchmark in data[language].keys():
