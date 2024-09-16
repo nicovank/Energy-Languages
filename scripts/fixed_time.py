@@ -75,7 +75,8 @@ def main(args: argparse.Namespace) -> None:
                                 sum(e["pkg"] + e["dram"] for e in s["energy"])
                                 for s in r["energy_samples"]
                             ]
-                        ) / (r["runtime_ms"] / 1e3)
+                        )
+                        / (r["runtime_ms"] / 1e3)
                         for r in data[language][benchmark]
                     ]
                 )
