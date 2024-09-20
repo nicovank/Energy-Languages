@@ -9,9 +9,10 @@ fi
 
 for i in {1..20}
 do
-    docker run -it --rm --privileged -e NNNNN=$i -v `pwd`/data/`hostname -s`/docker-default:/root/data energy-languages \
-        --languages experiments/$1-N \
+    docker run -it --rm --privileged -e NNNNN=$i -v `pwd`/data/`hostname -s`/docker-no-turbo:/root/data energy-languages \
+        --benchmark-root experiments \
+        --languages $1-N \
         --warmup 1 \
         --iterations 7
-    mv "$(pwd)/data/$(hostname -s)/docker-default/experiments/$1-N" "$(pwd)/data/$(hostname -s)/docker-default/experiments/$1-$i"
+    mv "$(pwd)/data/$(hostname -s)/docker-no-turbo/experiments/$1-N" "$(pwd)/data/$(hostname -s)/docker-no-turbo/experiments/$1-$i"
 done
