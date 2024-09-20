@@ -60,5 +60,5 @@ Running additional experiments.
 
 Running Java-N experiments.
 ```bash
-% sudo ./scripts/docker-java-n.sh
+% sudo ./scripts/docker-java-n.sh Java
 ```
