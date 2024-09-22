@@ -8,7 +8,7 @@ endif
 
 compile:
 	npm install
-	$(TSC) --alwaysStrict -t ESNEXT spectralnorm.ts
+	$(TSC) --skipLibCheck --alwaysStrict -t ESNEXT spectralnorm.ts
 
 run:
 	$(NODE) spectralnorm.js 5500

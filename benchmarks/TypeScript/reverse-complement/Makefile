@@ -8,7 +8,7 @@ endif
 
 compile:
 	npm install
-	$(TSC) --alwaysStrict -t ESNEXT revcomp.ts
+	$(TSC) --skipLibCheck --alwaysStrict -t ESNEXT revcomp.ts
 
 run:
 	$(NODE) revcomp.js 0 < ../../../fasta-25000000.txt

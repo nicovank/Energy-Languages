@@ -8,7 +8,7 @@ endif
 
 compile:
 	npm install
-	$(TSC) --alwaysStrict -t ESNEXT fasta.ts
+	$(TSC) --skipLibCheck --alwaysStrict -t ESNEXT fasta.ts
 
 run:
 	$(NODE) fasta.js 25000000

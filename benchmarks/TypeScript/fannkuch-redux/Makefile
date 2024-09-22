@@ -8,7 +8,7 @@ endif
 
 compile:
 	npm install
-	$(TSC) --alwaysStrict -t ESNEXT fannkuchredux.ts
+	$(TSC) --skipLibCheck --alwaysStrict -t ESNEXT fannkuchredux.ts
 
 run:
 	$(NODE) fannkuchredux.js 12

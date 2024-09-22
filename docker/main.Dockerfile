@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 ubuntu:latest
+FROM ubuntu:latest
 
 VOLUME [ "/root/data" ]
 
@@ -7,11 +7,11 @@ RUN apt update
 RUN DEBIAN_FRONTEND=noninteractive apt install -y tzdata
 RUN apt install -y git cmake ninja-build sudo curl wget pkg-config gnupg
 
-COPY docker/keys /root/Energy-Languages/docker/keys
+COPY docker /root/Energy-Languages/docker
 RUN gpg --import /root/Energy-Languages/docker/keys/*
 
 # C++.
-ARG CLANG_VERSION=17
+ARG CLANG_VERSION=19
 RUN apt install -y lsb-release wget software-properties-common gnupg
 RUN curl -sSf https://apt.llvm.org/llvm.sh | bash -s -- ${CLANG_VERSION} all
 ENV CC=clang-${CLANG_VERSION}
@@ -24,7 +24,7 @@ RUN apt install -y libapr1-dev libgmp-dev libpcre3-dev libboost-regex-dev
 
 # Rust.
 # https://forge.rust-lang.org/infra/other-installation-methods.html#standalone-installers
-ARG RUST_VERSION=1.71.1
+ARG RUST_VERSION=1.81.0
 RUN wget --no-verbose https://static.rust-lang.org/dist/rust-${RUST_VERSION}-x86_64-unknown-linux-gnu.tar.gz
 RUN wget --no-verbose https://static.rust-lang.org/dist/rust-${RUST_VERSION}-x86_64-unknown-linux-gnu.tar.gz.asc
 RUN gpg --verify rust-${RUST_VERSION}-x86_64-unknown-linux-gnu.tar.gz.asc rust-${RUST_VERSION}-x86_64-unknown-linux-gnu.tar.gz
@@ -33,8 +33,8 @@ RUN ./rust-${RUST_VERSION}-x86_64-unknown-linux-gnu/install.sh
 RUN rm rust-${RUST_VERSION}-x86_64-unknown-linux-gnu.tar.gz rust-${RUST_VERSION}-x86_64-unknown-linux-gnu.tar.gz.asc
 
 # Java.
-ARG JAVA_VERSION=21+35
-ARG JAVA_CHECKSUM=82f64c53acaa045370d6762ebd7441b74e6fda14b464d54d1ff8ca941ec069e6
+ARG JAVA_VERSION=21.0.4+7
+ARG JAVA_CHECKSUM=51fb4d03a4429c39d397d3a03a779077159317616550e4e71624c9843083e7b9
 RUN apt install -y libfastutil-java
 RUN wget --no-verbose https://github.com/adoptium/temurin21-binaries/releases/download/jdk-${JAVA_VERSION}/OpenJDK21U-jdk_x64_linux_hotspot_$(echo $JAVA_VERSION | sed s/+/_/).tar.gz
 RUN echo "${JAVA_CHECKSUM} OpenJDK21U-jdk_x64_linux_hotspot_$(echo $JAVA_VERSION | sed s/+/_/).tar.gz" | sha256sum --check
@@ -43,8 +43,8 @@ RUN rm OpenJDK21U-jdk_x64_linux_hotspot_$(echo $JAVA_VERSION | sed s/+/_/).tar.g
 
 # Go.
 # https://go.dev/dl/
-ARG GO_VERSION=1.21.0
-ARG GO_CHECKSUM=d0398903a16ba2232b389fb31032ddf57cac34efda306a0eebac34f0965a0742
+ARG GO_VERSION=1.23.1
+ARG GO_CHECKSUM=49bbb517cfa9eee677e1e7897f7cf9cfdbcf49e05f61984a2789136de359f9bd
 RUN wget --no-verbose https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz
 RUN echo "${GO_CHECKSUM} go${GO_VERSION}.linux-amd64.tar.gz" | sha256sum --check
 RUN tar -C /usr/local --strip-components=1 -xzf go${GO_VERSION}.linux-amd64.tar.gz
@@ -52,9 +52,9 @@ RUN rm go${GO_VERSION}.linux-amd64.tar.gz
 
 # C#.
 # https://dotnet.microsoft.com/en-us/download/dotnet
-ARG DOTNET_VERSION=7.0.400
-ARG DOTNET_URL=https://download.visualstudio.microsoft.com/download/pr/dbfe6cc7-dd82-4cec-b267-31ed988b1652/c60ab4793c3714be878abcb9aa834b63/dotnet-sdk-${DOTNET_VERSION}-linux-x64.tar.gz
-ARG DOTNET_CHECKSUM=4cfeedb8e99ffd423da7a99159ee3f31535fd142711941b8206542acb6be26638fbd9a184a5d904084ffdbd8362c83b6b2acf9d193b2cd38bf7f061443439e3c
+ARG DOTNET_VERSION=8.0.401 # 8.0.8.
+ARG DOTNET_URL=https://download.visualstudio.microsoft.com/download/pr/db901b0a-3144-4d07-b8ab-6e7a43e7a791/4d9d1b39b879ad969c6c0ceb6d052381/dotnet-sdk-8.0.401-linux-x64.tar.gz
+ARG DOTNET_CHECKSUM=4d2180e82c963318863476cf61c035bd3d82165e7b70751ba231225b5575df24d30c0789d5748c3a379e1e6896b57e59286218cacd440ffb0075c9355094fd8c
 RUN wget --no-verbose ${DOTNET_URL}
 RUN echo "${DOTNET_CHECKSUM} dotnet-sdk-${DOTNET_VERSION}-linux-x64.tar.gz" | sha512sum --check
 RUN tar -C /usr/local/bin -xzf dotnet-sdk-${DOTNET_VERSION}-linux-x64.tar.gz
@@ -62,8 +62,8 @@ RUN rm dotnet-sdk-${DOTNET_VERSION}-linux-x64.tar.gz
 
 # Node.js.
 # https://nodejs.org/en/download
-ARG NODE_VERSION=18.17.1
-ARG NODE_CHECKSUM=07e76408ddb0300a6f46fcc9abc61f841acde49b45020ec4e86bb9b25df4dced
+ARG NODE_VERSION=20.17.0
+ARG NODE_CHECKSUM=a24db3dcd151a52e75965dba04cf1b3cd579ff30d6e0af9da1aede4d0f17486b
 RUN wget --no-verbose https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz
 RUN echo "${NODE_CHECKSUM} node-v${NODE_VERSION}-linux-x64.tar.xz" | sha256sum --check
 RUN tar -C /usr/local --strip-components=1 -xJf node-v${NODE_VERSION}-linux-x64.tar.xz
@@ -71,13 +71,13 @@ RUN rm node-v${NODE_VERSION}-linux-x64.tar.xz
 
 # TypeScript.
 # https://www.npmjs.com/package/typescript
-ARG TYPESCRIPT_VERSION=5.1.6
+ARG TYPESCRIPT_VERSION=5.6.2
 RUN npm install -g typescript@${TYPESCRIPT_VERSION}
 
 # PHP.
 # https://www.php.net/downloads.php
-ARG PHP_VERSION=8.2.9
-ARG PHP_CHECKSUM=5fac52041335cacfb5845aeff2303f92403925338a0285f2e160feebcb840f04
+ARG PHP_VERSION=8.3.11
+ARG PHP_CHECKSUM=b93a69af83a1302543789408194bd1ae9829e116e784d578778200f20f1b72d4
 # https://github.com/php/php-src#building-php-source-code
 RUN apt install -y pkg-config build-essential autoconf bison re2c libxml2-dev libsqlite3-dev
 RUN wget --no-verbose https://www.php.net/distributions/php-${PHP_VERSION}.tar.gz
@@ -87,7 +87,7 @@ RUN cd php-${PHP_VERSION} && ./configure --enable-pcntl --enable-shmop --enable-
 RUN rm -rf php-${PHP_VERSION}.tar.gz php-${PHP_VERSION}
 
 # Python.
-ARG PYTHON_VERSION=3.11.4
+ARG PYTHON_VERSION=3.12.6
 # https://devguide.python.org/getting-started/setup-building/index.html#build-dependencies
 RUN apt install -y build-essential gdb lcov pkg-config libbz2-dev libffi-dev libgdbm-dev libgdbm-compat-dev liblzma-dev libncurses5-dev libreadline6-dev libsqlite3-dev libssl-dev lzma lzma-dev tk-dev uuid-dev zlib1g-dev
 RUN wget --no-verbose https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz
@@ -105,9 +105,9 @@ COPY scripts/requirements.txt /root/Energy-Languages/
 RUN python3 -m pip install -r /root/Energy-Languages/requirements.txt
 
 # PyPy.
-ARG PYPY_VERSION=7.3.12
+ARG PYPY_VERSION=7.3.17
 ARG PYPY_PYTHON_VERSION=3.10
-ARG PYPY_CHECKSUM=6c577993160b6f5ee8cab73cd1a807affcefafe2f7441c87bd926c10505e8731
+ARG PYPY_CHECKSUM=fdcdb9b24f1a7726003586503fdeb264fd68fc37fbfcea022dcfe825a7fee18b
 RUN wget --no-verbose https://downloads.python.org/pypy/pypy${PYPY_PYTHON_VERSION}-v${PYPY_VERSION}-linux64.tar.bz2
 RUN echo "${PYPY_CHECKSUM} pypy${PYPY_PYTHON_VERSION}-v${PYPY_VERSION}-linux64.tar.bz2" | sha256sum --check
 RUN tar -C /usr/local -xjf pypy${PYPY_PYTHON_VERSION}-v${PYPY_VERSION}-linux64.tar.bz2
@@ -115,8 +115,8 @@ RUN ln -s /usr/local/pypy${PYPY_PYTHON_VERSION}-v${PYPY_VERSION}-linux64/bin/pyp
 RUN rm pypy${PYPY_PYTHON_VERSION}-v${PYPY_VERSION}-linux64.tar.bz2
 
 # Lua.
-ARG LUA_VERSION=5.4.6
-ARG LUA_CHECKSUM=7d5ea1b9cb6aa0b59ca3dde1c6adcb57ef83a1ba8e5432c0ecd06bf439b3ad88
+ARG LUA_VERSION=5.4.7
+ARG LUA_CHECKSUM=9fbf5e28ef86c69858f6d3d34eccc32e911c1a28b4120ff3e84aaa70cfbf1e30
 RUN wget --no-verbose https://www.lua.org/ftp/lua-${LUA_VERSION}.tar.gz
 RUN echo "${LUA_CHECKSUM} lua-${LUA_VERSION}.tar.gz" | sha256sum --check
 RUN tar -xzf lua-${LUA_VERSION}.tar.gz
@@ -124,7 +124,7 @@ RUN cd lua-${LUA_VERSION} && make -j && make install
 RUN rm lua-${LUA_VERSION}.tar.gz
 
 # LuaJIT.
-ARG LUAJIT_COMMIT=93e87998b24021b94de8d1c8db244444c46fb6e9
+ARG LUAJIT_COMMIT=87ae18af97fd4de790bb6c476b212e047689cc93
 RUN git clone https://luajit.org/git/luajit.git
 RUN cd luajit && git checkout ${LUAJIT_COMMIT} && make -j && make install
 RUN rm -rf luajit
