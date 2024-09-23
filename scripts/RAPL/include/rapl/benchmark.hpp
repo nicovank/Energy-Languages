@@ -1,5 +1,5 @@
 /*
-A thin wrapper to make building benchmarks with runtime/counters/enery
+A thin wrapper to make building benchmarks with runtime/counters/energy
 measurements easier. A benchmark file should look like this.
 
 ```
