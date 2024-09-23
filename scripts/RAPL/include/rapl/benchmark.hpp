@@ -7,10 +7,10 @@ measurements easier. A benchmark file should look like this.
 #define RAPL_BENCHMARK_RUNTIME 1
 
 // To enable energy measurements.
-#define RAPL_BENCHMARK_COUNTERS 1
-
-// To enable energy measurements.
 #define RAPL_BENCHMARK_ENERGY 1
+
+// To enable performance counters.
+#define RAPL_BENCHMARK_COUNTERS 1
 
 // Specify which events to enable.
 #define RAPL_BENCHMARK_COUNTERS_EVENTS {{PERF_TYPE_HARDWARE, PERF_COUNT_HW_CPU_CYCLES}}
