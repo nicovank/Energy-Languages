@@ -5,17 +5,6 @@ Hyuk-Je Kwon, and Dung Tuan Nguyen.
 
 This repository contains our code and experiments reproducing and investigating _[Energy efficiency across programming languages: how do energy, time, and memory relate?](https://dl.acm.org/doi/10.1145/3136014.3136031)_.
 
-## License
-
-The original benchmark suite, the
-[Computer Language Benchmark Game](https://benchmarksgame-team.pages.debian.net/benchmarksgame/), is under
-[BSD-3-Clause](https://salsa.debian.org/benchmarksgame-team/benchmarksgame/-/blob/master/LICENSE.md).
-
-Code from [the repository this one originally forked from](https://github.com/greensoftwarelab/Energy-Languages) is
-under [MIT](https://github.com/greensoftwarelab/Energy-Languages/blob/master/LICENSE).
-
-Any other code in this repository is under [Apache-2.0](LICENSE).
-
 ## Documentation
 
 ### Requirements
@@ -62,3 +51,14 @@ Running Java-N experiments.
 ```bash
 % sudo ./scripts/docker-java-n.sh Java
 ```
+
+## License
+
+The original benchmark suite, the
+[Computer Language Benchmark Game](https://benchmarksgame-team.pages.debian.net/benchmarksgame/), is under
+[BSD-3-Clause](https://salsa.debian.org/benchmarksgame-team/benchmarksgame/-/blob/master/LICENSE.md).
+
+Code from [the repository this one originally forked from](https://github.com/greensoftwarelab/Energy-Languages) is
+under [MIT](https://github.com/greensoftwarelab/Energy-Languages/blob/master/LICENSE).
+
+Any other code in this repository is under [Apache-2.0](LICENSE).
