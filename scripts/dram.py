@@ -62,17 +62,17 @@ def main(args: argparse.Namespace) -> None:
         plt.scatter(xs, ys, s=10)
 
         slope, intercept, rvalue, _, _ = scipy.stats.linregress(xs, ys)
-        print(f"slope: {slope}, intercept: {intercept}")
+        print(f"slope: {slope:.2e}, intercept: {intercept:.2f}")
         plt.plot(
             [min(xs), max(xs)],
             [intercept + slope * min(xs), intercept + slope * max(xs)],
             color="red",
             linewidth=1,
         )
-        print(f"rvalue: {rvalue}")
+        print(f"R^2: {rvalue ** 2:.2f}")
 
-        plt.xlabel("LLC misses per second")
-        plt.ylabel("Power [W]")
+        plt.xlabel("LLC misses per second [1/s]")
+        plt.ylabel("Average energy consumed (DRAM) per second [J/s]")
         plt.ylim(bottom=0)
         plt.tight_layout()
         plt.savefig(f"dram.{args.format}", format=args.format)

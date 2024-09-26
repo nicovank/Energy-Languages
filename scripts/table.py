@@ -103,7 +103,12 @@ def main(args: argparse.Namespace) -> None:
                 language: {
                     benchmark: statistics.geometric_mean(
                         [
-                            sum([s["energy"]["pkg"] for s in e["energy_samples"]])
+                            sum(
+                                [
+                                    sum(e["pkg"] for e in s["energy"])
+                                    for s in e["energy_samples"]
+                                ]
+                            )
                             for e in subdata
                         ]
                     )
@@ -125,5 +130,5 @@ if __name__ == "__main__":
         nargs="+",
         required=True,
     )
-    parser.add_argument("--baseline", type=str, default="C")
+    parser.add_argument("--baseline", type=str, default=None)
     main(parser.parse_args())

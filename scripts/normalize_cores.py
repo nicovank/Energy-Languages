@@ -57,15 +57,15 @@ def main(args: argparse.Namespace) -> None:
             return np.polyval([a, b, c, d], x)
 
         c1, _ = scipy.optimize.curve_fit(log_fit, xs, ys)
-        x_fit = np.linspace(0, max(xs), 100)
+        x_fit = np.linspace(min(xs), max(xs), 100)
         y_power = log_fit(x_fit, *c1)
         print(f"{c1[0]:.2f} * ln(x) + {c1[1]:.2f}")
         plt.plot(x_fit, y_power, color="red", linewidth=1)
 
-        c2, _ = scipy.optimize.curve_fit(cubic_fit, xs, ys)
-        x_fit = np.linspace(0, max(xs), 100)
-        y_cubic = cubic_fit(x_fit, *c2)
-        print(f"{c2[0]:.2f} * x^3 + {c2[1]:.2f} * x^2 + {c2[2]:.2f} * x + {c2[3]:.2f}")
+        # c2, _ = scipy.optimize.curve_fit(cubic_fit, xs, ys)
+        # x_fit = np.linspace(0, max(xs), 100)
+        # y_cubic = cubic_fit(x_fit, *c2)
+        # print(f"{c2[0]:.2f} * x^3 + {c2[1]:.2f} * x^2 + {c2[2]:.2f} * x + {c2[3]:.2f}")
         # plt.plot(x_fit, y_cubic, color="green", linewidth=1)
 
         residuals = ys - log_fit(xs, *c1)
@@ -74,11 +74,11 @@ def main(args: argparse.Namespace) -> None:
         r2 = 1 - (ss_res / ss_tot)
         print(f"r2: {r2}")
 
-        residuals = ys - cubic_fit(xs, *c2)
-        ss_res = np.sum(residuals**2)
-        ss_tot = np.sum((ys - np.mean(ys)) ** 2)
-        r2 = 1 - (ss_res / ss_tot)
-        print(f"r2: {r2}")
+        # residuals = ys - cubic_fit(xs, *c2)
+        # ss_res = np.sum(residuals**2)
+        # ss_tot = np.sum((ys - np.mean(ys)) ** 2)
+        # r2 = 1 - (ss_res / ss_tot)
+        # print(f"r2: {r2}")
 
         plt.xlabel("Average number of cores used")
         plt.ylabel("Average power draw [W]")
