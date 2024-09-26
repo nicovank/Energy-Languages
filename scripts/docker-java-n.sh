@@ -13,12 +13,13 @@ if [ ! -d "experiments/$1-N" ]; then
   exit 1
 fi
 
-for i in {1..20}
+for i in {1..15}
 do
     docker run -it --rm --privileged -e NNNNN=$i -v `pwd`/data/`hostname -s`/$2:/root/data energy-languages \
         --benchmark-root experiments \
         --languages $1-N \
         --warmup 1 \
-        --iterations 5
+        --iterations 5 \
+        --timeout 5000
     mv "$(pwd)/data/$(hostname -s)/$2/$1-N" "$(pwd)/data/$(hostname -s)/$2/$1-$i"
 done
