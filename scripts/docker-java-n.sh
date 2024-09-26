@@ -17,6 +17,7 @@ for i in {1..15}
 do
     docker run -it --rm --privileged -e NNNNN=$i -v `pwd`/data/`hostname -s`/$2:/root/data energy-languages \
         --benchmark-root experiments \
+        --benchmarks spectral-norm mandelbrot binary-trees fannkuch-redux \
         --languages $1-N \
         --warmup 1 \
         --iterations 5 \

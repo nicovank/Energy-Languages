@@ -31,7 +31,7 @@ def main(args: argparse.Namespace) -> None:
             ),
         )
         fig, ax = plt.subplots()
-        fig.set_size_inches(5, 4)
+        fig.set_size_inches(4, 3)
 
         x = np.sort(np.array(list(data.keys())))
         runtime = [[r["runtime_ms"] for r in data[n]] for n in x]
@@ -51,10 +51,6 @@ def main(args: argparse.Namespace) -> None:
         )
         ax.scatter(x, y, s=20)
 
-        if not args.no_title:
-            ax.set_title(
-                f"Runtime per iteration for {args.benchmark} ({args.language})"
-            )
         ax.set_ylabel("Time per iteration [ms]")
         ax.set_xlabel("Number of iterations")
         ax.set_axisbelow(True)
@@ -71,5 +67,4 @@ if __name__ == "__main__":
     parser.add_argument("--language", type=str, default="Java")
     parser.add_argument("--font", type=str, default="Linux Libertine O")
     parser.add_argument("--format", type=str, default="png")
-    parser.add_argument("--no-title", action="store_true")
     main(parser.parse_args())
