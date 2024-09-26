@@ -87,7 +87,7 @@ if __name__ == "__main__":
         nargs="+",
         required=True,
     )
-    parser.add_argument("--font", type=str, default="Linux Libertine")
+    parser.add_argument("--font", type=str, default="Linux Libertine O")
     parser.add_argument("--format", type=str, default="png")
     parser.add_argument("--xmax", type=int, default=math.inf)
     main(parser.parse_args())

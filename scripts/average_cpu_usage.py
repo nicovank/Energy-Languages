@@ -112,7 +112,7 @@ if __name__ == "__main__":
         nargs="+",
         required=True,
     )
-    parser.add_argument("--font", type=str, default="Linux Libertine")
+    parser.add_argument("--font", type=str, default="Linux Libertine O")
     parser.add_argument("--format", type=str, default="png")
     parser.add_argument("--no-title", action="store_true")
     main(parser.parse_args())

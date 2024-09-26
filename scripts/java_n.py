@@ -9,14 +9,13 @@ import numpy as np
 
 
 def main(args: argparse.Namespace) -> None:
-    experiments_root = os.path.join(args.data_root, "experiments")
     java_n_experiments = [
-        e for e in os.listdir(experiments_root) if e.startswith(f"{args.language}-")
+        e for e in os.listdir(args.data_root) if e.startswith(f"{args.language}-")
     ]
     data = collections.defaultdict(list)
     for experiment in java_n_experiments:
         n = int(experiment.split("-")[1])
-        path = os.path.join(experiments_root, experiment, f"{args.benchmark}.json")
+        path = os.path.join(args.data_root, experiment, f"{args.benchmark}.json")
         if not os.path.exists(path):
             continue
         with open(path, "r") as f:
@@ -70,7 +69,7 @@ if __name__ == "__main__":
     parser.add_argument("--data-root", type=str, required=True)
     parser.add_argument("--benchmark", type=str, required=True)
     parser.add_argument("--language", type=str, default="Java")
-    parser.add_argument("--font", type=str, default="Linux Libertine")
+    parser.add_argument("--font", type=str, default="Linux Libertine O")
     parser.add_argument("--format", type=str, default="png")
     parser.add_argument("--no-title", action="store_true")
     main(parser.parse_args())

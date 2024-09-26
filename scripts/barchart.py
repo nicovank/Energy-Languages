@@ -101,6 +101,6 @@ if __name__ == "__main__":
         type=str,
         default="LuaJIT",
     )
-    parser.add_argument("--font", type=str, default="Linux Libertine")
+    parser.add_argument("--font", type=str, default="Linux Libertine O")
     parser.add_argument("--format", type=str, default="png")
     main(parser.parse_args())

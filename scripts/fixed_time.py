@@ -93,7 +93,7 @@ def main(args: argparse.Namespace) -> None:
         )
         plt.ylim(bottom=0, top=plt.ylim()[1] * 1.1)
         plt.xlabel("Language")
-        plt.ylabel("Energy [J]")
+        plt.ylabel("Energy (PKG + DRAM) [J]")
         plt.tight_layout()
         plt.savefig(f"fixed_time.{args.format}")
 
@@ -107,7 +107,7 @@ if __name__ == "__main__":
         nargs="+",
         required=True,
     )
-    parser.add_argument("--font", type=str, default="Linux Libertine")
+    parser.add_argument("--font", type=str, default="Linux Libertine O")
     parser.add_argument("--format", type=str, default="png")
     parser.add_argument("--no-title", action="store_true")
     main(parser.parse_args())
