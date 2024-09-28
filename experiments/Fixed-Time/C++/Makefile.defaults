@@ -1,1 +1,0 @@
-CXXFLAGS := -O3 -DNDEBUG -flto -march=native -mtune=native

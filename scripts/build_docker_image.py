@@ -22,7 +22,6 @@ def generate_input_files() -> None:
     HASHES = {
         5000000: "97197f5957a12f8a859ba7edff6d97994daa18afacd77db21fa68c6f2e447e38",
         25000000: "3fcf4f78104c8a65ef210fe1d469f4e473456c791225f2f1f9114f4986aa09fa",
-        800000000: "7fb6c91ac859dd58174ad47b328da4268876f21065a6e0c6a9cfcb7153a1f4ba",
     }
 
     for size in HASHES.keys():

@@ -1,9 +1,0 @@
-[package]
-name = "pidigits"
-version = "1.0.0"
-
-[[bin]]
-name = "pidigits"
-path = "pidigits.rs"
-
-[dependencies]

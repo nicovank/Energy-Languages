@@ -132,7 +132,6 @@ RUN rm -rf luajit
 WORKDIR /root/Energy-Languages
 COPY fasta-5000000.txt fasta-5000000.txt
 COPY fasta-25000000.txt fasta-25000000.txt
-COPY fasta-800000000.txt fasta-800000000.txt
 COPY benchmarks benchmarks
 COPY experiments experiments
 COPY scripts scripts
