@@ -64,7 +64,10 @@ def main(args: argparse.Namespace) -> None:
                 )
 
     plt.rcParams["font.family"] = args.font
+    plt.gcf().set_size_inches(8, 5)
     with plt.style.context("bmh"):
+        xs = []
+        ys = []
         for language in args.languages:
             x = language_to_index[language]
             y = [
@@ -84,16 +87,25 @@ def main(args: argparse.Namespace) -> None:
                 if benchmark in data[language]
             ]
 
-            plt.scatter([x] * len(y), y, label=language)
+            xs.extend([x] * len(y))
+            ys.extend(y)
+
+        plt.scatter(xs, ys)
+
+        # average of ys
+        y_avg = statistics.mean(ys)
+        plt.axhline(y_avg, color="red", linestyle="--", linewidth=1)
+        print("Average: ", y_avg)
+        print("Standard deviation: ", statistics.stdev(ys))
 
         plt.xticks(
             range(len(args.languages)),
-            [pl.replace("#", "\\#") for pl in args.languages],
+            args.languages,
             rotation=45,
         )
         plt.ylim(bottom=0, top=plt.ylim()[1] * 1.1)
-        plt.xlabel("Language")
-        plt.ylabel("Energy (PKG + DRAM) [J]")
+        plt.xlabel("Programming Language Implementation")
+        plt.ylabel("Average power draw (PKG + DRAM) [W]")
         plt.tight_layout()
         plt.savefig(f"fixed_time.{args.format}")
 

@@ -1,7 +1,6 @@
 import argparse
 import statistics
 
-import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy  # type: ignore
@@ -81,7 +80,7 @@ def main(args: argparse.Namespace) -> None:
         # print(f"r2: {r2}")
 
         plt.xlabel("Average number of cores used")
-        plt.ylabel("Average energy consumed (PKG) per second [J/s]")
+        plt.ylabel("Average power draw (PKG) [W]")
         plt.ylim(bottom=0)
         plt.tight_layout()
         plt.savefig(f"normalize_cores.{args.format}", format=args.format)

@@ -72,7 +72,7 @@ def main(args: argparse.Namespace) -> None:
         print(f"R^2: {rvalue ** 2:.2f}")
 
         plt.xlabel("LLC misses per second [1/s]")
-        plt.ylabel("Average energy consumed (DRAM) per second [J/s]")
+        plt.ylabel("Average power draw (DRAM) [W]")
         plt.ylim(bottom=0)
         plt.tight_layout()
         plt.savefig(f"dram.{args.format}", format=args.format)
