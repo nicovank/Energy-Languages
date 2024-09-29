@@ -21,13 +21,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: jlumbroso/free-disk-space@main
-        with:
-          docker-images: false
-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
       - name: Build Docker Image
-        run: python -m scripts.build_docker_image --verbose
+        run: python3 -m scripts.build_docker_image --verbose
