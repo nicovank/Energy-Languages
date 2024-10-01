@@ -40,7 +40,7 @@ Here is an example running all languages/benchmarks pairs.
 Running additional experiments.
 ```bash
 % sudo docker run -it --rm --privileged -v `pwd`/data/`hostname -s`/docker-default:/root/data energy-languages \
-    --benchmark-root experiments
+    --benchmark-root experiments \
     --languages "C as C++" "Go-no-GC" "JavaScript as TypeScript" \
     --warmup 1 \
     --iterations 21 \
