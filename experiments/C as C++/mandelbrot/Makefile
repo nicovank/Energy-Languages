@@ -1,7 +1,7 @@
 -include ../Makefile.defaults
 
 compile:
-	$(CC) $(CFLAGS) -std=gnu89 -mno-fma -fno-finite-math-only -mfpmath=sse -msse2 -fopenmp mandelbrot.c -o mandelbrot_run
+	$(CC) $(CFLAGS) -std=c++98 -mno-fma -fno-finite-math-only -mfpmath=sse -msse2 -fopenmp mandelbrot.c -o mandelbrot_run
 
 run:
 	./mandelbrot_run 16000

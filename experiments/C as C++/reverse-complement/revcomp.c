@@ -28,7 +28,7 @@ static intnative_t next_Sequence_Number_To_Output=1;
 static void process_Sequence(char * sequence, const intnative_t sequence_Size
   , const intnative_t sequence_Number){
    // Free up any memory we didn't need.
-   sequence=realloc(sequence, sequence_Size);
+   sequence=(char*)realloc(sequence, sequence_Size);
 
    // Set up pointers to the front_Pos and bac_Pos, advance front_Pos to the
    // first character on the next line, and then make sure front_Pos and
@@ -73,7 +73,7 @@ int main(){
          // Allocate memory for the initial sequence (assuming there is one).
          intnative_t sequence_Capacity=READ_SIZE, sequence_Size=0
            , sequence_Number=1;
-         char * sequence=malloc(sequence_Capacity);
+         char * sequence=(char*)malloc(sequence_Capacity);
 
          // Read in sequence data until we reach the end of the file or
          // encounter an error.
@@ -84,7 +84,7 @@ int main(){
             // Search the read in chunk of data for a '>' to see if any
             // sequences are being started.
             for(char * sequence_Start; (sequence_Start
-              =memchr(&sequence[sequence_Size], '>', bytes_Read)); ){
+              =(char*)memchr(&sequence[sequence_Size], '>', bytes_Read)); ){
 
                // Update the sequence_Size to reflect any data before the
                // '>' that was read in.
@@ -99,7 +99,7 @@ int main(){
 
                   // Allocate memory for a new sequence and copy the '>'
                   // & any data following it to the new sequence.
-                  char * const new_Sequence=malloc(READ_SIZE);
+                  char * const new_Sequence=(char*)malloc(READ_SIZE);
                   memcpy(new_Sequence, sequence_Start
                     , bytes_Read-number_Of_Preceding_Bytes);
 
@@ -134,7 +134,7 @@ int main(){
             // If there potentially isn't enough free space for all the data
             // from the next read, then double the capacity of the sequence.
             if(sequence_Size>sequence_Capacity-READ_SIZE)
-               sequence=realloc(sequence, sequence_Capacity*=2);
+               sequence=(char*)realloc(sequence, sequence_Capacity*=2);
          }
 
 

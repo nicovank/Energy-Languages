@@ -28,7 +28,7 @@ typedef struct tree_node{
 // tree.
 static inline tree_node * create_Tree(const intnative_t tree_Depth, 
   apr_pool_t * const memory_Pool){
-   tree_node * const root_Node=apr_palloc(memory_Pool, sizeof(tree_node));
+   tree_node * const root_Node=(tree_node*)apr_palloc(memory_Pool, sizeof(tree_node));
 
    // If tree_Depth is one or more then recursively call create_Tree() in order
    // to create the left and right subtrees using 2*root_Node_Value-1 and

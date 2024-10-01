@@ -37,7 +37,7 @@ static void replace(char const * const pattern, char const * const replacement
         // the characters preceding the match and the replacement text.
         while(dst_String->size+match[0]-pos+replacement_Size
           >dst_String->capacity)
-            dst_String->data=realloc(dst_String->data, dst_String->capacity*=2);
+            dst_String->data=(char*)realloc(dst_String->data, dst_String->capacity*=2);
 
         // Append the characters preceding the match and the replacement text to
         // dst_String and update the size of dst_String.
@@ -58,7 +58,7 @@ static void replace(char const * const pattern, char const * const replacement
     // the characters following the last match (or the entire src_String if
     // there was no match).
     while(dst_String->size+src_String->size-pos>dst_String->capacity)
-        dst_String->data=realloc(dst_String->data, dst_String->capacity*=2);
+        dst_String->data=(char*)realloc(dst_String->data, dst_String->capacity*=2);
 
     // Append the characters following the last match (or the entire src_String
     // if there was no match) to dst_String and update the size of dst_String.
@@ -87,7 +87,7 @@ int main(void){
         {"\\|[^|][^|]*\\|", "-"}
       };
 
-    string input={malloc(16384), 16384}, sequences={malloc(16384), 16384};
+    string input={(char*)malloc(16384), 16384}, sequences={(char*)malloc(16384), 16384};
     int postreplace_Size;
 
 
@@ -99,7 +99,7 @@ int main(void){
         // we've reached the full capacity of the input string then also double
         // its size.
         if((input.size+=bytes_Read)==input.capacity)
-            input.data=realloc(input.data, input.capacity*=2);
+            input.data=(char*)realloc(input.data, input.capacity*=2);
 
 
     #pragma omp parallel
@@ -129,9 +129,9 @@ int main(void){
             // copy the sequences string into prereplace_String for the initial
             // iteration.
             string prereplace_String={
-                malloc(sequences.capacity), sequences.capacity, sequences.size
+                (char*)malloc(sequences.capacity), sequences.capacity, sequences.size
               }, postreplace_String={
-                malloc(sequences.capacity), sequences.capacity
+                (char*)malloc(sequences.capacity), sequences.capacity
               };
             memcpy(prereplace_String.data, sequences.data, sequences.size);
 

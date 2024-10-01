@@ -98,7 +98,7 @@ static void generate_Frequencies_For_Desired_Length_Oligonucleotides(
 
 	// Create an array of elements from hash_Table.
 	intnative_t elements_Array_Size=kh_size(hash_Table), i=0;
-	element * elements_Array=malloc(elements_Array_Size*sizeof(element));
+	element * elements_Array=(element*)malloc(elements_Array_Size*sizeof(element));
 	uint32_t value;
 	kh_foreach(hash_Table, key, value
 	  , elements_Array[i++]=((element){key, value}));
@@ -191,7 +191,7 @@ int main(){
 	// geometrically.
 	intnative_t polynucleotide_Capacity=1048576;
 	intnative_t polynucleotide_Length=0;
-	char * polynucleotide=malloc(polynucleotide_Capacity);
+	char * polynucleotide=(char*)malloc(polynucleotide_Capacity);
 
 	// Start reading and encoding the third polynucleotide.
 	while(fgets(buffer, sizeof(buffer), stdin) && buffer[0]!='>'){
@@ -203,11 +203,11 @@ int main(){
 		// Make sure we still have enough memory allocated for any potential
 		// nucleotides in the next line.
 		if(polynucleotide_Capacity-polynucleotide_Length<sizeof(buffer))
-			polynucleotide=realloc(polynucleotide, polynucleotide_Capacity*=2);
+			polynucleotide=(char*)realloc(polynucleotide, polynucleotide_Capacity*=2);
 	}
 
 	// Free up any leftover memory.
-	polynucleotide=realloc(polynucleotide, polynucleotide_Length);
+	polynucleotide=(char*)realloc(polynucleotide, polynucleotide_Length);
 
 	char output_Buffer[7][MAXIMUM_OUTPUT_LENGTH];
 

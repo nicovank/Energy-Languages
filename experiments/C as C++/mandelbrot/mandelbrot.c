@@ -135,7 +135,7 @@ int main(int argc, char ** argv)
     long headerLength = numDigits(wid_ht)*2+5;
     long pad = ((headerLength + 7) & ~7) - headerLength; // pad aligns pixels on 8
     long dataLength = headerLength + wid_ht*(wid_ht>>3);
-    unsigned char * const buffer = malloc(pad + dataLength);
+    unsigned char * const buffer = (unsigned char *) malloc(pad + dataLength);
     unsigned char * const header = buffer + pad;
     unsigned char * const pixels = header + headerLength;
 

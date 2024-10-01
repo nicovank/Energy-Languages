@@ -85,7 +85,7 @@ static void
 eval_A_times_u(struct Param *p)
 {
     /* alias of source vector */
-    const v2dt  *pU = (void *) p->u;
+    const v2dt  *pU = (v2dt *) p->u;
     int          i;
     int          ie;
 
@@ -100,7 +100,7 @@ eval_A_times_u(struct Param *p)
 
         /* write result */
         {
-            double *mem = (void *) &sum;
+            double *mem = (double *) &sum;
 
             p->tmp[i] = mem[0] + mem[1];
         }
@@ -114,7 +114,7 @@ eval_A_times_u(struct Param *p)
 static void
 eval_At_times_u(struct Param *p)
 {
-    const v2dt  *pT = (void *) p->tmp;
+    const v2dt  *pT = (v2dt *) p->tmp;
     int          i;
     int          ie;
 
@@ -127,7 +127,7 @@ eval_At_times_u(struct Param *p)
             sum += pT[j] * eval_A_i(j*2, i);
 
         {
-            double *mem = (void *) &sum;
+            double *mem = (double *) &sum;
 
             p->v[i] = mem[0] + mem[1];
         }
