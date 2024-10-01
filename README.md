@@ -32,9 +32,9 @@ Here is an example running all languages/benchmarks pairs.
 ```bash
 % sudo docker run -it --rm --privileged -v `pwd`/data/`hostname -s`/docker-default:/root/data energy-languages \
     --languages C C++ Rust Go Java C\# JavaScript TypeScript PHP Python PyPy Lua LuaJIT \
-    --warmup 3 \
+    --warmup 1 \
     --iterations 21 \
-    --timeout 600
+    --timeout 10000
 ```
 
 Running additional experiments.
@@ -42,9 +42,9 @@ Running additional experiments.
 % sudo docker run -it --rm --privileged -v `pwd`/data/`hostname -s`/docker-default:/root/data energy-languages \
     --benchmark-root experiments
     --languages "C as C++" "Go-no-GC" "JavaScript as TypeScript" \
-    --warmup 3 \
+    --warmup 1 \
     --iterations 21 \
-    --timeout 600
+    --timeout 10000
 ```
 
 Running Java-N experiments.
