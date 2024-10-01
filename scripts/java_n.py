@@ -50,7 +50,7 @@ def main(args: argparse.Namespace) -> None:
         ax.set_xlabel("Number of iterations")
         ax.set_axisbelow(True)
         ax.set_ylim(0, ax.get_ylim()[1])
-        ax.yaxis.get_major_locator().set_params(integer=True)
+        ax.set_xticks([0, 3, 6, 9, 12, 15])
 
         fig.tight_layout()
         plt.savefig(f"java-n.{args.benchmark}.{args.format}", format=args.format)
