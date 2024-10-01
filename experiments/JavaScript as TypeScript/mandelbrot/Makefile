@@ -8,7 +8,7 @@ endif
 
 compile:
 	npm install
-	$(TSC) --alwaysStrict -t ESNEXT mandelbrot.ts
+	$(TSC) --skipLibCheck --alwaysStrict -t ESNEXT mandelbrot.ts
 
 run:
 	$(NODE) mandelbrot.js 16000

@@ -8,7 +8,7 @@ endif
 
 compile:
 	npm install
-	$(TSC) --alwaysStrict -t ESNEXT nbody.ts
+	$(TSC) --skipLibCheck --alwaysStrict -t ESNEXT nbody.ts
 
 run:
 	$(NODE) nbody.js 50000000

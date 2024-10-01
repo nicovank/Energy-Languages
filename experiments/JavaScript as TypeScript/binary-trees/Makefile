@@ -8,7 +8,7 @@ endif
 
 compile:
 	npm install
-	$(TSC) --alwaysStrict -t ESNEXT binarytrees.ts
+	$(TSC) --skipLibCheck --alwaysStrict -t ESNEXT binarytrees.ts
 
 run:
 	$(NODE) binarytrees.js 21

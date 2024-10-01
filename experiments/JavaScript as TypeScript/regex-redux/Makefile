@@ -8,7 +8,7 @@ endif
 
 compile:
 	npm install
-	$(TSC) --alwaysStrict -t ESNEXT regexredux.ts
+	$(TSC) --skipLibCheck --alwaysStrict -t ESNEXT regexredux.ts
 
 run:
 	$(NODE) regexredux.js 0 < ../../../fasta-5000000.txt
