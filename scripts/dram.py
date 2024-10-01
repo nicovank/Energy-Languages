@@ -57,13 +57,16 @@ def main(args: argparse.Namespace) -> None:
     )
 
     plt.rcParams["font.family"] = args.font
-    plt.gcf().set_size_inches(8, 5)
     with plt.style.context("bmh"):
-        plt.scatter(xs, ys, s=10)
+        fig, ax = plt.subplots()
+        fig.set_size_inches(8, 5)
+        ax.set_facecolor("white")
+
+        ax.scatter(xs, ys, s=10)
 
         slope, intercept, rvalue, _, _ = scipy.stats.linregress(xs, ys)
         print(f"slope: {slope:.2e}, intercept: {intercept:.2f}")
-        plt.plot(
+        ax.plot(
             [min(xs), max(xs)],
             [intercept + slope * min(xs), intercept + slope * max(xs)],
             color="red",
@@ -71,10 +74,10 @@ def main(args: argparse.Namespace) -> None:
         )
         print(f"R^2: {rvalue ** 2:.2f}")
 
-        plt.xlabel("LLC misses per second [1/s]")
-        plt.ylabel("Average power draw (DRAM) [W]")
-        plt.ylim(bottom=0)
-        plt.tight_layout()
+        ax.set_xlabel("LLC misses per second [1/s]")
+        ax.set_ylabel("Average power draw (DRAM) [W]")
+        ax.set_ylim(bottom=0)
+        fig.tight_layout()
         plt.savefig(f"dram.{args.format}", format=args.format)
 
 

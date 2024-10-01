@@ -41,10 +41,15 @@ def main(args: argparse.Namespace) -> None:
                 )
             )
 
+            print(language, benchmark, xs[-1], ys[-1])
+
     plt.rcParams["font.family"] = args.font
-    plt.gcf().set_size_inches(8, 5)
     with plt.style.context("bmh"):
-        plt.scatter(xs, ys, s=10)
+        fig, ax = plt.subplots()
+        fig.set_size_inches(8, 5)
+        ax.set_facecolor("white")
+
+        ax.scatter(xs, ys, s=10)
 
         def log_fit(x, a, b):
             return a * np.log(x) + b
@@ -59,13 +64,13 @@ def main(args: argparse.Namespace) -> None:
         x_fit = np.linspace(min(xs), max(xs), 100)
         y_power = log_fit(x_fit, *c1)
         print(f"{c1[0]:.2f} * ln(x) + {c1[1]:.2f}")
-        plt.plot(x_fit, y_power, color="red", linewidth=1)
+        ax.plot(x_fit, y_power, color="red", linewidth=1)
 
         # c2, _ = scipy.optimize.curve_fit(cubic_fit, xs, ys)
         # x_fit = np.linspace(0, max(xs), 100)
         # y_cubic = cubic_fit(x_fit, *c2)
         # print(f"{c2[0]:.2f} * x^3 + {c2[1]:.2f} * x^2 + {c2[2]:.2f} * x + {c2[3]:.2f}")
-        # plt.plot(x_fit, y_cubic, color="green", linewidth=1)
+        # ax.plot(x_fit, y_cubic, color="green", linewidth=1)
 
         residuals = ys - log_fit(xs, *c1)
         ss_res = np.sum(residuals**2)
@@ -79,10 +84,10 @@ def main(args: argparse.Namespace) -> None:
         # r2 = 1 - (ss_res / ss_tot)
         # print(f"r2: {r2}")
 
-        plt.xlabel("Average number of cores used")
-        plt.ylabel("Average power draw (PKG) [W]")
-        plt.ylim(bottom=0)
-        plt.tight_layout()
+        ax.set_xlabel("Average number of cores used")
+        ax.set_ylabel("Average power draw (PKG) [W]")
+        ax.set_ylim(bottom=0)
+        fig.tight_layout()
         plt.savefig(f"normalize_cores.{args.format}", format=args.format)
 
 

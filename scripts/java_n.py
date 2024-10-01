@@ -24,13 +24,8 @@ def main(args: argparse.Namespace) -> None:
 
     plt.rcParams["font.family"] = args.font
     with plt.style.context("bmh"):
-        plt.rc(
-            "axes",
-            prop_cycle=cycler(
-                color=[plt.rcParams["axes.prop_cycle"].by_key()["color"][0]]
-            ),
-        )
         fig, ax = plt.subplots()
+        ax.set_facecolor("white")
         fig.set_size_inches(4, 3)
 
         x = np.sort(np.array(list(data.keys())))
@@ -55,6 +50,7 @@ def main(args: argparse.Namespace) -> None:
         ax.set_xlabel("Number of iterations")
         ax.set_axisbelow(True)
         ax.set_ylim(0, ax.get_ylim()[1])
+        ax.yaxis.get_major_locator().set_params(integer=True)
 
         fig.tight_layout()
         plt.savefig(f"java-n.{args.benchmark}.{args.format}", format=args.format)

@@ -64,8 +64,11 @@ def main(args: argparse.Namespace) -> None:
                 )
 
     plt.rcParams["font.family"] = args.font
-    plt.gcf().set_size_inches(8, 5)
     with plt.style.context("bmh"):
+        fig, ax = plt.subplots()
+        fig.set_size_inches(8, 5)
+        ax.set_facecolor("white")
+
         xs = []
         ys = []
         for language in args.languages:
@@ -90,23 +93,23 @@ def main(args: argparse.Namespace) -> None:
             xs.extend([x] * len(y))
             ys.extend(y)
 
-        plt.scatter(xs, ys)
+        ax.scatter(xs, ys)
 
         # average of ys
         y_avg = statistics.mean(ys)
-        plt.axhline(y_avg, color="red", linestyle="--", linewidth=1)
+        ax.axhline(y_avg, color="red", linestyle="--", linewidth=1)
         print("Average: ", y_avg)
         print("Standard deviation: ", statistics.stdev(ys))
 
-        plt.xticks(
+        ax.set_xticks(
             range(len(args.languages)),
             args.languages,
             rotation=45,
         )
-        plt.ylim(bottom=0, top=plt.ylim()[1] * 1.1)
-        plt.xlabel("Programming Language Implementation")
-        plt.ylabel("Average power draw (PKG + DRAM) [W]")
-        plt.tight_layout()
+        ax.set_ylim(bottom=0, top=ax.get_ylim()[1] * 1.1)
+        ax.set_xlabel("Programming Language Implementation")
+        ax.set_ylabel("Average power draw (PKG + DRAM) [W]")
+        fig.tight_layout()
         plt.savefig(f"fixed_time.{args.format}")
 
 

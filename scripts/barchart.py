@@ -38,7 +38,7 @@ def main(args: argparse.Namespace) -> None:
                 [
                     sum(
                         [
-                            s["energy"]["pkg"] + s["energy"]["dram"]
+                            sum(e["pkg"] + e["dram"] for e in s["energy"])
                             for s in r["energy_samples"]
                         ]
                     )
@@ -58,33 +58,49 @@ def main(args: argparse.Namespace) -> None:
         [energies[args.b][b] / energies[args.a][b] for b in benchmarks]
     )
 
+    if args.a == "Python":
+        args.a = "CPython"
+    if args.b == "Python":
+        args.b = "CPython"
+
     print(runtime_bar, energy_bar)
 
     plt.rcParams["font.family"] = args.font
     with plt.style.context("bmh"):
-        width = 0.25
+        fig, ax = plt.subplots()
+        ax.set_facecolor("white")
+        fig.set_size_inches(4, 2)
 
-        plt.barh(
-            [3 * width / 2, 3 * width / 2 + 1],
+        spacing = 0.5
+        width = 0.2  # < spacing / 2
+
+        ax.barh(
+            [width / 2, spacing + width / 2],
             [1, 1],
             width,
             label=args.a,
         )
 
-        plt.barh(
-            [width / 2, width / 2 + 1],
+        ax.barh(
+            [-width / 2, spacing - width / 2],
             [runtime_bar, energy_bar],
             width,
             label=args.b,
         )
 
-        plt.legend()
-        plt.yticks(
-            [width, width + 1], ["Relative runtime", "Relative energy consumption"]
+        ax.legend(
+            loc="center",
+            bbox_to_anchor=(0.5, 1.2),
+            ncol=2,
+            facecolor="white",
+            edgecolor="white",
         )
-        plt.grid(visible=None, which="major", axis="y")
-        plt.tick_params(axis="y", length=0)
 
+        ax.set_yticks([0, spacing], ["Runtime", "Energy\nConsumption"])
+        ax.set_ylim(-0.4, 0.9)
+        ax.grid(visible=None, which="major", axis="y")
+        ax.tick_params(axis="y", length=0)
+        fig.tight_layout()
         plt.savefig(f"barchart.{args.format}", format=args.format)
 
 
@@ -94,12 +110,10 @@ if __name__ == "__main__":
     parser.add_argument(
         "a",
         type=str,
-        default="Lua",
     )
     parser.add_argument(
         "b",
         type=str,
-        default="LuaJIT",
     )
     parser.add_argument("--font", type=str, default="Linux Libertine O")
     parser.add_argument("--format", type=str, default="png")
