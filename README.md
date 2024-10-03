@@ -1,9 +1,9 @@
 # Energy Efficiency in Programming Languages
 
-[Nicolas van Kempen](https://nvankempen.com), [Emery Berger](https://emeryberger.com),
-Hyuk-Je Kwon, and Dung Tuan Nguyen.
-
-This repository contains our code and experiments reproducing and investigating _[Energy efficiency across programming languages: how do energy, time, and memory relate?](https://dl.acm.org/doi/10.1145/3136014.3136031)_.
+[Nicolas van Kempen](https://nvankempen.com),
+Hyuk-Je Kwon,
+Dung Tuan Nguyen,
+[Emery Berger](https://emeryberger.com).
 
 ## Documentation
 
@@ -21,12 +21,6 @@ The easiest way to run these benchmarks is using Docker.
 % sudo python3 -m scripts.build_docker_image
 % sudo docker run --privileged -v [OUTPUT_DIRECTORY]:/root/data energy-languages [OPTIONS]
 ```
-
-The following options are available:
- -  `--languages`: A whitespace-separated list of languages to benchmarks.
- -  `--warmup`: The number of warmup iterations to run before measuring.
- -  `--iterations`: The number of iterations to run for each benchmark.
- -  `--timeout`: The timeout after which to stop execution. Some benchmarks are known to occasionally run indefinitely.
 
 Here is an example running all languages/benchmarks pairs.
 ```bash
@@ -52,13 +46,60 @@ Running Java-N experiments.
 % sudo ./scripts/docker-java-n.sh Java docker-default
 ```
 
+## Figures
+
+### Average power draw as a function of the average number of cores used
+
+![Average power draw as a function of the average number of cores used](media/normalize_cores.png "Average power draw as a function of the average number of cores used")
+
+```bash
+% python3 -m scripts.normalize_cores \
+    --data-root data/`hostname -s`/docker-default \
+    --languages C C++ Rust Go Java C\# JavaScript TypeScript PHP Python PyPy Lua LuaJIT
+```
+
+### Average power draw as a function of memory activity
+
+![Average power draw as a function of memory activity](media/dram.png "Average power draw as a function of memory activity")
+
+```bash
+% python3 -m scripts.dram \
+    --data-root data/`hostname -s`/docker-default \
+    --languages C C++ Rust Go Java C\# JavaScript TypeScript PHP Python PyPy Lua LuaJIT
+```
+
+### Average power draw controlling for external factors
+
+![Average power draw controlling for external factors](media/fixed_time.png "Average power draw controlling for external factors")
+
+```bash
+% python3 -m scripts.fixed_time \
+    --data-root data/`hostname -s`/docker-min-freq-cpuset-13 \
+    --languages C C++ Rust Go Java C\# JavaScript TypeScript PHP Python PyPy Lua LuaJIT
+```
+
+### Other
+
+A few other scripts can be useful to generate figures and results.
+Their options are self-explanatory and/or documented in the `--help` message.
+Notably:
+ -  `scripts.table`: Build two tables comparing runtime and energy
+    consumption for a list of languages.
+ -  `scripts.barchart`: Compare two implementations of the same programming
+    language.
+ -  `scripts.java_n`: Generate a figure for a given benchmark of time per
+    iteration as a function of number of iterations.
+
 ## License
 
 The original benchmark suite, the
-[Computer Language Benchmark Game](https://benchmarksgame-team.pages.debian.net/benchmarksgame/), is under
-[BSD-3-Clause](https://salsa.debian.org/benchmarksgame-team/benchmarksgame/-/blob/master/LICENSE.md).
+[Computer Language Benchmark Game](https://benchmarksgame-team.pages.debian.net/benchmarksgame/),
+is under
+[BSD-3-Clause](https://salsa.debian.org/benchmarksgame-team/benchmarksgame/-/blob/c68e92512e8076c72c6b9fd207e777b5ac1a87ef/LICENSE.md).
 
-Code from [the repository this one originally forked from](https://github.com/greensoftwarelab/Energy-Languages) is
-under [MIT](https://github.com/greensoftwarelab/Energy-Languages/blob/master/LICENSE).
+Code from
+[the repository this one originally forked from](https://github.com/greensoftwarelab/Energy-Languages)
+is under
+[MIT](https://github.com/greensoftwarelab/Energy-Languages/blob/1356528173d6bb07fb2512037c0ed8e2279ce440/LICENSE).
 
 Any other code in this repository is under [Apache-2.0](LICENSE).
