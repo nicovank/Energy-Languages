@@ -93,7 +93,7 @@ if __name__ == "__main__":
         nargs="+",
         required=True,
     )
-    parser.add_argument('--fit', type=str, choices=["linear", "log"], default="log")
+    parser.add_argument("--fit", type=str, choices=["linear", "log"], default="log")
     parser.add_argument("--font", type=str, default="Linux Libertine O")
     parser.add_argument("--format", type=str, default="png")
     main(parser.parse_args())
