@@ -2,10 +2,21 @@ import argparse
 import math
 import statistics
 
+import matplotlib
 import matplotlib.pyplot as plt
 import scipy  # type: ignore
 
 from . import utils
+
+def human_readable(x):
+    assert math.isclose(int(x), x)
+    if x < 1e3:
+        return f"{int(x)}"
+    if x < 1e6:
+        return f"{int(x / 1e3)}k"
+    if x < 1e9:
+        return f"{int(x / 1e6)}M"
+    return f"{int(x / 1e9)}G"
 
 
 def main(args: argparse.Namespace) -> None:
@@ -74,7 +85,11 @@ def main(args: argparse.Namespace) -> None:
         )
         print(f"R^2: {rvalue ** 2:.2f}")
 
-        ax.set_xlabel("LLC misses per second [1/s]")
+        ax.get_xaxis().set_major_formatter(
+            matplotlib.ticker.FuncFormatter(lambda x, p: human_readable(x)))
+
+
+        ax.set_xlabel("LLC misses per second")
         ax.set_ylabel("Average power draw (DRAM) [W]")
         ax.set_ylim(bottom=0)
         fig.tight_layout()
