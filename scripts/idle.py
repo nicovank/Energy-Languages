@@ -8,12 +8,12 @@ def main(args: argparse.Namespace) -> None:
     with open(args.path) as f:
         data = json.load(f)
 
-    keys = list(data["energy_samples"][0]["energy"].keys())
+    keys = list(data["energy_samples"][0]["energy"][0].keys())
     energy = collections.defaultdict(list)
     duration = []
     for sample in data["energy_samples"]:
         for entry in keys:
-            energy[entry].append(sample["energy"][entry])
+            energy[entry].append(sum([e[entry] for e in sample["energy"]]))
         duration.append(sample["duration_ms"] / 1e3)
 
     if "pkg" in keys and "dram" in keys:
