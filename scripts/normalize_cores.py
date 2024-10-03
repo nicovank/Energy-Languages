@@ -51,38 +51,31 @@ def main(args: argparse.Namespace) -> None:
 
         ax.scatter(xs, ys, s=10)
 
+        def linear_fit(x, a, b):
+            return a * np.array(x) + b
+
         def log_fit(x, a, b):
             return a * np.log(x) + b
 
-        def cubic_fit(x, a, b, c, d):
-            # Use np.
-            # return a * x**3 + b * x**2 + c * x + d
-            # Numpy version
-            return np.polyval([a, b, c, d], x)
-
-        c1, _ = scipy.optimize.curve_fit(log_fit, xs, ys)
         x_fit = np.linspace(min(xs), max(xs), 100)
-        y_power = log_fit(x_fit, *c1)
-        print(f"{c1[0]:.2f} * ln(x) + {c1[1]:.2f}")
-        ax.plot(x_fit, y_power, color="red", linewidth=1)
 
-        # c2, _ = scipy.optimize.curve_fit(cubic_fit, xs, ys)
-        # x_fit = np.linspace(0, max(xs), 100)
-        # y_cubic = cubic_fit(x_fit, *c2)
-        # print(f"{c2[0]:.2f} * x^3 + {c2[1]:.2f} * x^2 + {c2[2]:.2f} * x + {c2[3]:.2f}")
-        # ax.plot(x_fit, y_cubic, color="green", linewidth=1)
+        if args.fit == "linear":
+            c1, _ = scipy.optimize.curve_fit(linear_fit, xs, ys)
+            y_fit = linear_fit(x_fit, *c1)
+            residuals = ys - linear_fit(xs, *c1)
+            print(f"{c1[0]:.2f} * x + {c1[1]:.2f}")
+        elif args.fit == "log":
+            c1, _ = scipy.optimize.curve_fit(log_fit, xs, ys)
+            y_fit = log_fit(x_fit, *c1)
+            residuals = ys - log_fit(xs, *c1)
+            print(f"{c1[0]:.2f} * ln(x) + {c1[1]:.2f}")
 
-        residuals = ys - log_fit(xs, *c1)
+        ax.plot(x_fit, y_fit, color="red", linewidth=1)
+
         ss_res = np.sum(residuals**2)
         ss_tot = np.sum((ys - np.mean(ys)) ** 2)
         r2 = 1 - (ss_res / ss_tot)
         print(f"r2: {r2}")
-
-        # residuals = ys - cubic_fit(xs, *c2)
-        # ss_res = np.sum(residuals**2)
-        # ss_tot = np.sum((ys - np.mean(ys)) ** 2)
-        # r2 = 1 - (ss_res / ss_tot)
-        # print(f"r2: {r2}")
 
         ax.set_xlabel("Average number of cores used")
         ax.set_ylabel("Average power draw (PKG) [W]")
@@ -100,6 +93,7 @@ if __name__ == "__main__":
         nargs="+",
         required=True,
     )
+    parser.add_argument('--fit', type=str, choices=["linear", "log"], default="log")
     parser.add_argument("--font", type=str, default="Linux Libertine O")
     parser.add_argument("--format", type=str, default="png")
     main(parser.parse_args())
