@@ -136,47 +136,16 @@ def main(args: argparse.Namespace) -> None:
                         )
 
                         env = {**os.environ, "JSON": json}
-                        if args.fixed_time:
-                            env["SECONDS"] = str(args.timeout)
 
                         status = run_benchmark(
                             args,
                             language,
                             benchmark,
-                            args.timeout if not args.fixed_time else None,
+                            args.timeout,
                             "measure",
                             env,
                             args.verbose,
                         )
-                        if args.fixed_time:
-                            # Let the process die in peace.
-                            time.sleep(1)
-                            # Assert nothing is still running...
-                            pgrep = subprocess.run(
-                                [
-                                    "pgrep",
-                                    "-l",
-                                    "|".join(
-                                        [
-                                            "binary",
-                                            "fannkuch",
-                                            "fasta",
-                                            "nucleotide",
-                                            "mandelbrot",
-                                            "body",
-                                            "digits",
-                                            "regex",
-                                            "comp",
-                                            "spectral",
-                                        ]
-                                    ),
-                                ],
-                                text=True,
-                                stdout=subprocess.PIPE,
-                            )
-                            if pgrep.returncode != 1:
-                                print(f"{pgrep.stdout}")
-                                sys.exit(-1)
 
                         if status == -1:
                             console.print(
@@ -224,11 +193,6 @@ if __name__ == "__main__":
         help="Path to output directory",
     )
     parser.add_argument(
-        "--fixed-time",
-        action="store_true",
-        help="Indicate fixed-time is used. Make sure to also specify timeout.",
-    )
-    parser.add_argument(
         "--timeout",
         type=int,
         default=None,
@@ -248,8 +212,5 @@ if __name__ == "__main__":
         raise RuntimeError(
             "Could not find the RAPL executable. Make sure you build it first."
         )
-
-    if args.fixed_time and args.timeout is None:
-        raise RuntimeError("Fixed-time is enabled but no timeout is specified.")
 
     main(args)
