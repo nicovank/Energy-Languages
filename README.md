@@ -15,14 +15,14 @@ Running the measurement tool requires:
 
 ### Docker
 
-The easiest way to run these benchmarks is using Docker.
+The easiest way to run these benchmarks is using Docker:
 ```bash
 % sudo modprobe msr # Enable msr kernel module.
 % sudo python3 -m scripts.build_docker_image
 % sudo docker run --privileged -v [OUTPUT_DIRECTORY]:/root/data energy-languages [OPTIONS]
 ```
 
-Here is an example running all languages/benchmarks pairs.
+Here is an example running all languages/benchmarks pairs:
 ```bash
 % sudo docker run -it --rm --privileged -v `pwd`/data/`hostname -s`/docker-default:/root/data energy-languages \
     --languages C C++ Rust Go Java C\# JavaScript TypeScript PHP Python PyPy Lua LuaJIT \
@@ -31,7 +31,7 @@ Here is an example running all languages/benchmarks pairs.
     --timeout 10000
 ```
 
-Running additional experiments.
+Running additional experiments:
 ```bash
 % sudo docker run -it --rm --privileged -v `pwd`/data/`hostname -s`/docker-default:/root/data energy-languages \
     --benchmark-root experiments \
@@ -44,6 +44,28 @@ Running additional experiments.
 Running Java-N experiments.
 ```bash
 % sudo ./scripts/docker-java-n.sh Java docker-default
+```
+
+Processors can be set to their minimum frequency with the following commands:
+```bash
+# Use frequency-info to check the defaults for your machine.
+% cpupower frequency-info
+
+# Pin to lowest possible frequency.
+% echo 1 | sudo tee /sys/devices/system/cpu/intel_pstate/no_turbo
+% sudo cpupower frequency-set --governor powersave
+% sudo cpupower frequency-set --max 800Mhz
+
+# Restore defaults after running experiments.
+% echo 0 | sudo tee /sys/devices/system/cpu/intel_pstate/no_turbo
+% sudo cpupower frequency-set --governor powersave
+% sudo cpupower frequency-set --max 3.4GHz
+```
+
+Finally, experiments can be pinned to a single code by using Docker's
+`--cpuset-cpus` option, specifying a core number. For example:
+```bash
+% sudo docker run -it --rm --privileged --cpuset-cpus=13 [...]
 ```
 
 ## Figures
