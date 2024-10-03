@@ -8,6 +8,7 @@ import scipy  # type: ignore
 
 from . import utils
 
+
 def human_readable(x):
     assert math.isclose(int(x), x)
     if x < 1e3:
@@ -86,8 +87,8 @@ def main(args: argparse.Namespace) -> None:
         print(f"R^2: {rvalue ** 2:.2f}")
 
         ax.get_xaxis().set_major_formatter(
-            matplotlib.ticker.FuncFormatter(lambda x, p: human_readable(x)))
-
+            matplotlib.ticker.FuncFormatter(lambda x, p: human_readable(x))
+        )
 
         ax.set_xlabel("LLC misses per second")
         ax.set_ylabel("Average power draw (DRAM) [W]")
