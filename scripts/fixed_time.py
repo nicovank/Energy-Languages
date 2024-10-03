@@ -9,6 +9,13 @@ from . import utils
 def main(args: argparse.Namespace) -> None:
     data, benchmarks = utils.parse(args.data_root, args.languages)
 
+    if "Java" in data:
+        data["OpenJDK"] = data.pop("Java")
+        args.languages = ["OpenJDK" if l == "Java" else l for l in args.languages]
+    if "Python" in data:
+        data["CPython"] = data.pop("Python")
+        args.languages = ["CPython" if l == "Python" else l for l in args.languages]
+
     language_to_index = {language: i for i, language in enumerate(args.languages)}
 
     runtimes = {
