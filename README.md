@@ -41,7 +41,7 @@ Running additional experiments:
     --timeout 10000
 ```
 
-Running Java-N experiments.
+Running Java-N experiments:
 ```bash
 % sudo ./scripts/docker-java-n.sh Java docker-default
 ```
