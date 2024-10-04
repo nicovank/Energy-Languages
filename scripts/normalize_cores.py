@@ -41,7 +41,7 @@ def main(args: argparse.Namespace) -> None:
                 )
             )
 
-            print(language, benchmark, xs[-1], ys[-1])
+            print(f"{language} {benchmark}, {xs[-1]:.1f}, {int(ys[-1])}")
 
     plt.rcParams["font.family"] = args.font
     with plt.style.context("bmh"):
