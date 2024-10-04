@@ -77,7 +77,7 @@ def main(args: argparse.Namespace) -> None:
         r2 = 1 - (ss_res / ss_tot)
         print(f"r2: {r2}")
 
-        ax.set_xlabel("Average number of cores used")
+        ax.set_xlabel("Average number of active cores")
         ax.set_ylabel("Average power draw (PKG) [W]")
         ax.set_ylim(bottom=0)
         fig.tight_layout()
