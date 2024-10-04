@@ -52,6 +52,10 @@ def main(args: argparse.Namespace) -> None:
         ax.set_ylim(0, ax.get_ylim()[1])
         ax.set_xticks([0, 3, 6, 9, 12, 15])
 
+        if args.ymax is not None:
+            ax.set_ylim(0, args.ymax)
+        print("ymax:", ax.get_ylim()[1])
+
         fig.tight_layout()
         plt.savefig(f"java-n.{args.benchmark}.{args.format}", format=args.format)
 
@@ -61,6 +65,7 @@ if __name__ == "__main__":
     parser.add_argument("--data-root", type=str, required=True)
     parser.add_argument("--benchmark", type=str, required=True)
     parser.add_argument("--language", type=str, default="Java")
+    parser.add_argument("--ymax", type=float, default=None)
     parser.add_argument("--font", type=str, default="Linux Libertine O")
     parser.add_argument("--format", type=str, default="png")
     main(parser.parse_args())
