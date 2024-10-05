@@ -93,8 +93,13 @@ def main(args: argparse.Namespace) -> None:
             matplotlib.ticker.FuncFormatter(lambda x, p: human_readable(x))
         )
 
-        ax.set_xlabel("LLC misses per second")
-        ax.set_ylabel("Average power draw (DRAM) [W]")
+        ax.set_xlabel(
+            "LLC misses per second", fontsize=("medium" if args.half_size else "large")
+        )
+        ax.set_ylabel(
+            "Average power draw (DRAM) [W]",
+            fontsize=("medium" if args.half_size else "large"),
+        )
         ax.set_ylim(bottom=0)
         if args.ymax:
             ax.set_ylim(top=args.ymax)

@@ -113,7 +113,11 @@ def main(args: argparse.Namespace) -> None:
             args.languages,
             rotation=45,
         )
-        ax.set_ylim(bottom=0, top=ax.get_ylim()[1] * 1.1)
+        if args.ymax is not None:
+            ax.set_ylim(bottom=0, top=args.ymax)
+        else:
+            ax.set_ylim(bottom=0, top=ax.get_ylim()[1] * 1.1)
+        print("ymax: ", ax.get_ylim()[1])
         ax.set_xlabel("Programming Language Implementation")
         ax.set_ylabel("Average power draw (PKG + DRAM) [W]")
         fig.tight_layout()
@@ -129,6 +133,7 @@ if __name__ == "__main__":
         nargs="+",
         required=True,
     )
+    parser.add_argument("--ymax", type=float, default=None)
     parser.add_argument("--font", type=str, default="Linux Libertine O")
     parser.add_argument("--format", type=str, default="png")
     parser.add_argument("--no-title", action="store_true")

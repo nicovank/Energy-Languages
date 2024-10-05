@@ -82,8 +82,14 @@ def main(args: argparse.Namespace) -> None:
 
         print("ymax:", ax.get_ylim()[1])
 
-        ax.set_xlabel("Average number of active cores")
-        ax.set_ylabel("Average power draw (PKG) [W]")
+        ax.set_xlabel(
+            "Average number of active cores",
+            fontsize=("medium" if args.half_size else "large"),
+        )
+        ax.set_ylabel(
+            "Average power draw (PKG) [W]",
+            fontsize=("medium" if args.half_size else "large"),
+        )
         ax.set_ylim(bottom=0)
         fig.tight_layout()
         plt.savefig(f"normalize_cores.{args.format}", format=args.format)

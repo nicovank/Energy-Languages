@@ -46,8 +46,8 @@ def main(args: argparse.Namespace) -> None:
         )
         ax.scatter(x, y, s=20)
 
-        ax.set_ylabel("Time per iteration [ms]")
-        ax.set_xlabel("Number of iterations")
+        ax.set_ylabel("Time per iteration [ms]", fontsize="medium")
+        ax.set_xlabel("Number of iterations", fontsize="medium")
         ax.set_axisbelow(True)
         ax.set_ylim(0, ax.get_ylim()[1])
         ax.set_xticks([0, 3, 6, 9, 12, 15])
