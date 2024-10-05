@@ -46,10 +46,13 @@ def main(args: argparse.Namespace) -> None:
     plt.rcParams["font.family"] = args.font
     with plt.style.context("bmh"):
         fig, ax = plt.subplots()
-        fig.set_size_inches(8, 5)
+        if args.half_size:
+            fig.set_size_inches(4, 3)
+        else:
+            fig.set_size_inches(8, 5)
         ax.set_facecolor("white")
 
-        ax.scatter(xs, ys, s=10)
+        ax.scatter(xs, ys, s=(5 if args.half_size else 10))
 
         def linear_fit(x, a, b):
             return a * np.array(x) + b
@@ -77,6 +80,8 @@ def main(args: argparse.Namespace) -> None:
         r2 = 1 - (ss_res / ss_tot)
         print(f"r2: {r2}")
 
+        print("ymax:", ax.get_ylim()[1])
+
         ax.set_xlabel("Average number of active cores")
         ax.set_ylabel("Average power draw (PKG) [W]")
         ax.set_ylim(bottom=0)
@@ -94,6 +99,7 @@ if __name__ == "__main__":
         required=True,
     )
     parser.add_argument("--fit", type=str, choices=["linear", "log"], default="log")
+    parser.add_argument("--half-size", default=False, action="store_true")
     parser.add_argument("--font", type=str, default="Linux Libertine O")
     parser.add_argument("--format", type=str, default="png")
     main(parser.parse_args())

@@ -71,10 +71,13 @@ def main(args: argparse.Namespace) -> None:
     plt.rcParams["font.family"] = args.font
     with plt.style.context("bmh"):
         fig, ax = plt.subplots()
-        fig.set_size_inches(8, 5)
+        if args.half_size:
+            fig.set_size_inches(4, 3)
+        else:
+            fig.set_size_inches(8, 5)
         ax.set_facecolor("white")
 
-        ax.scatter(xs, ys, s=10)
+        ax.scatter(xs, ys, s=(5 if args.half_size else 10))
 
         slope, intercept, rvalue, _, _ = scipy.stats.linregress(xs, ys)
         print(f"slope: {slope:.2e}, intercept: {intercept:.2f}")
@@ -93,6 +96,8 @@ def main(args: argparse.Namespace) -> None:
         ax.set_xlabel("LLC misses per second")
         ax.set_ylabel("Average power draw (DRAM) [W]")
         ax.set_ylim(bottom=0)
+        if args.ymax:
+            ax.set_ylim(top=args.ymax)
         fig.tight_layout()
         plt.savefig(f"dram.{args.format}", format=args.format)
 
@@ -106,7 +111,9 @@ if __name__ == "__main__":
         nargs="+",
         required=True,
     )
+    parser.add_argument("--half-size", default=False, action="store_true")
     parser.add_argument("--font", type=str, default="Linux Libertine O")
     parser.add_argument("--format", type=str, default="png")
-    parser.add_argument("--xmax", type=int, default=math.inf)
+    parser.add_argument("--xmax", type=float, default=math.inf)
+    parser.add_argument("--ymax", type=float, default=None)
     main(parser.parse_args())
