@@ -58,7 +58,7 @@ def main(args: argparse.Namespace) -> None:
             return a * np.array(x) + b
 
         def log_fit(x, a, b):
-            return a * np.log(x) + b
+            return a * np.log2(x) + b
 
         x_fit = np.linspace(min(xs), max(xs), 100)
 
@@ -71,7 +71,7 @@ def main(args: argparse.Namespace) -> None:
             c1, _ = scipy.optimize.curve_fit(log_fit, xs, ys)
             y_fit = log_fit(x_fit, *c1)
             residuals = ys - log_fit(xs, *c1)
-            print(f"{c1[0]:.2f} * ln(x) + {c1[1]:.2f}")
+            print(f"{c1[0]:.2f} * log_2(x) + {c1[1]:.2f}")
 
         ax.plot(x_fit, y_fit, color="red", linewidth=1)
 
