@@ -1,16 +1,17 @@
 import argparse
 import re
 import json
+from typing import Any
 
 import docker
 
 
-def convert_to_ns(value, unit):
+def convert_to_ns(value: str, unit: str) -> float:
     conversion_factors = {"s": 1e9, "ms": 1e6, "us": 1e3, "ns": 1}
     return float(value) * conversion_factors[unit]
 
 
-def parse_benchmark_results(text):
+def parse_benchmark_results(text: str) -> list[Any]:
     pattern = re.compile(r"(\w+): Mean \+- std dev: ([\d.]+) (\w+) \+- ([\d.]+) (\w+)")
     results = []
 
