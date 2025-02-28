@@ -1,10 +1,8 @@
 import argparse
-import docker
-
-
 import re
-import sys
 import json
+
+import docker
 
 
 def convert_to_ns(value, unit):
