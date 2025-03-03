@@ -7,7 +7,7 @@ import docker
 
 
 def convert_to_ns(value: str, unit: str) -> float:
-    conversion_factors = {"s": 1e9, "ms": 1e6, "us": 1e3, "ns": 1}
+    conversion_factors = {"sec": 1e9, "ms": 1e6, "us": 1e3, "ns": 1}
     return float(value) * conversion_factors[unit]
 
 
@@ -36,14 +36,20 @@ def main(args: argparse.Namespace) -> None:
         command = "pip install pyperformance && pyperformance run -r"
         if args.benchmarks:
             command += f" -b '{args.benchmarks}'"
-        stdout = client.containers.run(
+        container = client.containers.run(
             f"python:{version}",
             entrypoint=["/usr/bin/bash", "-c", command],
-            remove=True,
+            detach=True,
             tty=True,
+            remove=True,
         )
+
+        for line in container.logs(stream=True):
+            print(line.decode("UTF-8", errors="ignore"), end="")
+
+        stdout = container.logs().decode("UTF-8", errors="ignore")
         with open(f"pyperformance-{version}.json", "w") as f:
-            json.dump(parse_benchmark_results(stdout.decode("UTF-8")), f)
+            json.dump(parse_benchmark_results(stdout), f)
 
 
 if __name__ == "__main__":
