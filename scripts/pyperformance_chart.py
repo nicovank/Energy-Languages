@@ -26,7 +26,11 @@ def main(args: argparse.Namespace):
     data = parse_data(args.data_root)
     versions = sorted(data.keys(), key=lambda v: Version(v))
     min_version = versions[0]
-    benchmarks = [e["name"] for e in data[min_version]]
+    benchmarks = list(
+        set.intersection(
+            *[set(entry["name"] for entry in entries) for entries in data.values()]
+        )
+    )
     means = {
         version: {e["name"]: e["mean_ns"] for e in data[version]}
         for version in versions
@@ -55,7 +59,7 @@ def main(args: argparse.Namespace):
         else:
             fig.set_size_inches(8, 5)
         ax.set_facecolor("white")
-        
+
         for benchmark in benchmarks:
             print(benchmark, [means[version][benchmark] for version in versions])
             ax.errorbar(
@@ -63,17 +67,16 @@ def main(args: argparse.Namespace):
                 [means[version][benchmark] for version in versions],
                 yerr=[sigmas[version][benchmark] for version in versions],
                 label=benchmark,
-                marker='o',
-                capsize=5
+                marker="o",
+                capsize=5,
             )
 
-        ax.set_xlabel('Python version')
+        ax.set_xlabel("Python version")
         ax.set_ylabel("Normalized runtime")
         ax.set_ylim(bottom=0)
         plt.tight_layout()
-        plt.savefig(f'benchmark_comparison.{args.format}', format=args.format)
+        plt.savefig(f"benchmark_comparison.{args.format}", format=args.format)
         plt.show()
-
 
 
 if __name__ == "__main__":
