@@ -40,6 +40,14 @@ def main(args: argparse.Namespace):
         for version in versions
     }
 
+    # Print mean speedup accross all benchmarks.
+    for version in versions:
+        speedups = [
+            means[min_version][benchmark] / means[version][benchmark]
+            for benchmark in benchmarks
+        ]
+        print(f"Speedup for {version}: {statistics.mean(speedups)}")
+
     # Pick the n benchmarks with the highest mean runtime for the lowest Python version.
     benchmarks.sort(key=lambda b: means[min_version][b], reverse=True)
     benchmarks = benchmarks[: args.n]
@@ -54,28 +62,38 @@ def main(args: argparse.Namespace):
     plt.rcParams["font.family"] = args.font
     with plt.style.context("bmh"):
         fig, ax = plt.subplots()
-        if args.half_size:
-            fig.set_size_inches(4, 3)
-        else:
-            fig.set_size_inches(8, 5)
+        fig.set_size_inches(6, 2.5)
         ax.set_facecolor("white")
 
-        for benchmark in benchmarks:
+        width = 0
+
+        versions_int = [i for i in range(len(versions))]
+
+        ax.axhline(y=1, color="#bcbcbc", linestyle="-", zorder=999, linewidth=2)
+
+        for i, benchmark in enumerate(benchmarks):
             print(benchmark, [means[version][benchmark] for version in versions])
             ax.errorbar(
-                versions,
+                [
+                    v + (2 * ((i / (len(benchmarks) - 1)) - 0.5)) * width
+                    for v in versions_int
+                ],
                 [means[version][benchmark] for version in versions],
-                yerr=[sigmas[version][benchmark] for version in versions],
+                # yerr=[sigmas[version][benchmark] for version in versions],
                 label=benchmark,
                 marker="o",
-                capsize=5,
+                markersize=0,
+                linewidth=1,
             )
+
+        ax.set_xticks(versions_int)
+        ax.set_xticklabels(versions)
 
         ax.set_xlabel("Python version")
         ax.set_ylabel("Normalized runtime")
         ax.set_ylim(bottom=0)
         plt.tight_layout()
-        plt.savefig(f"benchmark_comparison.{args.format}", format=args.format)
+        plt.savefig(f"pyperformance.{args.format}", format=args.format)
         plt.show()
 
 
@@ -84,6 +102,5 @@ if __name__ == "__main__":
     parser.add_argument("--data-root", type=str, required=True)
     parser.add_argument("-n", type=int, default=10)
     parser.add_argument("--font", type=str, default="Linux Libertine O")
-    parser.add_argument("--half-size", default=False, action="store_true")
     parser.add_argument("--format", type=str, default="png")
     main(parser.parse_args())
