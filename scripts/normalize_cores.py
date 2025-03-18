@@ -1,4 +1,5 @@
 import argparse
+import collections
 import statistics
 
 import matplotlib.pyplot as plt
@@ -14,34 +15,37 @@ def main(args: argparse.Namespace) -> None:
     xs = []
     ys = []
 
+    highlighted = collections.defaultdict(lambda: {"xs": [], "ys": []})
+
     for language in args.languages:
+        where_xs = highlighted[language]["xs"] if language in args.highlight else xs
+        where_ys = highlighted[language]["ys"] if language in args.highlight else ys
+
         for benchmark in data[language].keys():
-            xs.append(
-                statistics.median(
-                    [
-                        (r["counters"]["PERF_COUNT_SW_TASK_CLOCK"] / 1e9)
-                        / (r["runtime_ms"] / 1e3)
-                        for r in data[language][benchmark]
-                    ]
-                )
+            where_xs.extend(
+                [
+                    (r["counters"]["PERF_COUNT_SW_TASK_CLOCK"] / 1e9)
+                    / (r["runtime_ms"] / 1e3)
+                    for r in data[language][benchmark]
+                ]
             )
 
-            ys.append(
-                statistics.median(
-                    [
-                        sum(
-                            [
-                                sum(e["pkg"] for e in s["energy"])
-                                for s in r["energy_samples"]
-                            ]
-                        )
-                        / (1e-3 * r["runtime_ms"])
-                        for r in data[language][benchmark]
-                    ]
-                )
+            where_ys.extend(
+                [
+                    sum(
+                        [
+                            sum(e["pkg"] for e in s["energy"])
+                            for s in r["energy_samples"]
+                        ]
+                    )
+                    / (1e-3 * r["runtime_ms"])
+                    for r in data[language][benchmark]
+                ]
             )
 
-            print(f"{language} {benchmark}, {xs[-1]:.1f}, {int(ys[-1])}")
+            print(f"{language} {benchmark}, {where_xs[-1]:.1f}, {int(where_ys[-1])}")
+
+    highlight_colors = ["orange", "green"]
 
     plt.rcParams["font.family"] = args.font
     with plt.style.context("bmh"):
@@ -52,7 +56,22 @@ def main(args: argparse.Namespace) -> None:
             fig.set_size_inches(8, 5)
         ax.set_facecolor("white")
 
-        ax.scatter(xs, ys, s=(5 if args.half_size else 10))
+        if not args.highlight:
+            ax.scatter(xs, ys, s=(5 if args.half_size else 10))
+        else:
+            ax.scatter(
+                xs, ys, s=(0.5 if args.half_size else 1), color="gray", label="CLBG"
+            )
+            for language in args.highlight:
+                highlighted_xs = highlighted[language]["xs"]
+                highlighted_ys = highlighted[language]["ys"]
+                ax.scatter(
+                    highlighted_xs,
+                    highlighted_ys,
+                    s=(5 if args.half_size else 10),
+                    label=language,
+                    color=highlight_colors.pop(0),
+                )
 
         def linear_fit(x, a, b):
             return a * np.array(x) + b
@@ -91,6 +110,7 @@ def main(args: argparse.Namespace) -> None:
             fontsize=("medium" if args.half_size else "large"),
         )
         ax.set_ylim(bottom=0)
+        ax.legend(loc="lower right")
         fig.tight_layout()
         plt.savefig(f"normalize_cores.{args.format}", format=args.format)
 
@@ -103,6 +123,13 @@ if __name__ == "__main__":
         type=str,
         nargs="+",
         required=True,
+    )
+    parser.add_argument(
+        "--highlight",
+        type=str,
+        nargs="+",
+        default=None,
+        help="if present, highlight these data points",
     )
     parser.add_argument("--fit", type=str, choices=["linear", "log"], default="log")
     parser.add_argument("--half-size", default=False, action="store_true")
