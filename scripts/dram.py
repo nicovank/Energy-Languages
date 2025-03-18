@@ -23,50 +23,13 @@ def human_readable(x):
 def main(args: argparse.Namespace) -> None:
     data, _ = utils.parse(args.data_root, args.languages)
 
-    xs = []
-    ys = []
+    all_xs = []
+    all_ys = []
 
     min_ratio = math.inf
     max_ratio = 0.0
+            
 
-    for language in args.languages:
-        for benchmark in data[language].keys():
-            for r in data[language][benchmark]:
-                ratio = sum(
-                    [sum(e["dram"] for e in s["energy"]) for s in r["energy_samples"]]
-                ) / sum(
-                    [sum(e["pkg"] for e in s["energy"]) for s in r["energy_samples"]]
-                )
-                min_ratio = min(min_ratio, ratio)
-                max_ratio = max(max_ratio, ratio)
-            x = statistics.median(
-                [
-                    r["counters"]["PERF_COUNT_HW_CACHE_MISSES"]
-                    / (1e-3 * r["runtime_ms"])
-                    for r in data[language][benchmark]
-                ]
-            )
-            if x > args.xmax:
-                continue
-            xs.append(x)
-            ys.append(
-                statistics.median(
-                    [
-                        sum(
-                            [
-                                sum(e["dram"] for e in s["energy"])
-                                for s in r["energy_samples"]
-                            ]
-                        )
-                        / (1e-3 * r["runtime_ms"])
-                        for r in data[language][benchmark]
-                    ]
-                )
-            )
-
-    print(
-        f"% of DRAM energy over CPU energy: {min_ratio * 100:.2f}% - {max_ratio * 100:.2f}%"
-    )
 
     plt.rcParams["font.family"] = args.font
     with plt.style.context("bmh"):
@@ -77,13 +40,66 @@ def main(args: argparse.Namespace) -> None:
             fig.set_size_inches(8, 5)
         ax.set_facecolor("white")
 
-        ax.scatter(xs, ys, s=(5 if args.half_size else 10))
+        all_xs = []
+        all_ys = []
 
-        slope, intercept, rvalue, _, _ = scipy.stats.linregress(xs, ys)
+        for suite in utils.suites():
+            suite_xs = []
+            suite_ys = []
+            for language in args.languages:
+                for benchmark in data[language].keys():
+                    if benchmark not in utils.benchmarks_by_suite(suite):
+                        continue
+                    
+                    for r in data[language][benchmark]:
+                        ratio = sum(
+                            [sum(e["dram"] for e in s["energy"]) for s in r["energy_samples"]]
+                        ) / sum(
+                            [sum(e["pkg"] for e in s["energy"]) for s in r["energy_samples"]]
+                        )
+                        min_ratio = min(min_ratio, ratio)
+                        max_ratio = max(max_ratio, ratio)
+
+                        x = r["counters"]["PERF_COUNT_HW_CACHE_MISSES"] / (
+                            1e-3 * r["runtime_ms"]
+                        )
+                        if x > args.xmax:
+                            continue
+                        suite_xs.append(x)
+                        suite_ys.append(
+                            sum(
+                                [
+                                    sum(e["dram"] for e in s["energy"])
+                                    for s in r["energy_samples"]
+                                ]
+                            )
+                            / (1e-3 * r["runtime_ms"])
+                        )
+                    
+
+
+            if not suite_xs or not suite_ys:
+                continue
+
+            ax.scatter(
+                suite_xs,
+                suite_ys,
+                s=(0.5 if args.half_size else 1),
+                label=utils.pretty_suite_name(suite),
+            )
+
+            all_xs.extend(suite_xs)
+            all_ys.extend(suite_ys)
+
+        print(
+            f"% of DRAM energy over CPU energy: {min_ratio * 100:.2f}% - {max_ratio * 100:.2f}%"
+        )
+
+        slope, intercept, rvalue, _, _ = scipy.stats.linregress(all_xs, all_ys)
         print(f"slope: {slope:.2e}, intercept: {intercept:.2f}")
         ax.plot(
-            [min(xs), max(xs)],
-            [intercept + slope * min(xs), intercept + slope * max(xs)],
+            [min(all_xs), max(all_xs)],
+            [intercept + slope * min(all_xs), intercept + slope * max(all_xs)],
             color="red",
             linewidth=1,
         )
@@ -103,6 +119,7 @@ def main(args: argparse.Namespace) -> None:
         ax.set_ylim(bottom=0)
         if args.ymax:
             ax.set_ylim(top=args.ymax)
+        ax.legend(loc="lower right")
         fig.tight_layout()
         plt.savefig(f"dram.{args.format}", format=args.format)
 

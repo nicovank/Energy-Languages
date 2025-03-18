@@ -1,4 +1,5 @@
 import collections
+from enum import Enum
 import json
 import os
 from typing import Any, Dict, List, Tuple
@@ -35,3 +36,85 @@ def timeval_to_seconds(tv: Dict[str, float]) -> float:
 
 def cpu_usage(user_cpu_time: float, kernel_cpu_time: float, runtime: float) -> float:
     return (user_cpu_time + kernel_cpu_time) / runtime
+
+
+class BenchmarkSuite(Enum):
+    CLBG = 1
+    SPECINT = 2
+    DACAPO = 3
+
+
+def suites() -> list[BenchmarkSuite]:
+    return [BenchmarkSuite.CLBG, BenchmarkSuite.SPECINT, BenchmarkSuite.DACAPO]
+
+
+def benchmarks_by_suite(suite: BenchmarkSuite) -> list[str]:
+    return {
+        BenchmarkSuite.CLBG: [
+            "binary-trees",
+            "binary-trees",
+            "fannkuch-redux",
+            "fasta",
+            "k-nucleotide",
+            "mandelbrot",
+            "n-body",
+            "pidigits",
+            "regex-redux",
+            "reverse-complement",
+            "spectral-norm",
+        ],
+        BenchmarkSuite.SPECINT: [
+            "600.perlbench_s",
+            "602.gcc_s",
+            "605.mcf_s",
+            "620.omnetpp_s",
+            "623.xalancbmk_s",
+            "625.x264_s",
+            "631.deepsjeng_s",
+            "641.leela_s",
+            "648.exchange2_s",
+            "657.xz_s",
+            "998.specrand_is",
+        ],
+        BenchmarkSuite.DACAPO: [
+            "avrora",
+            "batik",
+            "biojava",
+            "cassandra",
+            "eclipse",
+            "fop",
+            "graphchi",
+            "h2",
+            "jme",
+            "jython",
+            "kafka",
+            "luindex",
+            "lusearch",
+            "pmd",
+            "spring",
+            "sunflow",
+            "tomcat",
+            "tradebeans",
+            "tradesoap",
+            "xalan",
+            "zxing",
+        ],
+    }[suite]
+
+
+def suite_by_benchmark(benchmark: str) -> BenchmarkSuite:
+    if benchmark in benchmarks_by_suite(BenchmarkSuite.CLBG):
+        return BenchmarkSuite.CLBG
+    if benchmark in benchmarks_by_suite(BenchmarkSuite.SPECINT):
+        return BenchmarkSuite.SPECINT
+    if benchmark in benchmarks_by_suite(BenchmarkSuite.DACAPO):
+        return BenchmarkSuite.DACAPO
+    raise ValueError(f"Unknown benchmark {benchmark}")
+
+
+def pretty_suite_name(suite: BenchmarkSuite) -> str:
+    return {
+        BenchmarkSuite.CLBG: "CLBG",
+        BenchmarkSuite.SPECINT: "SPECint",
+        BenchmarkSuite.DACAPO: "DaCapo",
+    }[suite]

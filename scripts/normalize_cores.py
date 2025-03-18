@@ -1,6 +1,5 @@
 import argparse
 import collections
-import statistics
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -12,41 +11,6 @@ from . import utils
 def main(args: argparse.Namespace) -> None:
     data, _ = utils.parse(args.data_root, args.languages)
 
-    xs = []
-    ys = []
-
-    highlighted = collections.defaultdict(lambda: {"xs": [], "ys": []})
-
-    for language in args.languages:
-        where_xs = highlighted[language]["xs"] if language in args.highlight else xs
-        where_ys = highlighted[language]["ys"] if language in args.highlight else ys
-
-        for benchmark in data[language].keys():
-            where_xs.extend(
-                [
-                    (r["counters"]["PERF_COUNT_SW_TASK_CLOCK"] / 1e9)
-                    / (r["runtime_ms"] / 1e3)
-                    for r in data[language][benchmark]
-                ]
-            )
-
-            where_ys.extend(
-                [
-                    sum(
-                        [
-                            sum(e["pkg"] for e in s["energy"])
-                            for s in r["energy_samples"]
-                        ]
-                    )
-                    / (1e-3 * r["runtime_ms"])
-                    for r in data[language][benchmark]
-                ]
-            )
-
-            print(f"{language} {benchmark}, {where_xs[-1]:.1f}, {int(where_ys[-1])}")
-
-    highlight_colors = ["orange", "green"]
-
     plt.rcParams["font.family"] = args.font
     with plt.style.context("bmh"):
         fig, ax = plt.subplots()
@@ -56,22 +20,50 @@ def main(args: argparse.Namespace) -> None:
             fig.set_size_inches(8, 5)
         ax.set_facecolor("white")
 
-        if not args.highlight:
-            ax.scatter(xs, ys, s=(5 if args.half_size else 10))
-        else:
+        all_xs = []
+        all_ys = []
+
+        for suite in utils.suites():
+            suite_xs = []
+            suite_ys = []
+            for language in args.languages:
+                for benchmark in data[language].keys():
+                    if benchmark not in utils.benchmarks_by_suite(suite):
+                        continue
+
+                    suite_xs.extend(
+                        [
+                            (r["counters"]["PERF_COUNT_SW_TASK_CLOCK"] / 1e9)
+                            / (r["runtime_ms"] / 1e3)
+                            for r in data[language][benchmark]
+                        ]
+                    )
+
+                    suite_ys.extend(
+                        [
+                            sum(
+                                [
+                                    sum(e["pkg"] for e in s["energy"])
+                                    for s in r["energy_samples"]
+                                ]
+                            )
+                            / (1e-3 * r["runtime_ms"])
+                            for r in data[language][benchmark]
+                        ]
+                    )
+
+            if not suite_xs or not suite_ys:
+                continue
+
             ax.scatter(
-                xs, ys, s=(0.5 if args.half_size else 1), color="gray", label="CLBG"
+                suite_xs,
+                suite_ys,
+                s=(0.5 if args.half_size else 1),
+                label=utils.pretty_suite_name(suite),
             )
-            for language in args.highlight:
-                highlighted_xs = highlighted[language]["xs"]
-                highlighted_ys = highlighted[language]["ys"]
-                ax.scatter(
-                    highlighted_xs,
-                    highlighted_ys,
-                    s=(5 if args.half_size else 10),
-                    label=language,
-                    color=highlight_colors.pop(0),
-                )
+
+            all_xs.extend(suite_xs)
+            all_ys.extend(suite_ys)
 
         def linear_fit(x, a, b):
             return a * np.array(x) + b
@@ -79,23 +71,23 @@ def main(args: argparse.Namespace) -> None:
         def log_fit(x, a, b):
             return a * np.log2(x) + b
 
-        x_fit = np.linspace(min(xs), max(xs), 100)
+        x_fit = np.linspace(min(all_xs), max(all_xs), 100)
 
         if args.fit == "linear":
-            c1, _ = scipy.optimize.curve_fit(linear_fit, xs, ys)
+            c1, _ = scipy.optimize.curve_fit(linear_fit, all_xs, all_ys)
             y_fit = linear_fit(x_fit, *c1)
-            residuals = ys - linear_fit(xs, *c1)
+            residuals = all_ys - linear_fit(all_xs, *c1)
             print(f"{c1[0]:.2f} * x + {c1[1]:.2f}")
         elif args.fit == "log":
-            c1, _ = scipy.optimize.curve_fit(log_fit, xs, ys)
+            c1, _ = scipy.optimize.curve_fit(log_fit, all_xs, all_ys)
             y_fit = log_fit(x_fit, *c1)
-            residuals = ys - log_fit(xs, *c1)
+            residuals = all_ys - log_fit(all_xs, *c1)
             print(f"{c1[0]:.2f} * log_2(x) + {c1[1]:.2f}")
 
         ax.plot(x_fit, y_fit, color="red", linewidth=1)
 
         ss_res = np.sum(residuals**2)
-        ss_tot = np.sum((ys - np.mean(ys)) ** 2)
+        ss_tot = np.sum((all_ys - np.mean(all_ys)) ** 2)
         r2 = 1 - (ss_res / ss_tot)
         print(f"r2: {r2}")
 
@@ -123,13 +115,6 @@ if __name__ == "__main__":
         type=str,
         nargs="+",
         required=True,
-    )
-    parser.add_argument(
-        "--highlight",
-        type=str,
-        nargs="+",
-        default=None,
-        help="if present, highlight these data points",
     )
     parser.add_argument("--fit", type=str, choices=["linear", "log"], default="log")
     parser.add_argument("--half-size", default=False, action="store_true")
