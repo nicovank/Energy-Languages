@@ -1,0 +1,49 @@
+diff --git a/benchmarks/build.xml b/benchmarks/build.xml
+index 34499a59..2f8caa94 100644
+--- a/benchmarks/build.xml
++++ b/benchmarks/build.xml
+@@ -361,7 +361,7 @@
+     <!-- ================================= 
+          target: compile  all sources
+          ================================= -->
+-    <target name="compile" depends="avrora,batik,biojava,cassandra,eclipse,fop,graphchi,h2,h2o,jme,jython,kafka,luindex,lusearch,pmd,spring,sunflow,tomcat,tradebeans,tradesoap,xalan,zxing">
++    <target name="compile" depends="avrora,batik,biojava,cassandra,eclipse,fop,graphchi,h2,jme,jython,kafka,luindex,lusearch,pmd,spring,sunflow,tomcat,tradebeans,tradesoap,xalan,zxing">
+         <antcall target="build.status.fail" />
+         <antcall target="build.status.pass" />
+     </target>
+@@ -572,10 +572,6 @@ See ${log.build.report} for a summary of benchmark build status.
+         <build.bm benchmark="h2"/>
+         <generate-launcher-jars benchmark="h2"/>
+     </target>
+-    <target name="h2o" depends="init,harness">
+-        <build.bm benchmark="h2o"/>
+-        <generate-launcher-jars benchmark="h2o"/>
+-    </target>
+     <target name="jme" depends="init,harness">
+         <build.bm benchmark="jme"/>
+         <generate-launcher-jars benchmark="jme"/>
+diff --git a/benchmarks/harness/src/org/dacapo/harness/TestHarness.java b/benchmarks/harness/src/org/dacapo/harness/TestHarness.java
+index c3643b23..4b198bdb 100644
+--- a/benchmarks/harness/src/org/dacapo/harness/TestHarness.java
++++ b/benchmarks/harness/src/org/dacapo/harness/TestHarness.java
+@@ -83,20 +83,6 @@ public class TestHarness {
+     System.setProperty("java.awt.headless", "true");
+ 
+     setBuildInfo();  // set BuildVersion and BuildNickName.
+-    if (BuildVersion.contains("git")) {
+-      System.err.println(
+-        "--------------------------------------------------------------------------------\n" +
+-        "IMPORTANT NOTICE:  This is NOT a release build of the DaCapo suite.\n" +
+-        "Since it is not an official release of the DaCapo suite, care must be taken when\n" +
+-        "using the suite, and any use of the build must be sure to note that it is not an\n" +
+-        "offical release, and should note the relevant git hash.\n" +
+-        "\n" +
+-        "Feedback is greatly appreciated.   The preferred mode of feedback is via github.\n"+
+-	    "Please use our github page to create an issue or a pull request.\n"+
+-	    "    https://github.com/dacapobench/dacapobench.\n"+
+-        "--------------------------------------------------------------------------------\n"
+-      );
+-    }
+     try {
+       commandLineArgs = new CommandLineArgs(args);
+ 
