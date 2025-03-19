@@ -52,7 +52,7 @@ FROM ubuntu:latest AS runner
 
 # General.
 RUN apt update
-RUN apt install -y wget
+RUN apt install -y python3 wget
 
 # Java.
 ARG JAVA_VERSION=21.0.4+7
@@ -65,7 +65,8 @@ RUN wget --no-verbose https://github.com/adoptium/temurin21-binaries/releases/do
 # Copy things.
 COPY --from=builder /root/dacapobench/benchmarks /root/benchmarks
 COPY scripts/RAPL/build/rapl /root/rapl
+COPY scripts/run_dacapo.py /root/run_dacapo.py
 WORKDIR /root/benchmarks
 
 VOLUME [ "/root/data" ]
-ENTRYPOINT [ "/bin/bash" ]
+ENTRYPOINT [ "python3", "/root/run_dacapo.py", "--copies", "11", "--iterations", "1"]
