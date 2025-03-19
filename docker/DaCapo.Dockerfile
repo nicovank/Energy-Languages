@@ -32,4 +32,4 @@ COPY scripts/run_dacapo.py /root/run_dacapo.py
 WORKDIR /root
 VOLUME [ "/root/data" ]
 
-ENTRYPOINT [ "python3", "/root/run_dacapo.py", "--copies", "11", "--iterations", "1"]
+ENTRYPOINT [ "python3", "/root/run_dacapo.py", "--copies", "21", "--iterations", "1"]
