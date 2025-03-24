@@ -40,12 +40,16 @@ def cpu_usage(user_cpu_time: float, kernel_cpu_time: float, runtime: float) -> f
 
 class BenchmarkSuite(Enum):
     CLBG = 1
-    SPECINT = 2
-    DACAPO = 3
+    SPEC = 2
+    DACAPO = 4
 
 
 def suites() -> list[BenchmarkSuite]:
-    return [BenchmarkSuite.CLBG, BenchmarkSuite.SPECINT, BenchmarkSuite.DACAPO]
+    return [
+        BenchmarkSuite.CLBG,
+        BenchmarkSuite.SPEC,
+        BenchmarkSuite.DACAPO,
+    ]
 
 
 def benchmarks_by_suite(suite: BenchmarkSuite) -> list[str]:
@@ -63,7 +67,8 @@ def benchmarks_by_suite(suite: BenchmarkSuite) -> list[str]:
             "reverse-complement",
             "spectral-norm",
         ],
-        BenchmarkSuite.SPECINT: [
+        BenchmarkSuite.SPEC: [
+            # SPECint
             "600.perlbench_s",
             "602.gcc_s",
             "605.mcf_s",
@@ -74,7 +79,17 @@ def benchmarks_by_suite(suite: BenchmarkSuite) -> list[str]:
             "641.leela_s",
             "648.exchange2_s",
             "657.xz_s",
-            "998.specrand_is",
+            # SPECfp
+            "603.bwaves_s",
+            "607.cactuBSSN_s",
+            "619.lbm_s",
+            "621.wrf_s",
+            "627.cam4_s",
+            "628.pop2_s",
+            "638.imagick_s",
+            "644.nab_s",
+            "649.fotonik3d_s",
+            "654.roms_s",
         ],
         BenchmarkSuite.DACAPO: [
             "avrora",
@@ -105,8 +120,8 @@ def benchmarks_by_suite(suite: BenchmarkSuite) -> list[str]:
 def suite_by_benchmark(benchmark: str) -> BenchmarkSuite:
     if benchmark in benchmarks_by_suite(BenchmarkSuite.CLBG):
         return BenchmarkSuite.CLBG
-    if benchmark in benchmarks_by_suite(BenchmarkSuite.SPECINT):
-        return BenchmarkSuite.SPECINT
+    if benchmark in benchmarks_by_suite(BenchmarkSuite.SPEC):
+        return BenchmarkSuite.SPEC
     if benchmark in benchmarks_by_suite(BenchmarkSuite.DACAPO):
         return BenchmarkSuite.DACAPO
     raise ValueError(f"Unknown benchmark {benchmark}")
@@ -115,6 +130,6 @@ def suite_by_benchmark(benchmark: str) -> BenchmarkSuite:
 def pretty_suite_name(suite: BenchmarkSuite) -> str:
     return {
         BenchmarkSuite.CLBG: "CLBG",
-        BenchmarkSuite.SPECINT: "SPECint",
+        BenchmarkSuite.SPEC: "SPEC",
         BenchmarkSuite.DACAPO: "DaCapo",
     }[suite]

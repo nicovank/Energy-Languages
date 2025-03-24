@@ -81,18 +81,14 @@ def main(args: argparse.Namespace) -> None:
         for language in args.languages:
             x = language_to_index[language]
             y = [
-                statistics.median(
+                sum(
                     [
-                        sum(
-                            [
-                                sum(e["pkg"] + e["dram"] for e in s["energy"])
-                                for s in r["energy_samples"]
-                            ]
-                        )
-                        / (r["runtime_ms"] / 1e3)
-                        for r in data[language][benchmark]
+                        sum(e["pkg"] + e["dram"] for e in s["energy"])
+                        for s in r["energy_samples"]
                     ]
                 )
+                / (r["runtime_ms"] / 1e3)
+                for r in data[language][benchmark]
                 for benchmark in benchmarks
                 if benchmark in data[language]
             ]

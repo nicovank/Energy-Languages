@@ -17,7 +17,7 @@ def human_readable(x):
         return f"{int(x / 1e3)}k"
     if x < 1e9:
         return f"{int(x / 1e6)}M"
-    return f"{int(x / 1e9)}G"
+    return f"{x / 1e9:.1f}".rstrip(".0") + "G"
 
 
 def main(args: argparse.Namespace) -> None:
@@ -28,8 +28,6 @@ def main(args: argparse.Namespace) -> None:
 
     min_ratio = math.inf
     max_ratio = 0.0
-            
-
 
     plt.rcParams["font.family"] = args.font
     with plt.style.context("bmh"):
@@ -50,12 +48,18 @@ def main(args: argparse.Namespace) -> None:
                 for benchmark in data[language].keys():
                     if benchmark not in utils.benchmarks_by_suite(suite):
                         continue
-                    
+
                     for r in data[language][benchmark]:
                         ratio = sum(
-                            [sum(e["dram"] for e in s["energy"]) for s in r["energy_samples"]]
+                            [
+                                sum(e["dram"] for e in s["energy"])
+                                for s in r["energy_samples"]
+                            ]
                         ) / sum(
-                            [sum(e["pkg"] for e in s["energy"]) for s in r["energy_samples"]]
+                            [
+                                sum(e["pkg"] for e in s["energy"])
+                                for s in r["energy_samples"]
+                            ]
                         )
                         min_ratio = min(min_ratio, ratio)
                         max_ratio = max(max_ratio, ratio)
@@ -75,8 +79,6 @@ def main(args: argparse.Namespace) -> None:
                             )
                             / (1e-3 * r["runtime_ms"])
                         )
-                    
-
 
             if not suite_xs or not suite_ys:
                 continue
@@ -119,7 +121,9 @@ def main(args: argparse.Namespace) -> None:
         ax.set_ylim(bottom=0)
         if args.ymax:
             ax.set_ylim(top=args.ymax)
-        ax.legend(loc="lower right")
+        legend = ax.legend()
+        for handle in legend.legend_handles:
+            handle.set_sizes([10])
         fig.tight_layout()
         plt.savefig(f"dram.{args.format}", format=args.format)
 

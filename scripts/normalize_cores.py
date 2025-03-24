@@ -1,5 +1,4 @@
 import argparse
-import collections
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -102,7 +101,9 @@ def main(args: argparse.Namespace) -> None:
             fontsize=("medium" if args.half_size else "large"),
         )
         ax.set_ylim(bottom=0)
-        ax.legend(loc="lower right")
+        legend = ax.legend(loc="lower right")
+        for handle in legend.legend_handles:
+            handle.set_sizes([10])
         fig.tight_layout()
         plt.savefig(f"normalize_cores.{args.format}", format=args.format)
 
