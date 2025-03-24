@@ -1,9 +1,5 @@
 FROM ubuntu:latest
 
-
-
-FROM ubuntu:latest
-
 RUN apt update
 RUN DEBIAN_FRONTEND=noninteractive apt install -y tzdata
 RUN apt install -y python3 unzip wget
