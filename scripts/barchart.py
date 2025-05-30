@@ -65,6 +65,7 @@ def main(args: argparse.Namespace) -> None:
 
     print(runtime_bar, energy_bar)
 
+    plt.rcParams['pdf.fonttype'] = 42
     plt.rcParams["font.family"] = args.font
     with plt.style.context("bmh"):
         fig, ax = plt.subplots()
