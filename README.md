@@ -1,12 +1,5 @@
 # Energy Efficiency in Programming Languages
 
-[Nicolas van Kempen](https://nvankempen.com),
-Hyuk-Je Kwon,
-Dung Tuan Nguyen,
-[Emery Berger](https://emeryberger.com).
-
-[Read the paper!](https://arxiv.org/abs/2410.05460)
-
 ## Documentation
 
 ### Requirements
