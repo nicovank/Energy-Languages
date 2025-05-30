@@ -136,9 +136,9 @@ RUN wget --no-verbose https://www.lua.org/ftp/lua-${LUA_VERSION}.tar.gz \
 
 # LuaJIT.
 ARG LUAJIT_COMMIT=87ae18af97fd4de790bb6c476b212e047689cc93
-RUN git clone https://luajit.org/git/luajit.git \
-    && cd luajit && git checkout ${LUAJIT_COMMIT} && make -j && make install && cd .. \
-    && rm -rf luajit
+RUN git clone https://github.com/LuaJIT/LuaJIT.git \
+    && cd LuaJIT && git checkout ${LUAJIT_COMMIT} && make -j && make install && cd .. \
+    && rm -rf LuaJIT
 
 WORKDIR /root/Energy-Languages
 COPY fasta-5000000.txt fasta-5000000.txt
