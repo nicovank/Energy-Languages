@@ -23,13 +23,13 @@ def human_readable(x):
 def main(args: argparse.Namespace) -> None:
     data, _ = utils.parse(args.data_root, args.languages)
 
-    all_xs = []
-    all_ys = []
+    all_xs: list[float] = []
+    all_ys: list[float] = []
 
     min_ratio = math.inf
     max_ratio = 0.0
 
-    plt.rcParams['pdf.fonttype'] = 42
+    plt.rcParams["pdf.fonttype"] = 42
     plt.rcParams["font.family"] = args.font
     with plt.style.context("bmh"):
         fig, ax = plt.subplots()
