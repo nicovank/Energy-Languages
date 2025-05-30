@@ -22,7 +22,7 @@ def main(args: argparse.Namespace) -> None:
             for line in f:
                 data[n].append(json.loads(line))
 
-    plt.rcParams['pdf.fonttype'] = 42
+    plt.rcParams["pdf.fonttype"] = 42
     plt.rcParams["font.family"] = args.font
     with plt.style.context("bmh"):
         fig, ax = plt.subplots()
