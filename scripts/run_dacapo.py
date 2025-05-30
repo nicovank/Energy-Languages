@@ -27,23 +27,26 @@ def main(args: argparse.Namespace) -> None:
             print(
                 f"Running {benchmark} #{i} [{datetime.datetime.now().strftime('%H:%M:%S')}]..."
             )
-            subprocess.run(
-                [
-                    RAPL_PATH,
-                    "--json",
-                    os.path.join(DATA_PATH, f"{benchmark}.json"),
-                    "java",
-                    *PORTABILITY.get(benchmark, []),
-                    "-jar",
-                    DACAPO_JAR,
-                    "-n",
-                    str(args.iterations),
-                    benchmark,
-                ],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                check=True,
-            )
+            try:
+                subprocess.run(
+                    [
+                        RAPL_PATH,
+                        "--json",
+                        os.path.join(DATA_PATH, f"{benchmark}.json"),
+                        "java",
+                        *PORTABILITY.get(benchmark, []),
+                        "-jar",
+                        DACAPO_JAR,
+                        "-n",
+                        str(args.iterations),
+                        benchmark,
+                    ],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    check=True,
+                )
+            except subprocess.CalledProcessError:
+                print(f"[ERROR] Failed to run {benchmark} #{i}...")
 
 
 if __name__ == "__main__":
