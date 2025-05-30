@@ -3,24 +3,29 @@ FROM ubuntu:latest
 VOLUME [ "/root/data" ]
 
 # General.
-RUN apt update
-RUN DEBIAN_FRONTEND=noninteractive apt install -y tzdata
-RUN apt install -y git cmake ninja-build sudo curl wget pkg-config gnupg
+RUN apt update \
+    && DEBIAN_FRONTEND=noninteractive apt install -y tzdata \
+    && apt install -y git cmake ninja-build sudo curl wget pkg-config gnupg \
+    && apt clean && rm -rf /var/lib/apt/lists/*
 
 COPY docker/keys /root/Energy-Languages/docker/keys
 RUN gpg --import /root/Energy-Languages/docker/keys/*
 
 # C++.
 ARG CLANG_VERSION=19
-RUN apt install -y lsb-release wget software-properties-common gnupg
-RUN curl -sSf https://apt.llvm.org/llvm.sh | bash -s -- ${CLANG_VERSION} all
+RUN apt update \
+    && apt install -y lsb-release wget software-properties-common gnupg \
+    && curl -sSf https://apt.llvm.org/llvm.sh | bash -s -- ${CLANG_VERSION} all \
+    && apt clean && rm -rf /var/lib/apt/lists/*
 ENV CC=clang-${CLANG_VERSION}
 ENV CXX=clang++-${CLANG_VERSION}
 RUN ln -s /usr/bin/llvm-ar-${CLANG_VERSION} /usr/bin/llvm-ar
 RUN ln -s /usr/bin/llvm-profdata-${CLANG_VERSION} /usr/bin/llvm-profdata
 
 # C/C++ libraries.
-RUN apt install -y libapr1-dev libgmp-dev libpcre3-dev libboost-regex-dev
+RUN apt update \
+    && apt install -y libapr1-dev libgmp-dev libpcre3-dev libboost-regex-dev \
+    && apt clean && rm -rf /var/lib/apt/lists/*
 
 # Rust.
 # https://forge.rust-lang.org/infra/other-installation-methods.html#standalone-installers
@@ -35,7 +40,9 @@ RUN wget --no-verbose https://static.rust-lang.org/dist/rust-${RUST_VERSION}-x86
 # Java.
 ARG JAVA_VERSION=21.0.4+7
 ARG JAVA_CHECKSUM=51fb4d03a4429c39d397d3a03a779077159317616550e4e71624c9843083e7b9
-RUN apt install -y libfastutil-java
+RUN apt update \
+    && apt install -y libfastutil-java \
+    && apt clean && rm -rf /var/lib/apt/lists/*
 RUN wget --no-verbose https://github.com/adoptium/temurin21-binaries/releases/download/jdk-${JAVA_VERSION}/OpenJDK21U-jdk_x64_linux_hotspot_$(echo $JAVA_VERSION | sed s/+/_/).tar.gz \
     && echo "${JAVA_CHECKSUM} OpenJDK21U-jdk_x64_linux_hotspot_$(echo $JAVA_VERSION | sed s/+/_/).tar.gz" | sha256sum --check \
     && tar -C /usr/local --strip-components=1 -xzf OpenJDK21U-jdk_x64_linux_hotspot_$(echo $JAVA_VERSION | sed s/+/_/).tar.gz \
@@ -79,7 +86,9 @@ RUN npm install -g typescript@${TYPESCRIPT_VERSION}
 ARG PHP_VERSION=8.3.11
 ARG PHP_CHECKSUM=b93a69af83a1302543789408194bd1ae9829e116e784d578778200f20f1b72d4
 # https://github.com/php/php-src#building-php-source-code
-RUN apt install -y pkg-config build-essential autoconf bison re2c libxml2-dev libsqlite3-dev
+RUN apt update \
+    && apt install -y pkg-config build-essential autoconf bison re2c libxml2-dev libsqlite3-dev \
+    && apt clean && rm -rf /var/lib/apt/lists/*
 RUN wget --no-verbose https://www.php.net/distributions/php-${PHP_VERSION}.tar.gz \
     && echo "${PHP_CHECKSUM} php-${PHP_VERSION}.tar.gz" | sha256sum --check \
     && tar -xzf php-${PHP_VERSION}.tar.gz \
@@ -89,7 +98,9 @@ RUN wget --no-verbose https://www.php.net/distributions/php-${PHP_VERSION}.tar.g
 # Python.
 ARG PYTHON_VERSION=3.12.6
 # https://devguide.python.org/getting-started/setup-building/index.html#build-dependencies
-RUN apt install -y build-essential gdb lcov pkg-config libbz2-dev libffi-dev libgdbm-dev libgdbm-compat-dev liblzma-dev libncurses5-dev libreadline6-dev libsqlite3-dev libssl-dev lzma lzma-dev tk-dev uuid-dev zlib1g-dev
+RUN apt update \
+    && apt install -y build-essential gdb lcov pkg-config libbz2-dev libffi-dev libgdbm-dev libgdbm-compat-dev liblzma-dev libncurses5-dev libreadline6-dev libsqlite3-dev libssl-dev lzma lzma-dev tk-dev uuid-dev zlib1g-dev \
+    && apt clean && rm -rf /var/lib/apt/lists/*
 RUN wget --no-verbose https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz \
     && wget --no-verbose https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz.asc \
     && gpg --verify Python-${PYTHON_VERSION}.tar.xz.asc Python-${PYTHON_VERSION}.tar.xz \
