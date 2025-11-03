@@ -5,7 +5,7 @@ import statistics
 
 def get_mean_and_stddev(data) -> tuple[float, float]:
     mean = statistics.mean(data)
-    stddev = statistics.stdev(data)
+    stddev = statistics.stdev(data) if len(data) > 1 else 0
     return mean, stddev
 
 
